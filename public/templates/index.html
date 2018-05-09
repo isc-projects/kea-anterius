@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <title>Glass | ISC DHCP Server Interface</title>
+    <!-- Favicon-->
+    <link rel="icon" href="../../favicon.ico" type="image/x-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&subset=latin,cyrillic-ext" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css">
+
+    <!-- Bootstrap Core Css -->
+    <link href="assets/plugins/bootstrap/css/bootstrap.css" rel="stylesheet">
+
+    <!-- Waves Effect Css -->
+    <link href="assets/plugins/node-waves/waves.css" rel="stylesheet" />
+
+    <!-- Animation Css -->
+    <link href="assets/plugins/animate-css/animate.css" rel="stylesheet" />
+
+    <!-- Morris Css -->
+    <link href="assets/plugins/morris/morris.css" rel="stylesheet" />
+
+    <!-- Custom Css -->
+    <link href="assets/css/style.css" rel="stylesheet">
+
+    <link href="assets/css/glass.css" rel="stylesheet">
+
+    <link href="assets/plugins/jquery-datatable/skin/bootstrap/css/dataTables.bootstrap.css" rel="stylesheet">
+
+    <!-- AdminBSB Themes. You can choose a theme from css/themes instead of get all themes -->
+    <link href="assets/css/themes/all-themes.css" rel="stylesheet" />
+</head>
+
+<body class="theme-red">
+<!-- Page Loader -->
+<div class="page-loader-wrapper">
+    <div class="loader">
+        <div class="preloader">
+            <div class="spinner-layer pl-red">
+                <div class="circle-clipper left">
+                    <div class="circle"></div>
+                </div>
+                <div class="circle-clipper right">
+                    <div class="circle"></div>
+                </div>
+            </div>
+        </div>
+        <p>Please wait...</p>
+    </div>
+</div>
+<!-- #END# Page Loader -->
+<!-- Overlay For Sidebars -->
+<div class="overlay"></div>
+<!-- #END# Overlay For Sidebars -->
+
+<!-- #END# Search Bar -->
+<!-- Top Bar -->
+<nav class="navbar">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a href="javascript:void(0);" class="bars"></a>
+            <a class="navbar-brand" href="/">[application_name]</a>
+        </div>
+    </div>
+</nav>
+<!-- #Top Bar -->
+<section>
+    <!-- Left Sidebar -->
+    <aside id="leftsidebar" class="sidebar">
+        <div class="user-info" style="background: url('images/user-img-background.jpg') no-repeat no-repeat;height: 75px">
+            <div class="image">
+                <img src="images/glass_logo.png" width="48" height="48" alt="User">
+
+            </div>
+        </div>
+
+        <!-- Menu -->
+        <div class="menu">
+            <ul class="list">
+                <li class="header">Glass Navigation</li>
+                <li class="active">
+                    <a href="/" pjax="1">
+                        <i class="material-icons">home</i>
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/dhcp_statistics" pjax="1">
+                        <i class="material-icons">pie_chart</i>
+                        <span>Statistics</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/dhcp_leases" pjax="1">
+                        <i class="material-icons">layers</i>
+                        <span>Leases</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/dhcp_log" pjax="1">
+                        <i class="material-icons">view_stream</i>
+                        <span>Logs</span>
+                    </a>
+                </li>
+
+                <li class="header">Admin</li>
+                <li>
+                    <a href="/dhcp_config" pjax="1">
+                        <i class="material-icons">mode_edit</i>
+                        <span>DHCP Config</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/dhcp_config_snapshots" pjax="1">
+                        <i class="material-icons">cloud_download</i>
+                        <span>DHCP Config Snapshots</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/dhcp_start_stop_restart" pjax="1">
+                        <i class="material-icons">refresh</i>
+                        <span>Start / Stop / Restart</span>
+                    </a>
+                </li>
+
+                <li class="header">Settings</li>
+                <li>
+                    <a href="/glass_settings" pjax="1">
+                        <i class="material-icons">settings</i>
+                        <span>Glass Settings</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/glass_alerts" pjax="1">
+                        <i class="material-icons">add_alert</i>
+                        <span>Glass Alerts</span>
+                    </a>
+                </li>
+
+                <li class="header">Glass API</li>
+                <li>
+                    <a href="/api_examples" pjax="1">
+                        <i class="material-icons">widgets</i>
+                        <span>API Examples</span>
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+        <!-- #Menu -->
+        <!-- Footer -->
+        <div class="legal">
+            <div class="copyright">
+                &copy; 2017 <a href="javascript:void(0);">Glass | Chris Miles</a><br>
+                &copy; 2016 - 2017 <a href="javascript:void(0);">AdminBSB - Material Design</a>
+            </div>
+            <div class="version">
+                <b>Version: </b> 1.0.0
+            </div>
+        </div>
+        <!-- #Footer -->
+    </aside>
+    <!-- #END# Left Sidebar -->
+
+    <!-- For Material Design Colors -->
+    <div class="modal fade" id="mdModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="modal-title">Modal title</h4>
+                </div>
+                <div class="modal-body" id="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                    <div id="modal-buttons" style="display:inline-block"></div>
+                    <button type="button" class="btn btn-link waves-effect" data-dismiss="modal">CLOSE</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+<!-- Jquery Core Js -->
+<script src="assets/plugins/jquery/jquery.min.js"></script>
+
+<script src="assets/plugins/jquery-datatable/jquery.dataTables.js"></script>
+<script src="assets/plugins/jquery-datatable/skin/bootstrap/js/dataTables.bootstrap.js"></script>
+<script src="assets/plugins/jquery-datatable/extensions/export/dataTables.buttons.min.js"></script>
+
+<!-- Morris Chart -->
+<script src="assets/plugins/raphael/raphael.min.js"></script>
+<script src="assets/plugins/morris/morris.min.js"></script>
+
+<!-- Glass -->
+<script src="assets/js/api-examples.js"></script>
+<script src="assets/js/glass-core.js"></script>
+<script src="assets/js/glass-websockets.js"></script>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="block-header" style="display:none">
+            <h2 id="block-header">Dashboard</h2>
+        </div>
+        <div id="body-content">
+            [body_content]
+        </div>
+    </div>
+</section>
+
+<!-- Bootstrap Core Js -->
+<script src="assets/plugins/bootstrap/js/bootstrap.js"></script>
+
+<!-- Select Plugin Js -->
+<script src="assets/plugins/bootstrap-select/js/bootstrap-select.js"></script>
+
+<!-- Slimscroll Plugin Js -->
+<script src="assets/plugins/jquery-slimscroll/jquery.slimscroll.js"></script>
+
+<!-- Notify plugin -->
+<script src="assets/plugins/bootstrap-notify/bootstrap-notify.js"></script>
+
+<!-- Waves Effect Plugin Js -->
+<script src="assets/plugins/node-waves/waves.js"></script>
+
+<!-- Custom Js -->
+<script src="assets/js/admin.js"></script>
+
+<!-- File Saver: Used in DHCP Logs -->
+<script src="assets/js/file-saver.js"></script>
+
+<!-- PJAX Framework -->
+<script src="assets/js/pjax.js"></script>
+
+<script type="text/javascript">
+
+    function get_stats() {
+		$.get( "/get_stats", function( data ) {
+            $('#cpu-utilization').html(data.cpu_utilization + "%");
+            $('#leases-sec').html(data.leases_per_second.toLocaleString('en') + ' / ' + data.leases_per_minute.toLocaleString('en'));
+            $('#total-leases').html(data.leases_used.toLocaleString('en'));
+            $('#server-name').html(data.host_name);
+            $('#shared-networks > tbody').html(data.shared_network_table);
+
+            $('#display-subnets > tbody').html(data.display_subnets_table);
+
+            if(typeof shared_networks !== "undefined")
+			    shared_networks.destroy();
+
+			if(typeof display_subnets !== "undefined")
+                display_subnets.destroy();
+
+			shared_networks = $('#shared-networks').DataTable({
+				dom: 'tip',
+				responsive: true,
+				"pageLength": 100,
+				"aaSorting": []
+			});
+
+			display_subnets = $('#display-subnets').DataTable({
+				dom: 'tip',
+				responsive: true,
+				"pageLength": 100,
+				"aaSorting": []
+			});
+
+			$('#shared-networks').fadeOut(100).fadeIn(100);
+			$('#display-subnets').fadeOut(100).fadeIn(100);
+		});
+    }
+
+    change_favicon("images/glass_logo.png");
+
+	var get_stats_timer = setInterval(function () {
+		if (window_focus && $('#total-leases').length) {
+			get_stats();
+		}
+	}, 5000);
+
+    function parse_statistics_stream(data){
+        data = JSON.parse(data);
+        $('#cpu-utilization').html(data.cpu_utilization + "%");
+        $('#leases-sec').html(data.leases_per_second.toLocaleString('en') + ' / ' + data.leases_per_minute.toLocaleString('en'));
+    }
+
+	var window_focus = true;
+
+	$(window).focus(function() {
+		window_focus = true;
+		get_stats();
+	}).blur(function() {
+		window_focus = false;
+	});
+
+	if (typeof $.fn.slimScroll != 'undefined') {
+		var configs = $.AdminBSB.options.leftSideBar;
+		var height = ($(window).height() - ($('.legal').outerHeight() + $('.user-info').outerHeight() + $('.navbar').innerHeight()));
+		var $el = $('.list');
+
+		$el.slimscroll({
+			height: height + "px",
+			color: configs.scrollColor,
+			size: configs.scrollWidth,
+			alwaysVisible: configs.scrollAlwaysVisible,
+			borderRadius: configs.scrollBorderRadius,
+			railBorderRadius: configs.scrollRailBorderRadius
+		});
+
+		//Scroll active menu item when page load, if option set = true
+		if ($.AdminBSB.options.leftSideBar.scrollActiveItemWhenPageLoad) {
+			var activeItemOffsetTop = $('.menu .list li.active')[0].offsetTop
+			if (activeItemOffsetTop > 150) $el.slimscroll({ scrollTo: activeItemOffsetTop + 'px' });
+		}
+	}
+
+</script>
+
+</body>
+</html>
