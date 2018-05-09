@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <title>Glass | ISC DHCP Server Interface</title>
+    <title>Kea | Anterius</title>
     <!-- Favicon-->
-    <link rel="icon" href="../../favicon.ico" type="image/x-icon">
+    <link rel="icon" href="../images/favicon.ico" type="image/x-icon">
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&subset=latin,cyrillic-ext" rel="stylesheet" type="text/css">
@@ -32,10 +32,10 @@
     <link href="assets/plugins/jquery-datatable/skin/bootstrap/css/dataTables.bootstrap.css" rel="stylesheet">
 
     <!-- AdminBSB Themes. You can choose a theme from css/themes instead of get all themes -->
-    <link href="assets/css/themes/all-themes.css" rel="stylesheet" />
+    <link href="assets/css/themes/theme-green.css" rel="stylesheet" />
 </head>
 
-<body class="theme-red">
+<body class="theme-green">
 <!-- Page Loader -->
 <div class="page-loader-wrapper">
     <div class="loader">
@@ -49,7 +49,7 @@
                 </div>
             </div>
         </div>
-        <p>Please wait...</p>
+        <p>Loading console...</p>
     </div>
 </div>
 <!-- #END# Page Loader -->
@@ -71,9 +71,9 @@
 <section>
     <!-- Left Sidebar -->
     <aside id="leftsidebar" class="sidebar">
-        <div class="user-info" style="background: url('images/user-img-background.jpg') no-repeat no-repeat;height: 75px">
+        <div class="user-info" style="background: url('images/bg.jpg') no-repeat no-repeat; width: 100%; background-size: cover;">
             <div class="image">
-                <img src="images/glass_logo.png" width="48" height="48" alt="User">
+                <img src="images/kea_logo.png" alt="User">
 
             </div>
         </div>
@@ -81,7 +81,7 @@
         <!-- Menu -->
         <div class="menu">
             <ul class="list">
-                <li class="header">Glass Navigation</li>
+                <li class="header">Kea Monitoring Options</li>
                 <li class="active">
                     <a href="/" pjax="1">
                         <i class="material-icons">home</i>
@@ -108,7 +108,7 @@
                     </a>
                 </li>
 
-                <li class="header">Admin</li>
+                <li class="header">Kea Configuration Options</li>
                 <li>
                     <a href="/dhcp_config" pjax="1">
                         <i class="material-icons">mode_edit</i>
@@ -132,24 +132,24 @@
                 <li>
                     <a href="/glass_settings" pjax="1">
                         <i class="material-icons">settings</i>
-                        <span>Glass Settings</span>
+                        <span>Kea-Anterius Settings</span>
                     </a>
                 </li>
 
                 <li>
                     <a href="/glass_alerts" pjax="1">
                         <i class="material-icons">add_alert</i>
-                        <span>Glass Alerts</span>
+                        <span>Kea-Anterius Alerts Config</span>
                     </a>
                 </li>
 
-                <li class="header">Glass API</li>
+                <!-- <li class="header">Glass API</li>
                 <li>
                     <a href="/api_examples" pjax="1">
                         <i class="material-icons">widgets</i>
                         <span>API Examples</span>
                     </a>
-                </li>
+                </li> -->
 
             </ul>
         </div>

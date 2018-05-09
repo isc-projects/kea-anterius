@@ -1910,7 +1910,7 @@
     color: #fff !important; }
 
 .bg-green {
-  background-color: #4CAF50 !important;
+  background-color: rgb(1, 107, 5) !important;
   color: #fff; }
   .bg-green .content .text,
   .bg-green .content .number {
@@ -2021,7 +2021,7 @@
   color: #009688 !important; }
 
 .col-green {
-  color: #4CAF50 !important; }
+  color: rgb(1, 107, 5) !important; }
 
 .col-light-green {
   color: #8BC34A !important; }
@@ -2295,7 +2295,7 @@
   .demo-choose-skin .teal {
     background-color: #009688; }
   .demo-choose-skin .green {
-    background-color: #4CAF50; }
+    background-color: rgb(1, 107, 5); }
   .demo-choose-skin .light-green {
     background-color: #8BC34A; }
   .demo-choose-skin .lime {
@@ -3477,8 +3477,8 @@ section.content {
   border-bottom: 2px solid #009688; }
 
 [type="checkbox"]:checked.chk-col-green + label:before {
-  border-right: 2px solid #4CAF50;
-  border-bottom: 2px solid #4CAF50; }
+  border-right: 2px solid rgb(1, 107, 5);
+  border-bottom: 2px solid rgb(1, 107, 5); }
 
 [type="checkbox"]:checked.chk-col-light-green + label:before {
   border-right: 2px solid #8BC34A;
@@ -3573,8 +3573,8 @@ section.content {
   background-color: #009688; }
 
 [type="checkbox"].filled-in:checked.chk-col-green + label:after {
-  border: 2px solid #4CAF50;
-  background-color: #4CAF50; }
+  border: 2px solid rgb(1, 107, 5);
+  background-color: rgb(1, 107, 5); }
 
 [type="checkbox"].filled-in:checked.chk-col-light-green + label:after {
   border: 2px solid #8BC34A;
@@ -3671,8 +3671,8 @@ section.content {
   border-color: #009688; }
 
 [type="radio"].radio-col-green:checked + label:after {
-  background-color: #4CAF50;
-  border-color: #4CAF50; }
+  background-color: rgb(1, 107, 5);
+  border-color: rgb(1, 107, 5); }
 
 [type="radio"].radio-col-light-green:checked + label:after {
   background-color: #8BC34A;
@@ -3782,11 +3782,11 @@ section.content {
   border: 2px solid #009688; }
 
 [type="radio"].with-gap.radio-col-green:checked + label:before {
-  border: 2px solid #4CAF50; }
+  border: 2px solid rgb(1, 107, 5); }
 
 [type="radio"].with-gap.radio-col-green:checked + label:after {
-  background-color: #4CAF50;
-  border: 2px solid #4CAF50; }
+  background-color: rgb(1, 107, 5);
+  border: 2px solid rgb(1, 107, 5); }
 
 [type="radio"].with-gap.radio-col-light-green:checked + label:before {
   border: 2px solid #8BC34A; }
@@ -3930,7 +3930,7 @@ section.content {
   .switch label input[type=checkbox]:checked + .lever.switch-col-green {
     background-color: rgba(76, 175, 80, 0.5); }
     .switch label input[type=checkbox]:checked + .lever.switch-col-green:after {
-      background-color: #4CAF50; }
+      background-color: rgb(1, 107, 5); }
   .switch label input[type=checkbox]:checked:not(:disabled) ~ .lever.switch-col-light-green:active:after {
     box-shadow: 0 1px 3px 1px rgba(0, 0, 0, 0.4), 0 0 0 15px rgba(139, 195, 74, 0.1); }
   .switch label input[type=checkbox]:checked + .lever.switch-col-light-green {
@@ -4185,7 +4185,7 @@ section.content {
   border-bottom: 2px solid #009688; }
 
 .nav-tabs.tab-col-green > li > a:before {
-  border-bottom: 2px solid #4CAF50; }
+  border-bottom: 2px solid rgb(1, 107, 5); }
 
 .nav-tabs.tab-col-light-green > li > a:before {
   border-bottom: 2px solid #8BC34A; }
@@ -4364,7 +4364,7 @@ section.content {
         background-color: rgba(0, 0, 0, 0.12); }
 
 .modal-col-green {
-  background-color: #4CAF50; }
+  background-color: rgb(1, 107, 5); }
   .modal-col-green .modal-body,
   .modal-col-green .modal-title {
     color: #fff !important; }
@@ -4652,9 +4652,9 @@ section.content {
     border-top-color: transparent !important; }
 
 .panel-group .panel-col-green {
-  border: 1px solid #4CAF50; }
+  border: 1px solid rgb(1, 107, 5); }
   .panel-group .panel-col-green .panel-title {
-    background-color: #4CAF50 !important;
+    background-color: rgb(1, 107, 5) !important;
     color: #fff; }
   .panel-group .panel-col-green .panel-body {
     border-top-color: transparent !important; }
@@ -4840,7 +4840,7 @@ section.content {
 
 .full-body .panel-col-green .panel-body {
   border-top-color: #fff !important;
-  background-color: #4CAF50;
+  background-color: rgb(1, 107, 5);
   color: #fff; }
 
 .full-body .panel-col-light-green .panel-body {
@@ -4990,7 +4990,7 @@ section.content {
   .input-group .form-line.error:after {
     border-bottom: 2px solid #F44336; }
   .input-group .form-line.success:after {
-    border-bottom: 2px solid #4CAF50; }
+    border-bottom: 2px solid rgb(1, 107, 5); }
   .input-group .form-line.warning:after {
     border-bottom: 2px solid #FFC107; }
   .input-group .form-line.focused:after {
@@ -5100,7 +5100,7 @@ section.content {
   .form-group .form-line.error:after {
     border-bottom: 2px solid #F44336; }
   .form-group .form-line.success:after {
-    border-bottom: 2px solid #4CAF50; }
+    border-bottom: 2px solid rgb(1, 107, 5); }
   .form-group .form-line.warning:after {
     border-bottom: 2px solid #FFC107; }
   .form-group .form-line.focused:after {
@@ -5318,11 +5318,11 @@ fieldset[disabled] .form-control {
     color: #fff; }
 
 .breadcrumb-col-green li a {
-  color: #4CAF50 !important;
+  color: rgb(1, 107, 5) !important;
   font-weight: bold; }
 
 .breadcrumb-bg-green {
-  background-color: #4CAF50 !important; }
+  background-color: rgb(1, 107, 5) !important; }
   .breadcrumb-bg-green li {
     color: #fff !important; }
     .breadcrumb-bg-green li a {
@@ -5696,14 +5696,14 @@ fieldset[disabled] .form-control {
     opacity: 0.8; }
 
 .list-group .pl-green {
-  stroke: #4CAF50; }
+  stroke: rgb(1, 107, 5); }
 
 .list-group .list-group-bg-green {
-  background-color: #4CAF50;
+  background-color: rgb(1, 107, 5);
   border: none;
   color: #fff; }
   .list-group .list-group-bg-green:hover, .list-group .list-group-bg-green:focus {
-    background-color: #4CAF50;
+    background-color: rgb(1, 107, 5);
     color: #fff;
     opacity: 0.8; }
 
@@ -6301,7 +6301,7 @@ fieldset[disabled] .form-control {
   stroke: #009688; }
 
 .md-preloader .pl-green {
-  stroke: #4CAF50; }
+  stroke: rgb(1, 107, 5); }
 
 .md-preloader .pl-light-green {
   stroke: #8BC34A; }
@@ -6391,7 +6391,7 @@ fieldset[disabled] .form-control {
   .spinner-layer.pl-teal {
     border-color: #009688; }
   .spinner-layer.pl-green {
-    border-color: #4CAF50; }
+    border-color: rgb(1, 107, 5); }
   .spinner-layer.pl-light-green {
     border-color: #8BC34A; }
   .spinner-layer.pl-lime {
