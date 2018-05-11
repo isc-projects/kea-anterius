@@ -1,5 +1,5 @@
 ﻿.theme-green .navbar {
-  background-color: rgb(0, 82, 3); }
+  background-color: rgb(0, 59, 2); }
 
 .theme-green .navbar-brand {
   color: #fff; }
@@ -30,7 +30,7 @@
 .theme-green .sidebar .menu .list li.active {
   background-color: transparent; }
   .theme-green .sidebar .menu .list li.active > :first-child i, .theme-green .sidebar .menu .list li.active > :first-child span {
-    color: rgb(0, 82, 3); }
+    color: rgb(0, 59, 2); }
 
 .theme-green .sidebar .menu .list .toggled {
   background-color: transparent; }
@@ -41,5 +41,5 @@
 .theme-green .sidebar .legal {
   background-color: #fff; }
   .theme-green .sidebar .legal .copyright a {
-    color: rgb(0, 82, 3) !important; }
+    color: rgb(0, 59, 2) !important; }
 
