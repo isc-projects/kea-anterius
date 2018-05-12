@@ -51,17 +51,6 @@
     <script src="assets/js/glass-core.js"></script>
     <script src="assets/js/glass-websockets.js"></script>
 
-    <section class="content">
-        <div class="container-fluid">
-            <div class="block-header" style="display:none">
-                <h2 id="block-header">Dashboard</h2>
-            </div>
-            <div id="body-content">
-                [body_content]
-            </div>
-        </div>
-    </section>
-
     <!-- Bootstrap Core Js -->
     <script src="assets/plugins/bootstrap/js/bootstrap.js"></script>
 
@@ -167,9 +156,20 @@
             }
         }
 
+        function navtoggle() {
+            side_nav = document.getElementById("leftsidebar");
+
+            if (side_nav.style.width == "300px") {
+                side_nav.style.width = "0px";
+                document.getElementById("content").style.marginLeft = "15px";
+            } else {
+                side_nav.style.width = "300px";
+                document.getElementById("content").style.marginLeft = "315px";
+            }
+        }
+
+
     </script>
-
-
 
 </head>
 
@@ -199,11 +199,12 @@
     <!-- Top Bar -->
     <nav class="navbar">
         <div class="container-fluid" style="background: url('images/bg1.jpg') no-repeat no-repeat; width: 100%; background-size: cover;">
-            <div class="navbar-header">
 
-                <a href="javascript:void(0);" class="bars">
+            <div class="navbar-header">
+                <a class="navbar-header" style="color:aliceblue; margin-left: -10px; cursor:pointer" onclick="navtoggle()">
+                    <i class="material-icons">menu</i>
                 </a>
-                <a class="navbar-brand" href="/">
+                <a class="navbar-brand" style="float: right; margin-left: 10px" href="/">
                     [application_name] </a>
             </div>
         </div>
@@ -214,10 +215,9 @@
         <aside id="leftsidebar" class="sidebar">
             <div class="user-info" style="background: url('images/bg1.jpg') no-repeat no-repeat; width: 100%; background-size: cover;">
                 <!-- <div class="image"> -->
-                    <img src="images/kea_logo.png" height="60">
+                <img src="images/kea_logo.png" height="60">
                 <!-- </div> -->
             </div>
-
             <!-- Menu -->
             <div class="menu">
                 <ul class="list">
@@ -308,6 +308,17 @@
             <!-- #Footer -->
         </aside>
         <!-- #END# Left Sidebar -->
+
+        <section class="content" id="content">
+            <div class="container-fluid">
+                <div class="block-header" style="display:none">
+                    <h2 id="block-header">Dashboard</h2>
+                </div>
+                <div id="body-content">
+                    [body_content]
+                </div>
+            </div>
+        </section>
 
         <!-- For Material Design Colors -->
         <div class="modal fade" id="mdModal" tabindex="-1" role="dialog">

@@ -231,14 +231,14 @@ leases_per_minute_counter_timer = setInterval(function () {
 
 
     /* Websockets statistics subscription broadcast */
-    if (ws_event_subscribers('dhcp_statistics')) {
-        return_data = {
-            "cpu_utilization": cpu_utilization,
-            "leases_per_second": current_leases_per_second,
-            "leases_per_minute": leases_per_minute
-        };
-        wss.broadcast_event(JSON.stringify(return_data), 'dhcp_statistics');
-    }
+    // if (ws_event_subscribers('dhcp_statistics')) {
+    //     return_data = {
+    //         "cpu_utilization": cpu_utilization,
+    //         "leases_per_second": current_leases_per_second,
+    //         "leases_per_minute": leases_per_minute
+    //     };
+    //     wss.broadcast_event(JSON.stringify(return_data), 'dhcp_statistics');
+    // }
 
 }, 1000);
 
@@ -283,8 +283,8 @@ fs.watch('config/glass_config.json', function (event, filename) {
  * Websocket Server
  */
 
-const WebSocket = require('ws');
-const wss = new WebSocket.Server({port: 8080});
+// const WebSocket = require('ws');
+// const wss = new WebSocket.Server({port: 8080});
 
 // options.interval = 300;
 // var tail_dhcp_log = new tail_module(
@@ -359,125 +359,125 @@ const wss = new WebSocket.Server({port: 8080});
 // }, 3600 * 1000);
 /* 60 Minutes */
 
-wss.on('connection', function connection(ws) {
-    socket_clients++;
-    console.log("[WS] CLIENT_CONNECT: Socket clients (" + socket_clients + ")");
+// wss.on('connection', function connection(ws) {
+//     socket_clients++;
+//     console.log("[WS] CLIENT_CONNECT: Socket clients (" + socket_clients + ")");
 
-    if (!listening_to_log_file) {
-        /* Watch log file for new information */
-        var tail_module = require('always-tail2');
+//     if (!listening_to_log_file) {
+//         /* Watch log file for new information */
+//         var tail_module = require('always-tail2');
 
-        listening_to_log_file = 1;
-    }
+//         listening_to_log_file = 1;
+//     }
 
-});
+// });
 
-wss.on('close', function close() {
-    socket_clients--;
-    console.log("[WS] CLIENT_DISCONNECT: Socket clients (" + socket_clients + ")");
-});
+// wss.on('close', function close() {
+//     socket_clients--;
+//     console.log("[WS] CLIENT_DISCONNECT: Socket clients (" + socket_clients + ")");
+// });
 
-function heartbeat() {
-    this.isAlive = true;
-}
+// function heartbeat() {
+//     this.isAlive = true;
+// }
 
-function isJson(str) {
-    try {
-        JSON.parse(str);
-    } catch (e) {
-        return false;
-    }
-    return true;
-}
+// function isJson(str) {
+//     try {
+//         JSON.parse(str);
+//     } catch (e) {
+//         return false;
+//     }
+//     return true;
+// }
 
-function ws_event_subscribers(event) {
-    if (typeof wss === "undefined")
-        return false;
+// function ws_event_subscribers(event) {
+//     if (typeof wss === "undefined")
+//         return false;
 
-    var is_listening = false;
+//     var is_listening = false;
 
-    wss.clients.forEach(function each(ws) {
+//     wss.clients.forEach(function each(ws) {
 
-        /* Count event listeners */
-        for (var event_listening in ws.event_subscription) {
-            if (event_listening == event) {
-                is_listening = true;
-                return true;
-            }
-        }
+//         /* Count event listeners */
+//         for (var event_listening in ws.event_subscription) {
+//             if (event_listening == event) {
+//                 is_listening = true;
+//                 return true;
+//             }
+//         }
 
-    });
+//     });
 
-    if (is_listening) {
-        return true;
-    }
+//     if (is_listening) {
+//         return true;
+//     }
 
-    return false;
-}
+//     return false;
+// }
 
-wss.on('connection', function connection(ws) {
-    ws.isAlive = true;
-    ws.on('pong', heartbeat);
-    ws.event_subscription = [];
+// wss.on('connection', function connection(ws) {
+//     ws.isAlive = true;
+//     ws.on('pong', heartbeat);
+//     ws.event_subscription = [];
 
-    ws.on('message', function incoming(data) {
-        if (data != "" && isJson(data)) {
-            var json = JSON.parse(data);
-            if (typeof json["event_subscription"] !== "undefined") {
-                console.log("[WS] Incoming Subscription '%s'", json['event_subscription']);
-                ws.event_subscription[json["event_subscription"]] = 1;
-            }
-            if (typeof json["event_unsubscribe"] !== "undefined") {
-                console.log("[WS] event_unsubscribe '%s'", json['event_unsubscribe']);
-                delete ws.event_subscription[json["event_unsubscribe"]];
-            }
-            if (typeof json["all_events"] !== "undefined") {
-                console.log("[WS] event_unsubscribe '%s'", json['event_unsubscribe']);
-                ws.event_subscription = [];
-            }
-        }
-    });
+//     ws.on('message', function incoming(data) {
+//         if (data != "" && isJson(data)) {
+//             var json = JSON.parse(data);
+//             if (typeof json["event_subscription"] !== "undefined") {
+//                 console.log("[WS] Incoming Subscription '%s'", json['event_subscription']);
+//                 ws.event_subscription[json["event_subscription"]] = 1;
+//             }
+//             if (typeof json["event_unsubscribe"] !== "undefined") {
+//                 console.log("[WS] event_unsubscribe '%s'", json['event_unsubscribe']);
+//                 delete ws.event_subscription[json["event_unsubscribe"]];
+//             }
+//             if (typeof json["all_events"] !== "undefined") {
+//                 console.log("[WS] event_unsubscribe '%s'", json['event_unsubscribe']);
+//                 ws.event_subscription = [];
+//             }
+//         }
+//     });
 
-    stale_connections_audit();
-});
+//     stale_connections_audit();
+// });
 
-wss.broadcast = function broadcast(data) {
-    wss.clients.forEach(function each(client) {
-        if (client.readyState === WebSocket.OPEN) {
-            client.send(data);
-        }
-    });
-};
+// wss.broadcast = function broadcast(data) {
+//     wss.clients.forEach(function each(client) {
+//         if (client.readyState === WebSocket.OPEN) {
+//             client.send(data);
+//         }
+//     });
+// };
 
-wss.broadcast_event = function broadcast(data, event) {
-    wss.clients.forEach(function each(client) {
-        if (client.readyState === WebSocket.OPEN) {
-            if (client.event_subscription[event])
-                client.send(JSON.stringify({"event": event, "data": data}));
-        }
-    });
-};
+// wss.broadcast_event = function broadcast(data, event) {
+//     wss.clients.forEach(function each(client) {
+//         if (client.readyState === WebSocket.OPEN) {
+//             if (client.event_subscription[event])
+//                 client.send(JSON.stringify({"event": event, "data": data}));
+//         }
+//     });
+// };
 
-function stale_connections_audit() {
-    socket_clients = 0;
-    wss.clients.forEach(function each(ws) {
-        if (ws.isAlive === false) return ws.terminate();
+// function stale_connections_audit() {
+//     socket_clients = 0;
+//     wss.clients.forEach(function each(ws) {
+//         if (ws.isAlive === false) return ws.terminate();
 
-        ws.isAlive = false;
-        ws.ping('', false, true);
+//         ws.isAlive = false;
+//         ws.ping('', false, true);
 
-        socket_clients++;
-    });
+//         socket_clients++;
+//     });
 
-    console.log("[WS] STATUS: Socket clients (" + socket_clients + ")");
-}
+//     console.log("[WS] STATUS: Socket clients (" + socket_clients + ")");
+// }
 
-/* Keepalive - kill stale connections (30s poll) */
-const interval = setInterval(function ping() {
-    stale_connections_audit();
-}, 30000);
+// /* Keepalive - kill stale connections (30s poll) */
+// const interval = setInterval(function ping() {
+//     stale_connections_audit();
+// }, 30000);
 
-var socket_clients = 0;
+// var socket_clients = 0;
 
 
 /**
