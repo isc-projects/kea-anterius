@@ -156,10 +156,11 @@
             }
         }
 
+        //Toggle show/hide feature for side nav menu
         function navtoggle() {
             side_nav = document.getElementById("leftsidebar");
-
-            if (side_nav.style.width == "300px") {
+            
+            if (side_nav.style.width == "300px" || side_nav.offsetWidth == 300) {
                 side_nav.style.width = "0px";
                 document.getElementById("content").style.marginLeft = "15px";
             } else {

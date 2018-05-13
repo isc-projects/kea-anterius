@@ -7,10 +7,12 @@ var template_render = require('../lib/render_template.js');
 router.get('/', function(req, res, next) {
 
 	var json_file = require('jsonfile');
-	var glass_config = json_file.readFileSync('config/glass_config.json');
+	var ante_config = json_file.readFileSync('config/anterius_config.json');
 
+	// TODO: see if dhcpd-pools will work for Kea files
+	// Third-party lib dhcpd-pools to parse config and lease files
 	const execSync = require('child_process').execSync;
-	output = execSync('./bin/dhcpd-pools -c ' + glass_config.config_file + ' -l ' + glass_config.leases_file + ' -f j -A -s e');
+	output = execSync('./bin/dhcpd-pools -c ' + ante_config.config_file + ' -l ' + ante_config.leases_file + ' -f j -A -s e');
 
 	var dhcp_data = JSON.parse(output);
 

@@ -79,7 +79,7 @@ module.exports = app;
 module.exports.glass_config = glass_config;
 
 /**
- * Global Statistics Variables
+ * Global Statistics Variables - data model
  */
 leases_per_minute = 0;
 cpu_utilization = 0;
