@@ -11,7 +11,7 @@ var app = express();
 
 /* Read Config */
 var json_file = require('jsonfile');
-var glass_config = json_file.readFileSync('config/glass_config.json');
+var glass_config = json_file.readFileSync('config/anterius_config.json');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -185,7 +185,7 @@ if (fs.existsSync(oui_database_file)) {
  */
 
 var json_file = require('jsonfile');
-var glass_config = json_file.readFileSync('config/glass_config.json');
+var glass_config = json_file.readFileSync('config/anterius_config.json');
 
 var options = {};
 options.interval = 1000;
@@ -268,10 +268,10 @@ cpu_utilization_poll = setInterval(function () {
 /**
  * Watch config changes so we reload it for core functions...
  */
-fs.watch('config/glass_config.json', function (event, filename) {
+fs.watch('config/anterius_config.json', function (event, filename) {
     if (filename) {
         setTimeout(function () {
-            glass_config = json_file.readFileSync('config/glass_config.json');
+            glass_config = json_file.readFileSync('config/anterius_config.json');
             console.log("[Glass Server] Config Loaded");
         }, 1000);
     } else {

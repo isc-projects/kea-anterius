@@ -36,7 +36,7 @@ router.get('/', authorize.auth, function(req, res, next) {
 
 	/* Read Config */
 	var json_file = require('jsonfile');
-	var glass_config = json_file.readFileSync('config/glass_config.json');
+	var glass_config = json_file.readFileSync('config/anterius_config.json');
 
 	content = template_render.set_template_variable(content, "title", "DHCP Config Snaphots");
 

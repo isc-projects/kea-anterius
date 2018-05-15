@@ -128,7 +128,7 @@
 * **Leases Per Minute** (Checked once every 5 seconds) - If your disk fills up - or your SAN is unavailable - alerting your team on absolutely zero activity on your production server can allow you to be on the 8-ball. This is a step-above process alerting because you can have the dhcp server process running and no leases being written.
   * **Default**: 50
   * Glass keeps track of a rolling average of leases being written on the minute, the counter can be seen realtime on the dashboard
-* 0 value in **Glass Settings** or in your **glass_config.json** will turn the alerting functionality **OFF**
+* 0 value in **Glass Settings** or in your **anterius_config.json** will turn the alerting functionality **OFF**
 
 ## Alert Delivery Methods
 * Glass currently supports the following alerting delivery methods
@@ -186,7 +186,7 @@ service apparmor restart
 </pre>
 
 ## Glass Configuration
-* Glass configuration is stored in **./config/glass_config.json**
+* Glass configuration is stored in **./config/anterius_config.json**
 * All of these settings can be edited in both Glass Settings and Glass Alerts within the Web Interface, if you have custom file locations you will need to edit this config file before starting
 
 **Defaults**

@@ -9,10 +9,10 @@ router.get('/', function(req, res, next) {
 
 	counters = template_render.get_template("counters");
 
-	/* Display Shared Networks Row */
+	/* Display Shared Networks table */
 	content_shared_networks = template_render.get_template("shared_networks");
 
-	/* Display Subnets Row */
+	/* Display Subnets table */
 	content_subnets = template_render.get_template("display_subnets");
 
 	res.send(

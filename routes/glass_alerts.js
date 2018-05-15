@@ -15,7 +15,7 @@ router.get('/', authorize.auth, function(req, res, next) {
 	var json_file = require('jsonfile');
 
 	/* Read Config */
-	glass_config = json_file.readFileSync('config/glass_config.json');
+	glass_config = json_file.readFileSync('config/anterius_config.json');
 
 	/* Shared Network Alert Threshold (Critical) */
 	input = template_render.form_input('Shared Network Alert Threshold % (Critical)', '<input type="input" class="form-control" id="shared_network_critical_threshold" placeholder="95%" value="' + glass_config.shared_network_critical_threshold + '">');

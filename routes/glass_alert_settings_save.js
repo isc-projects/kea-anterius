@@ -9,7 +9,7 @@ var authorize = require('../lib/authorize.js');
 router.post('/', authorize.auth, function(req, res, next) {
 	var request = req.body;
 	var json_file = require('jsonfile');
-	var glass_config = json_file.readFileSync('config/glass_config.json');
+	var glass_config = json_file.readFileSync('config/anterius_config.json');
 
 	glass_config.shared_network_critical_threshold = request.shared_network_critical_threshold;
 	glass_config.shared_network_warning_threshold = request.shared_network_warning_threshold;
@@ -19,7 +19,7 @@ router.post('/', authorize.auth, function(req, res, next) {
     glass_config.email_alert_to = request.email_alert_to;
     glass_config.sms_alert_to = request.sms_alert_to;
 
-	json_file.writeFile('./config/glass_config.json', glass_config, {spaces: 2}, function(err) {
+	json_file.writeFile('./config/anterius_config.json', glass_config, {spaces: 2}, function(err) {
 		console.error(err);
 	});
 
