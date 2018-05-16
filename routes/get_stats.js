@@ -11,14 +11,18 @@ router.get('/', function (req, res, next) {
 	// var ante_config = json_file.readFileSync('config/anterius_config.json');
 
 	//Kea REST API calls
+	req_data = JSON.stringify({ "command": "statistic-get-all", "service": ["dhcp4"] });
 
 	var options = {
 		host: 'localhost',
-		port: 8000,
-		method: 'POST',
+		port: '8000',
+		path: '/',
 		headers: {
 			'Content-Type': 'application/json',
-		}
+			'Content-Length': req_data.length
+		},
+		method: 'POST'
+		
 	};
 
 	var req = http.request(options, function (res) {
@@ -35,7 +39,7 @@ router.get('/', function (req, res, next) {
 		console.error(`problem with request: ${e.message}`);
 	});
 
-	req.write(JSON.stringify('{ "command": "config-get", "service": ["dhcp4"] }'));
+	req.write(req_data);
 	req.end();
 
 	// var api_data = JSON.parse(json_stats);

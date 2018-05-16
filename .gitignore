@@ -14,6 +14,7 @@ pids
 config_backups
 config/anterius_config.json
 
+
 #temporarily disabled
 api
 
@@ -24,6 +25,7 @@ lib-cov
 coverage
 
 .idea/
+.vscode/
 
 # nyc test coverage
 .nyc_output
