@@ -35,8 +35,7 @@ router.get('/', function (req, res, next) {
 			set_stats(JSON.parse(body));
 		});
 		res.on('end', function () {
-			console.log('Total leases: ' + total_leases);
-
+			console.log(kea_stats);
 		});
 	});
 
@@ -47,10 +46,6 @@ router.get('/', function (req, res, next) {
 	req.write(req_data);
 	req.end();
 
-
-	// alert(api_data);
-
-
 	// TODO: see if dhcpd-pools will work for Kea files
 	// Third-party lib dhcpd-pools to parse config and lease files
 	// const execSync = require('child_process').execSync;
@@ -58,42 +53,49 @@ router.get('/', function (req, res, next) {
 
 	// var dhcp_data = JSON.parse(output);
 
-	// for (var i = 0; i < dhcp_data['shared-networks'].length; i++) {
-	// 	utilization = round(parseFloat(dhcp_data['shared-networks'][i].used / dhcp_data['shared-networks'][i].defined) * 100, 2);
-	// 	if (isNaN(utilization))
-	// 		utilization = 0;
+	// Calculate Shared network utilization
+	shared_nw_count = kea_config['Dhcp4']['shared-networks'].length;
+	shared_nw_util = [];
+	for (var i = 0; i < shared_nw_count; i++) {
+		utilization = round(parseFloat(kea_stats['shared-network[' + i + '].assigned-addresses'][0][0] / kea_stats['shared-network[' + i + '].total-addresses'][0][0]) * 100, 2);
 
-	// 	dhcp_data['shared-networks'][i].utilization = utilization;
-	// }
+		if (isNaN(utilization))
+			utilization = 0;
+
+			shared_nw_util.push(utilization);
+	}
+	// TODO: Modify list sorting
 	// dhcp_data['shared-networks'].sort(function (a, b) {
 	// 	return parseFloat(b.utilization) - parseFloat(a.utilization);
 	// });
 
-	// shared_networks = '';
+	shared_networks_table = '';
 
-	// for (var i = 0; i < dhcp_data['shared-networks'].length; i++) {
+	for (var i = 0; i < shared_nw_count; i++) {
 
-	// 	utilization = dhcp_data['shared-networks'][i].utilization;
+		utilization = shared_nw_util[i];
 
-	// 	table_row = '';
-	// 	table_row = table_row + '<td><b>' + dhcp_data['shared-networks'][i].location + '</b></td>';
-	// 	table_row = table_row + '<td>' + dhcp_data['shared-networks'][i].used.toLocaleString('en') + ' (' + utilization + '%)</td>';
-	// 	table_row = table_row + '<td class="hide_col">' + dhcp_data['shared-networks'][i].defined.toLocaleString('en') + '</td>';
-	// 	table_row = table_row + '<td class="hide_col">' + dhcp_data['shared-networks'][i].free.toLocaleString('en') + '</td>';
+		// TODO: replace attribute values from API
+		// Define shared network row for table
+		table_row = '';
+		table_row = table_row + '<td><b>' + dhcp_data['shared-networks'][i].location + '</b></td>';
+		table_row = table_row + '<td>' + dhcp_data['shared-networks'][i].used.toLocaleString('en') + ' (' + utilization + '%)</td>';
+		table_row = table_row + '<td class="hide_col">' + dhcp_data['shared-networks'][i].defined.toLocaleString('en') + '</td>';
+		table_row = table_row + '<td class="hide_col">' + dhcp_data['shared-networks'][i].free.toLocaleString('en') + '</td>';
 
-	// 	utilization_color = 'green';
+		utilization_color = 'green';
 
-	// 	if (utilization >= 80)
-	// 		utilization_color = 'orange';
-	// 	if (utilization >= 90)
-	// 		utilization_color = 'red';
+		if (utilization >= 80)
+			utilization_color = 'orange';
+		if (utilization >= 90)
+			utilization_color = 'red';
 
-	// 	table_row = table_row + '<td><div class="progress">' +
-	// 		'<div class="progress-bar bg-' + utilization_color + '" role="progressbar" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100" style="width: ' + utilization + '%"></div>' +
-	// 		'</div></td>';
+		table_row = table_row + '<td><div class="progress">' +
+			'<div class="progress-bar bg-' + utilization_color + '" role="progressbar" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100" style="width: ' + utilization + '%"></div>' +
+			'</div></td>';
 
-	// 	shared_networks = shared_networks + '<tr>' + table_row + '</tr>';
-	// }
+			shared_networks_table = shared_networks_table + '<tr>' + table_row + '</tr>';
+	}
 
 	// /* Display All Subnets */
 	// for (var i = 0; i < dhcp_data.subnets.length; i++) {
@@ -141,7 +143,7 @@ router.get('/', function (req, res, next) {
 	// 	"leases_used": total_leases,
 	// 	"leases_per_second": current_leases_per_second,
 	// 	"leases_per_minute": leases_per_minute,
-	// 	"shared_network_table": shared_networks,
+	// 	"shared_network_table": shared_networks_table,
 	// 	"host_name": host_name,
 	// 	"display_subnets_table": display_subnets
 	// };
@@ -154,7 +156,7 @@ module.exports = router;
 
 function set_stats(api_data) {
 	// console.log(api_data[0].arguments);
-	total_leases = api_data[0].arguments['subnet[1].assigned-addresses'][0][0];
+	kea_stats = api_data[0].arguments;
 
 }
 

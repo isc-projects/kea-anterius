@@ -79,8 +79,11 @@ module.exports = app;
 module.exports.glass_config = glass_config;
 
 /**
- * Global Statistics Variables - data model
+ Anterius Data Model - Global Statistics Variables
  */
+kea_stats = {};
+kea_config = {};
+
 leases_per_minute = -1;
 cpu_utilization = -1;
 total_leases = -1;
