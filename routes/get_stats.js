@@ -120,7 +120,7 @@ router.get('/', function (req, res, next) {
 
 	for (var i = 0; i < kea_stats.subnets.length; i++) {
 		utilization = kea_stats.subnets[i].utilization;
-		
+
 		// TODO: Find and replace correct attribute value source from API
 		// Define subnet row for table
 		table_row = '';

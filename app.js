@@ -17,14 +17,14 @@ var glass_config = json_file.readFileSync('config/anterius_config.json');
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 if (glass_config.ip_ranges_to_allow != "") {
     var ip_filter = require('express-ipfilter').IpFilter;
     var ips = glass_config.ip_ranges_to_allow;
-    app.use(ip_filter(ips, {mode: 'allow'}));
+    app.use(ip_filter(ips, { mode: 'allow' }));
 }
 
 /* URL Routes */

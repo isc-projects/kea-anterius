@@ -4,8 +4,8 @@ var fs = require('fs');
 var template_render = require('../lib/render_template.js');
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-    console.log(req.url);
+router.get('/', function (req, res, next) {
+	console.log(req.url);
 
 	counters = template_render.get_template("counters");
 
@@ -17,12 +17,12 @@ router.get('/', function(req, res, next) {
 
 	res.send(
 		template_render.get_index_template(
-		    counters +
+			counters +
 			'<div class="row clearfix">' +
 			content_shared_networks + content_subnets +
 			'</div>',
-            req.url
-        ) + '<script type="text/javascript">get_stats(); </script>'
+			req.url
+		) + '<script type="text/javascript">get_stats(); </script>'
 
 	);
 
