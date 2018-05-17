@@ -85,7 +85,7 @@
                 $('#server-name').html(data.host_name);
                 $('#shared-networks > tbody').html(data.shared_network_table);
 
-                $('#display-subnets > tbody').html(data.display_subnets_table);
+                $('#subnets > tbody').html(data.subnet_table);
 
                 if (typeof shared_networks !== "undefined")
                     shared_networks.destroy();
@@ -100,7 +100,7 @@
                     "aaSorting": []
                 });
 
-                display_subnets = $('#display-subnets').DataTable({
+                display_subnets = $('#subnets').DataTable({
                     dom: 'tip',
                     responsive: true,
                     "pageLength": 100,
@@ -108,7 +108,7 @@
                 });
 
                 $('#shared-networks').fadeOut(100).fadeIn(100);
-                $('#display-subnets').fadeOut(100).fadeIn(100);
+                $('#subnets').fadeOut(100).fadeIn(100);
             });
         }
 
