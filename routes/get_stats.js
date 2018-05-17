@@ -22,16 +22,21 @@ router.get('/', function (req, res, next) {
 			'Content-Length': req_data.length
 		},
 		method: 'POST'
-		
+
 	};
+	var api_data;
 
 	var req = http.request(options, function (res) {
 		console.log('STATUS: ' + res.statusCode);
 		console.log('HEADERS: ' + JSON.stringify(res.headers));
 		res.setEncoding('utf8');
 		res.on('data', function (body) {
-			console.log('BODY: ' + body);
-			// json_stats = chunk;
+			// console.log('BODY: ' + body);
+			set_stats(JSON.parse(body));
+		});
+		res.on('end', function () {
+			console.log('Total leases: ' + total_leases);
+
 		});
 	});
 
@@ -42,7 +47,6 @@ router.get('/', function (req, res, next) {
 	req.write(req_data);
 	req.end();
 
-	// var api_data = JSON.parse(json_stats);
 
 	// alert(api_data);
 
@@ -147,6 +151,12 @@ router.get('/', function (req, res, next) {
 });
 
 module.exports = router;
+
+function set_stats(api_data) {
+	// console.log(api_data[0].arguments);
+	total_leases = api_data[0].arguments['subnet[1].assigned-addresses'][0][0];
+
+}
 
 function round(num, places) {
 	var multiplier = Math.pow(10, places);

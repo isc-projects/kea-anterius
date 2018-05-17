@@ -81,14 +81,14 @@ module.exports.glass_config = glass_config;
 /**
  * Global Statistics Variables - data model
  */
-leases_per_minute = 0;
-cpu_utilization = 0;
-total_leases = 0;
+leases_per_minute = -1;
+cpu_utilization = -1;
+total_leases = -1;
 
 current_time = 0;
-leases_per_second = 0;
-current_leases_per_second = 0;
-leases_last_update_time = 0;
+leases_per_second = -1;
+current_leases_per_second = -1;
+leases_last_update_time = -1;
 
 listening_to_log_file = 0;
 
