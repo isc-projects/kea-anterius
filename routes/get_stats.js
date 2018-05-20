@@ -22,9 +22,7 @@ router.get('/', function (req, res, next) {
 			'Content-Length': req_data.length
 		},
 		method: 'POST'
-
 	};
-	var api_data;
 
 	var req = http.request(options, function (res) {
 		console.log('STATUS: ' + res.statusCode);
@@ -34,13 +32,13 @@ router.get('/', function (req, res, next) {
 			// console.log('BODY: ' + body);
 			set_stats(JSON.parse(body));
 		});
-		res.on('end', function () {
-			console.log(kea_stats);
-		});
+		// res.on('end', function () {
+		// 	// console.log(kea_stats);
+		// });
 	});
 
 	req.on('error', (e) => {
-		console.error(`problem with request: ${e.message}`);
+		console.error(`Request Error: ${e.message}`);
 	});
 
 	req.write(req_data);
@@ -163,7 +161,10 @@ module.exports = router;
 function set_stats(api_data) {
 	// console.log(api_data[0].arguments);
 	kea_stats = api_data[0].arguments;
-
+}
+function set_config(api_data) {
+	// console.log(api_data[0].arguments);
+	kea_config = api_data[0].arguments;
 }
 
 function round(num, places) {

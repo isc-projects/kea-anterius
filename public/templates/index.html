@@ -159,13 +159,22 @@
         //Toggle show/hide feature for side nav menu
         function navtoggle() {
             side_nav = document.getElementById("leftsidebar");
+            menutext = document.getElementsByClassName("menutext")
 
             if (side_nav.style.width == "300px" || side_nav.offsetWidth == 300) {
-                side_nav.style.width = "0px";
+                for (i = 0; i < menutext.length; i++) {
+                    menutext[i].style.opacity = 0;
+                }
+                side_nav.style.width = "0px";                
                 document.getElementById("content").style.marginLeft = "15px";
             } else {
                 side_nav.style.width = "300px";
                 document.getElementById("content").style.marginLeft = "315px";
+                setTimeout(function () {
+                    for (i = 0; i < menutext.length; i++) {
+                        menutext[i].style.opacity = 1;
+                    }
+                }, 200);
             }
         }
 
@@ -222,65 +231,65 @@
             <!-- Menu -->
             <div class="menu">
                 <ul class="list">
-                    <li class="header">Kea Monitoring Options</li>
+                    <li class="header menutext">Kea Monitoring Options</li>
                     <li class="active">
                         <a href="/" pjax="1">
                             <i class="material-icons">home</i>
-                            <span>Home</span>
+                            <span class="menutext">Home</span>
                         </a>
                     </li>
                     <li>
                         <a href="/dhcp_statistics" pjax="1">
                             <i class="material-icons">pie_chart</i>
-                            <span>Statistics</span>
+                            <span class="menutext">Statistics</span>
                         </a>
                     </li>
                     <li>
                         <a href="/dhcp_leases" pjax="1">
                             <i class="material-icons">layers</i>
-                            <span>Leases</span>
+                            <span class="menutext">Leases</span>
                         </a>
                     </li>
 
                     <li>
                         <a href="/dhcp_log" pjax="1">
                             <i class="material-icons">view_stream</i>
-                            <span>Logs</span>
+                            <span class="menutext">Logs</span>
                         </a>
                     </li>
 
-                    <li class="header">Kea Configuration Options</li>
+                    <li class="header menutext">Kea Configuration Options</li>
                     <li>
                         <a href="/dhcp_config" pjax="1">
                             <i class="material-icons">mode_edit</i>
-                            <span>DHCP Config</span>
+                            <span class="menutext">DHCP Config</span>
                         </a>
                     </li>
                     <li>
                         <a href="/dhcp_config_snapshots" pjax="1">
                             <i class="material-icons">cloud_download</i>
-                            <span>DHCP Config Snapshots</span>
+                            <span class="menutext">DHCP Config Snapshots</span>
                         </a>
                     </li>
                     <li>
                         <a href="/dhcp_start_stop_restart" pjax="1">
                             <i class="material-icons">refresh</i>
-                            <span>Start / Stop / Restart</span>
+                            <span class="menutext">Start / Stop / Restart</span>
                         </a>
                     </li>
 
-                    <li class="header">Settings</li>
+                    <li class="header menutext">Settings</li>
                     <li>
                         <a href="/glass_settings" pjax="1">
                             <i class="material-icons">settings</i>
-                            <span>Kea-Anterius Settings</span>
+                            <span class="menutext">Kea-Anterius Settings</span>
                         </a>
                     </li>
 
                     <li>
                         <a href="/glass_alerts" pjax="1">
                             <i class="material-icons">add_alert</i>
-                            <span>Kea-Anterius Alerts Config</span>
+                            <span class="menutext">Kea-Anterius Alerts Config</span>
                         </a>
                     </li>
 
@@ -288,7 +297,7 @@
                 <li>
                     <a href="/api_examples" pjax="1">
                         <i class="material-icons">widgets</i>
-                        <span>API Examples</span>
+                        <span class="menutext">API Examples</span>
                     </a>
                 </li> -->
 
