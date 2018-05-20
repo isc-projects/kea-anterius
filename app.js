@@ -1,5 +1,6 @@
 var express = require('express');
 var path = require('path');
+var http = require('http');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
@@ -89,8 +90,8 @@ cpu_utilization = -1;
 total_leases = -1;
 
 current_time = 0;
-leases_per_second = -1;
-current_leases_per_second = -1;
+lps = -1;
+leases_per_sec = -1;
 leases_last_update_time = -1;
 
 listening_to_log_file = 0;
@@ -150,7 +151,7 @@ if (fs.existsSync(oui_database_file)) {
 // });
 
 /**
- * Leases File Listener
+ * Leases File Listener <memfile> - calculate leases/sec
  */
 // var tail_module = require('always-tail2');
 // tail = new tail_module(
@@ -173,13 +174,13 @@ if (fs.existsSync(oui_database_file)) {
 
 //     /* Count leases per second */
 //     if (/lease/.test(data)) {
-//         leases_per_second++;
+//         lps++;
 //     }
 //     if (current_time != unix_time) {
 //         current_time = unix_time;
-//         current_leases_per_second = leases_per_second;
+//         leases_per_sec = lps;
 //         leases_last_update_time = unix_time;
-//         leases_per_second = 0;
+//         lps = 0;
 //     }
 // });
 
@@ -197,53 +198,116 @@ var dashboard_timer = setInterval(function () {
     // console.log("Checking timers...");
     unix_time = Math.floor(new Date() / 1000);
     if ((unix_time - 5) > leases_last_update_time) {
-        current_leases_per_second = 0;
+        leases_per_sec = 0;
     }
 
     // console.log(JSON.stringify(dhcp_lease_data, null, 2));
 
 }, 5000);
 
+
 /**
  * Calculate leases per minute
  */
-var leases_per_minute_data = [];
-var leases_per_minute_counter = 0;
+var lps_list = [0];
+var lpm_counter = 0;
 
-// Recurrent Loop for leases/min stats
-leases_per_minute_counter_timer = setInterval(function () {
-    // console.log("leases per minute counter %i", leases_per_minute_counter);
+// Recurrent Loop for lease stats
+lease_stats_monitor = setInterval(function () {
 
-    leases_per_minute_data[leases_per_minute_counter] = current_leases_per_second;
-    leases_per_minute_counter++;
+    //Kea REST API call - config-get and statistics-get
+    stats_req_data = JSON.stringify({ "command": "statistic-get-all", "service": ["dhcp4"] });
+    config_req_data = JSON.stringify({ "command": "config-get", "service": ["dhcp4"] });
 
-    /* Count how many actual data sets we walked that have values */
+    fire_kea_api(stats_req_data, 0);
+    fire_kea_api(config_req_data, 1);
+
+    total_leases = 0;
+    subnet_count = kea_config['Dhcp4']['subnet4'].length;
+    shared_nw_count = kea_config['Dhcp4']['shared-networks'].length;
+
+    for (var i = 0; i < shared_nw_count; i++) {
+        total_leases += kea_stats['shared-network[' + i + '].assigned-addresses'][0][0];
+    }
+    for (var i = 1; i <= subnet_count; i++) {
+        total_leases += kea_stats['subnet[' + i + '].assigned-addresses'][0][0];
+    }
+
+    // Update metric - leases / sec 
+    if (lpm_counter > 0)
+        leases_per_sec = total_leases - lps_list[lpm_counter - 1];
+
+    lps_list[lpm_counter] = leases_per_sec;
+    lpm_counter++;
+
     leases_per_minute = 0;
     for (i = 0; i < 59; i++) {
-        if (leases_per_minute_data[i] > 0) {
-            leases_per_minute += leases_per_minute_data[i];
-            // console.log("iteration " + i + " val: " + leases_per_minute_data[i] + " lpm: " + leases_per_minute);
+        if (lps_list[i] > 0) {
+            leases_per_minute += lps_list[i];
+            // console.log("iteration " + i + " val: " + lps_list[i] + " lpm: " + leases_per_minute);
         }
         else {
             // console.log("no data " + i);
         }
     }
 
-    if (leases_per_minute_counter == 60)
-        leases_per_minute_counter = 0;
+    if (lpm_counter == 60)
+        lpm_counter = 0;
 
 
     /* Websockets statistics subscription broadcast */
     // if (ws_event_subscribers('dhcp_statistics')) {
     //     return_data = {
     //         "cpu_utilization": cpu_utilization,
-    //         "leases_per_second": current_leases_per_second,
+    //         "lps": leases_per_sec,
     //         "leases_per_minute": leases_per_minute
     //     };
     //     wss.broadcast_event(JSON.stringify(return_data), 'dhcp_statistics');
     // }
 
 }, 1000);
+
+function fire_kea_api(req_data, mode) {
+    var options = {
+        host: 'localhost',
+        port: '8000',
+        path: '/',
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': req_data.length
+        },
+        method: 'POST'
+    };
+    var req = http.request(options, function (res, mode) {
+        console.log('STATUS: ' + res.statusCode);
+        console.log('HEADERS: ' + JSON.stringify(res.headers));
+        res.setEncoding('utf8');
+        res.on('data', function (body, mode) {
+            // console.log('BODY: ' + body);
+            console.log('here');
+            set_stats(JSON.parse(body), mode);
+        });
+        res.on('end', function () {
+            // console.log(kea_stats);
+            return
+        });
+    });
+
+    req.on('error', (e) => {
+        console.error(`Request Error: ${e.message}`);
+    });
+
+    req.write(req_data);
+    req.end();
+}
+
+function set_stats(api_data, mode) {
+    console.log(mode, api_data[0].arguments);
+    if (mode == 0)
+        kea_stats = api_data[0].arguments;
+    else
+        kea_config = api_data[0].arguments;
+}
 
 /**
  * Poll: CPU Utilization

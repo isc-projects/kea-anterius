@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var fs = require('fs');
-var http = require('http');
 var template_render = require('../lib/render_template.js');
 
 /* GET home page. */
@@ -10,39 +9,7 @@ router.get('/', function (req, res, next) {
 	// var json_file = require('jsonfile');
 	// var ante_config = json_file.readFileSync('config/anterius_config.json');
 
-	//Kea REST API calls
-	req_data = JSON.stringify({ "command": "statistic-get-all", "service": ["dhcp4"] });
-
-	var options = {
-		host: 'localhost',
-		port: '8000',
-		path: '/',
-		headers: {
-			'Content-Type': 'application/json',
-			'Content-Length': req_data.length
-		},
-		method: 'POST'
-	};
-
-	var req = http.request(options, function (res) {
-		console.log('STATUS: ' + res.statusCode);
-		console.log('HEADERS: ' + JSON.stringify(res.headers));
-		res.setEncoding('utf8');
-		res.on('data', function (body) {
-			// console.log('BODY: ' + body);
-			set_stats(JSON.parse(body));
-		});
-		// res.on('end', function () {
-		// 	// console.log(kea_stats);
-		// });
-	});
-
-	req.on('error', (e) => {
-		console.error(`Request Error: ${e.message}`);
-	});
-
-	req.write(req_data);
-	req.end();
+	
 
 	// TODO: see if dhcpd-pools will work for Kea files, if parsing lease files
 	// Third-party lib dhcpd-pools to parse config and lease files
@@ -55,7 +22,6 @@ router.get('/', function (req, res, next) {
 	shared_nw_count = kea_config['Dhcp4']['shared-networks'].length;
 	shared_nw_util = [];
 	for (var i = 0; i < shared_nw_count; i++) {
-		// TODO: Check whether assigned addresses is updated with reclaimed, else use assigned - reclaimed
 		utilization = round(parseFloat(kea_stats['shared-network[' + i + '].assigned-addresses'][0][0] / kea_stats['shared-network[' + i + '].total-addresses'][0][0]) * 100, 2);
 
 		if (isNaN(utilization))
@@ -101,7 +67,6 @@ router.get('/', function (req, res, next) {
 	subnet_count = kea_config['Dhcp4']['subnets'].length;
 	subnet_util = [];
 	for (var i = 1; i <= subnet_count; i++) {
-		// TODO: Check whether assigned addresses is updated with reclaimed, else use assigned - reclaimed
 		utilization = round(parseFloat(kea_stats['subnet[' + i + '].assigned-addresses'][0][0] / kea_stats['subnet[' + i + '].total-addresses'][0][0]) * 100, 2);
 
 		if (isNaN(utilization))
@@ -145,7 +110,7 @@ router.get('/', function (req, res, next) {
 	response_data = {
 		"cpu_utilization": cpu_utilization,
 		"leases_used": total_leases,
-		"leases_per_second": current_leases_per_second,
+		"leases_per_second": leases_per_sec,
 		"leases_per_minute": leases_per_minute,
 		"shared_network_table": shared_network_table,
 		"host_name": host_name,
@@ -157,15 +122,6 @@ router.get('/', function (req, res, next) {
 });
 
 module.exports = router;
-
-function set_stats(api_data) {
-	// console.log(api_data[0].arguments);
-	kea_stats = api_data[0].arguments;
-}
-function set_config(api_data) {
-	// console.log(api_data[0].arguments);
-	kea_config = api_data[0].arguments;
-}
 
 function round(num, places) {
 	var multiplier = Math.pow(10, places);
