@@ -103,6 +103,12 @@ debug_watch_lease_parse_stream = 0;
 
 host_name = execSync("cat /etc/hostname").toString().replace("\n", "");
 
+//Kea REST API call - config-get and statistics-get
+stats_req_data = JSON.stringify({ "command": "statistic-get-all", "service": ["dhcp4"] });
+config_req_data = JSON.stringify({ "command": "config-get", "service": ["dhcp4"] });
+
+fire_kea_api(stats_req_data);
+fire_kea_api(config_req_data);
 
 /**
  * Ingest OUI Database
@@ -215,12 +221,8 @@ var lpm_counter = 0;
 // Recurrent Loop for lease stats
 lease_stats_monitor = setInterval(function () {
 
-    //Kea REST API call - config-get and statistics-get
-    stats_req_data = JSON.stringify({ "command": "statistic-get-all", "service": ["dhcp4"] });
-    config_req_data = JSON.stringify({ "command": "config-get", "service": ["dhcp4"] });
-
-    fire_kea_api(stats_req_data, 0);
-    fire_kea_api(config_req_data, 1);
+    fire_kea_api(stats_req_data);
+    fire_kea_api(config_req_data);
 
     total_leases = 0;
     subnet_count = kea_config['Dhcp4']['subnet4'].length;
@@ -267,7 +269,7 @@ lease_stats_monitor = setInterval(function () {
 
 }, 1000);
 
-function fire_kea_api(req_data, mode) {
+function fire_kea_api(req_data) {
     var options = {
         host: 'localhost',
         port: '8000',
@@ -278,14 +280,14 @@ function fire_kea_api(req_data, mode) {
         },
         method: 'POST'
     };
-    var req = http.request(options, function (res, mode) {
+    var req = http.request(options, function (res) {
         console.log('STATUS: ' + res.statusCode);
         console.log('HEADERS: ' + JSON.stringify(res.headers));
         res.setEncoding('utf8');
-        res.on('data', function (body, mode) {
+        res.on('data', function (body) {
             // console.log('BODY: ' + body);
-            console.log('here');
-            set_stats(JSON.parse(body), mode);
+            body = JSON.parse(body)[0].arguments;
+            set_stats(body, 'Dhcp4' in body);
         });
         res.on('end', function () {
             // console.log(kea_stats);
@@ -296,17 +298,17 @@ function fire_kea_api(req_data, mode) {
     req.on('error', (e) => {
         console.error(`Request Error: ${e.message}`);
     });
-
     req.write(req_data);
     req.end();
 }
 
 function set_stats(api_data, mode) {
-    console.log(mode, api_data[0].arguments);
-    if (mode == 0)
-        kea_stats = api_data[0].arguments;
+    // console.log(mode, api_data);
+    if (mode)
+        kea_config = api_data;
     else
-        kea_config = api_data[0].arguments;
+        kea_stats = api_data;
+
 }
 
 /**
