@@ -35,159 +35,6 @@
     <!-- AdminBSB Themes. You can choose a theme from css/themes instead of get all themes -->
     <link href="assets/css/themes/theme-green.css" rel="stylesheet" />
 
-    <!-- Jquery Core Js -->
-    <script src="assets/plugins/jquery/jquery.min.js"></script>
-
-    <script src="assets/plugins/jquery-datatable/jquery.dataTables.js"></script>
-    <script src="assets/plugins/jquery-datatable/skin/bootstrap/js/dataTables.bootstrap.js"></script>
-    <script src="assets/plugins/jquery-datatable/extensions/export/dataTables.buttons.min.js"></script>
-
-    <!-- Morris Chart -->
-    <script src="assets/plugins/raphael/raphael.min.js"></script>
-    <script src="assets/plugins/morris/morris.min.js"></script>
-
-    <!-- Glass -->
-    <script src="assets/js/api-examples.js"></script>
-    <script src="assets/js/glass-core.js"></script>
-    <script src="assets/js/glass-websockets.js"></script>
-
-    <!-- Bootstrap Core Js -->
-    <script src="assets/plugins/bootstrap/js/bootstrap.js"></script>
-
-    <!-- Select Plugin Js -->
-    <script src="assets/plugins/bootstrap-select/js/bootstrap-select.js"></script>
-
-    <!-- Slimscroll Plugin Js -->
-    <script src="assets/plugins/jquery-slimscroll/jquery.slimscroll.js"></script>
-
-    <!-- Notify plugin -->
-    <script src="assets/plugins/bootstrap-notify/bootstrap-notify.js"></script>
-
-    <!-- Waves Effect Plugin Js -->
-    <script src="assets/plugins/node-waves/waves.js"></script>
-
-    <!-- Custom Js -->
-    <script src="assets/js/admin.js"></script>
-
-    <!-- File Saver: Used in DHCP Logs -->
-    <script src="assets/js/file-saver.js"></script>
-
-    <!-- PJAX Framework -->
-    <script src="assets/js/pjax.js"></script>
-
-    <script type="text/javascript">
-
-        function get_stats() {
-            $.get("/get_stats", function (data) {
-                $('#cpu-utilization').html(data.cpu_utilization + "%");
-                $('#leases-sec').html(data.leases_per_second.toLocaleString('en') + ' / ' + data.leases_per_minute.toLocaleString('en'));
-                $('#total-leases').html(data.leases_used.toLocaleString('en'));
-                $('#server-name').html(data.host_name);
-                $('#shared-networks > tbody').html(data.shared_network_table);
-
-                $('#subnets > tbody').html(data.subnet_table);
-
-                if (typeof shared_networks !== "undefined")
-                    shared_networks.destroy();
-
-                if (typeof display_subnets !== "undefined")
-                    display_subnets.destroy();
-
-                shared_networks = $('#shared-networks').DataTable({
-                    dom: 'tip',
-                    responsive: true,
-                    "pageLength": 100,
-                    "aaSorting": []
-                });
-
-                display_subnets = $('#subnets').DataTable({
-                    dom: 'tip',
-                    responsive: true,
-                    "pageLength": 100,
-                    "aaSorting": []
-                });
-
-                $('#shared-networks').fadeOut(100).fadeIn(100);
-                $('#subnets').fadeOut(100).fadeIn(100);
-            });
-        }
-
-        var get_stats_timer = setInterval(function () {
-            if (window_focus && $('#total-leases').length) {
-                get_stats();
-            }
-        }, 5000);
-
-        function parse_statistics_stream(data) {
-            data = JSON.parse(data);
-            $('#cpu-utilization').html(data.cpu_utilization + "%");
-            $('#leases-sec').html(data.leases_per_second.toLocaleString('en') + ' / ' + data.leases_per_minute.toLocaleString('en'));
-        }
-
-        var window_focus = true;
-
-        $(window).focus(function () {
-            window_focus = true;
-            get_stats();
-        }).blur(function () {
-            window_focus = false;
-        });
-
-        if (typeof $.fn.slimScroll != 'undefined') {
-            var configs = $.AdminBSB.options.leftSideBar;
-            var height = ($(window).height() - ($('.legal').outerHeight() + $('.user-info').outerHeight() + $('.navbar').innerHeight()));
-            var $el = $('.list');
-
-            $el.slimscroll({
-                height: height + "px",
-                color: configs.scrollColor,
-                size: configs.scrollWidth,
-                alwaysVisible: configs.scrollAlwaysVisible,
-                borderRadius: configs.scrollBorderRadius,
-                railBorderRadius: configs.scrollRailBorderRadius
-            });
-
-            //Scroll active menu item when page load, if option set = true
-            if ($.AdminBSB.options.leftSideBar.scrollActiveItemWhenPageLoad) {
-                var activeItemOffsetTop = $('.menu .list li.active')[0].offsetTop
-                if (activeItemOffsetTop > 150) $el.slimscroll({ scrollTo: activeItemOffsetTop + 'px' });
-            }
-        }
-
-        //Toggle show/hide feature for side nav menu
-        function navtoggle() {
-            side_nav = document.getElementById("leftsidebar");
-            logo = document.getElementById("logo");
-            menuitems = document.getElementsByClassName("menuitems");
-
-            logo.style.transition = "opacity 0.5s ease";
-            for (i = 0; i < menuitems.length; i++) {
-                menuitems[i].style.transition = "opacity 0.5s ease";
-            }
-            if (side_nav.style.width == "300px" || side_nav.offsetWidth == 300) {
-                for (i = 0; i < menuitems.length; i++) {
-                    menuitems[i].style.opacity = 0;
-                }
-                logo.style.opacity = 0;
-                setTimeout(function () {
-                    side_nav.style.width = "0px";
-                    document.getElementById("content").style.marginLeft = "15px";
-                }, 150);
-            } else {
-                side_nav.style.width = "300px";
-                document.getElementById("content").style.marginLeft = "315px";
-                setTimeout(function () {
-                    for (i = 0; i < menuitems.length; i++) {
-                        menuitems[i].style.opacity = 1;
-                    }
-                    logo.style.opacity = 1;
-                }, 100);
-            }
-        }
-
-
-    </script>
-
 </head>
 
 <body class="theme-green">
@@ -356,6 +203,161 @@
         </div>
 
     </section>
+
+    <!-- Jquery Core Js -->
+    <script src="assets/plugins/jquery/jquery.min.js"></script>
+
+    <script src="assets/plugins/jquery-datatable/jquery.dataTables.js"></script>
+    <script src="assets/plugins/jquery-datatable/skin/bootstrap/js/dataTables.bootstrap.js"></script>
+    <script src="assets/plugins/jquery-datatable/extensions/export/dataTables.buttons.min.js"></script>
+
+    <!-- Morris Chart -->
+    <script src="assets/plugins/raphael/raphael.min.js"></script>
+    <script src="assets/plugins/morris/morris.min.js"></script>
+
+    <!-- Glass -->
+    <script src="assets/js/api-examples.js"></script>
+    <script src="assets/js/glass-core.js"></script>
+    <script src="assets/js/glass-websockets.js"></script>
+
+    <!-- Bootstrap Core Js -->
+    <script src="assets/plugins/bootstrap/js/bootstrap.js"></script>
+
+    <!-- Select Plugin Js -->
+    <script src="assets/plugins/bootstrap-select/js/bootstrap-select.js"></script>
+
+    <!-- Slimscroll Plugin Js -->
+    <script src="assets/plugins/jquery-slimscroll/jquery.slimscroll.js"></script>
+
+    <!-- Notify plugin -->
+    <script src="assets/plugins/bootstrap-notify/bootstrap-notify.js"></script>
+
+    <!-- Waves Effect Plugin Js -->
+    <script src="assets/plugins/node-waves/waves.js"></script>
+
+    <!-- Custom Js -->
+    <script src="assets/js/admin.js"></script>
+
+    <!-- File Saver: Used in DHCP Logs -->
+    <script src="assets/js/file-saver.js"></script>
+
+    <!-- PJAX Framework -->
+    <script src="assets/js/pjax.js"></script>
+
+    <script type="text/javascript">
+
+        function get_stats() {
+            $.get("/get_stats", function (data) {
+                $('#cpu-utilization').html(data.cpu_utilization + "%");
+                $('#leases-sec').html(data.leases_per_second.toLocaleString('en') + ' / ' + data.leases_per_minute.toLocaleString('en'));
+                $('#total-leases').html(data.leases_used.toLocaleString('en'));
+                $('#server-name').html(data.host_name);
+                $('#shared-networks > tbody').html(data.shared_network_table);
+
+                $('#subnets > tbody').html(data.subnet_table);
+
+                if (typeof shared_networks !== "undefined")
+                    shared_networks.destroy();
+
+                if (typeof display_subnets !== "undefined")
+                    display_subnets.destroy();
+
+                shared_networks = $('#shared-networks').DataTable({
+                    dom: 'tip',
+                    responsive: true,
+                    "pageLength": 100,
+                    "aaSorting": []
+                });
+
+                display_subnets = $('#subnets').DataTable({
+                    dom: 'tip',
+                    responsive: true,
+                    "pageLength": 100,
+                    "aaSorting": []
+                });
+
+                $('#shared-networks').fadeOut(100).fadeIn(100);
+                $('#subnets').fadeOut(100).fadeIn(100);
+            });
+        }
+
+        var get_stats_timer = setInterval(function () {
+            if (window_focus && $('#total-leases').length) {
+                get_stats();
+            }
+        }, 5000);
+
+        function parse_statistics_stream(data) {
+            data = JSON.parse(data);
+            $('#cpu-utilization').html(data.cpu_utilization + "%");
+            $('#leases-sec').html(data.leases_per_second.toLocaleString('en') + ' / ' + data.leases_per_minute.toLocaleString('en'));
+        }
+
+        var window_focus = true;
+
+        $(window).focus(function () {
+            window_focus = true;
+            get_stats();
+        }).blur(function () {
+            window_focus = false;
+        });
+
+        if (typeof $.fn.slimScroll != 'undefined') {
+            var configs = $.AdminBSB.options.leftSideBar;
+            var height = ($(window).height() - ($('.legal').outerHeight() + $('.user-info').outerHeight() + $('.navbar').innerHeight()));
+            var $el = $('.list');
+
+            $el.slimscroll({
+                height: height + "px",
+                color: configs.scrollColor,
+                size: configs.scrollWidth,
+                alwaysVisible: configs.scrollAlwaysVisible,
+                borderRadius: configs.scrollBorderRadius,
+                railBorderRadius: configs.scrollRailBorderRadius
+            });
+
+            //Scroll active menu item when page load, if option set = true
+            if ($.AdminBSB.options.leftSideBar.scrollActiveItemWhenPageLoad) {
+                var activeItemOffsetTop = $('.menu .list li.active')[0].offsetTop
+                if (activeItemOffsetTop > 150) $el.slimscroll({ scrollTo: activeItemOffsetTop + 'px' });
+            }
+        }
+
+        //Toggle show/hide feature for side nav menu
+        function navtoggle() {
+            side_nav = document.getElementById("leftsidebar");
+            logo = document.getElementById("logo");
+            menuitems = document.getElementsByClassName("menuitems");
+
+            logo.style.transition = "opacity 0.5s ease";
+            for (i = 0; i < menuitems.length; i++) {
+                menuitems[i].style.transition = "opacity 0.5s ease";
+            }
+            if (side_nav.style.width == "300px" || side_nav.offsetWidth == 300) {
+                for (i = 0; i < menuitems.length; i++) {
+                    menuitems[i].style.opacity = 0;
+                }
+                logo.style.opacity = 0;
+                setTimeout(function () {
+                    side_nav.style.width = "0px";
+                    document.getElementById("content").style.marginLeft = "15px";
+                }, 150);
+            } else {
+                side_nav.style.width = "300px";
+                document.getElementById("content").style.marginLeft = "315px";
+                setTimeout(function () {
+                    for (i = 0; i < menuitems.length; i++) {
+                        menuitems[i].style.opacity = 1;
+                    }
+                    logo.style.opacity = 1;
+                }, 100);
+            }
+        }
+
+
+    </script>
+
+
 </body>
 
 </html>

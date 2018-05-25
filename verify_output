@@ -1,0 +1,13 @@
+Internet Systems Consortium DHCP Server 4.3.3
+Copyright 2004-2015 Internet Systems Consortium.
+All rights reserved.
+For info, please visit https://www.isc.org/software/dhcp/
+Can't open ./syntax_verify_config: Permission denied
+
+If you think you have received this message due to a bug rather
+than a configuration issue please read the section on submitting
+bugs on either our web page at www.isc.org or in the README file
+before submitting a bug.  These pages explain the proper
+process and the information we find helpful for debugging..
+
+exiting.

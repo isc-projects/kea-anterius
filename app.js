@@ -12,7 +12,7 @@ var app = express();
 
 /* Read Config */
 var json_file = require('jsonfile');
-var glass_config = json_file.readFileSync('config/anterius_config.json');
+var anter_config = json_file.readFileSync('config/anterius_config.json');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -22,9 +22,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-if (glass_config.ip_ranges_to_allow != "") {
+if (anter_config.ip_ranges_to_allow != "") {
     var ip_filter = require('express-ipfilter').IpFilter;
-    var ips = glass_config.ip_ranges_to_allow;
+    var ips = anter_config.ip_ranges_to_allow;
     app.use(ip_filter(ips, { mode: 'allow' }));
 }
 
@@ -47,7 +47,7 @@ app.use('/glass_alerts', require('./routes/glass_alerts'));
 app.use('/glass_alert_settings_save', require('./routes/glass_alert_settings_save'));
 app.use('/glass_settings_save', require('./routes/glass_settings_save'));
 
-/* Glass API Routes - temporarily disabled */
+/* Glass API Routes - disabled */
 // app.use('/api/get_active_leases/', require('./api/get_active_leases'));
 // app.use('/api/get_subnet_details/', require('./api/get_subnet_details'));
 // app.use('/api/get_vendor_count/', require('./api/get_vendor_count'));
@@ -77,7 +77,7 @@ app.use(function (err, req, res, next) {
 });
 
 module.exports = app;
-module.exports.glass_config = glass_config;
+module.exports.anter_config = anter_config;
 
 /**
  Anterius Data Model - Global Statistics Variables
@@ -133,7 +133,7 @@ if (fs.existsSync(oui_database_file)) {
                 if (typeof oui_line_data[1] !== "undefined")
                     oui_data[oui_line_data[0].trim()] = oui_line_data[1].trim();
             }
-            console.log("[Glass Server] OUI Database Loaded");
+            console.log("<Anterius Server> OUI Database Loaded");
         }
     });
 }
@@ -146,7 +146,7 @@ if (fs.existsSync(oui_database_file)) {
 // lease_read_buffer = "";
 
 // fs = require('fs');
-// fs.readFile(glass_config.leases_file, 'utf8', function (err, data) {
+// fs.readFile(anter_config.leases_file, 'utf8', function (err, data) {
 //     if (err) {
 //         return console.log(err);
 //     }
@@ -161,7 +161,7 @@ if (fs.existsSync(oui_database_file)) {
  */
 // var tail_module = require('always-tail2');
 // tail = new tail_module(
-//     glass_config.leases_file,
+//     anter_config.leases_file,
 //     "\n",
 //     options
 // );
@@ -195,7 +195,7 @@ if (fs.existsSync(oui_database_file)) {
  */
 
 var json_file = require('jsonfile');
-var glass_config = json_file.readFileSync('config/anterius_config.json');
+var anter_config = json_file.readFileSync('config/anterius_config.json');
 
 var options = {};
 options.interval = 1000;
@@ -281,8 +281,8 @@ function fire_kea_api(req_data) {
         method: 'POST'
     };
     var req = http.request(options, function (res) {
-        console.log('STATUS: ' + res.statusCode);
-        console.log('HEADERS: ' + JSON.stringify(res.headers));
+        // console.log('STATUS: ' + res.statusCode);
+        // console.log('HEADERS: ' + JSON.stringify(res.headers));
         res.setEncoding('utf8');
         res.on('data', function (body) {
             // console.log('BODY: ' + body);
@@ -340,8 +340,8 @@ cpu_utilization_poll = setInterval(function () {
 fs.watch('config/anterius_config.json', function (event, filename) {
     if (filename) {
         setTimeout(function () {
-            glass_config = json_file.readFileSync('config/anterius_config.json');
-            console.log("[Glass Server] Config Loaded");
+            anter_config = json_file.readFileSync('config/anterius_config.json');
+            console.log("<Anterius Server> Config Loaded");
         }, 1000);
     } else {
         console.log('filename not provided');
@@ -357,7 +357,7 @@ fs.watch('config/anterius_config.json', function (event, filename) {
 
 // options.interval = 300;
 // var tail_dhcp_log = new tail_module(
-//     glass_config.log_file,
+//     anter_config.log_file,
 //     "\n",
 //     options
 // );
@@ -555,7 +555,7 @@ fs.watch('config/anterius_config.json', function (event, filename) {
 
 // var Slack = require('slack-node');
 
-// webhookUri = glass_config.slack_webhook_url;
+// webhookUri = anter_config.slack_webhook_url;
 
 // slack = new Slack();
 // slack.setWebhook(webhookUri);
@@ -564,7 +564,7 @@ fs.watch('config/anterius_config.json', function (event, filename) {
 //     console.log("[Slack] %s", message);
 
 //     slack.webhook({
-//         channel: glass_config.slack_alert_channel,
+//         channel: anter_config.slack_alert_channel,
 //         username: "Glass",
 //         icon_emoji: "https://imgur.com/wD3CcBi",
 //         text: "(" + host_name + ") " + message
@@ -574,164 +574,164 @@ fs.watch('config/anterius_config.json', function (event, filename) {
 // }
 
 /**
- * Alert Checks - disabled till phase 2
+ * Alert Checks - disabled
  */
 
-// alert_status = [];
-// alert_status['leases_per_minute'] = 0;
-// setTimeout(function () {
-//     console.log("[Glass Server] Alert loop started");
+alert_status = [];
+alert_status['leases_per_minute'] = 0;
+setTimeout(function () {
+    console.log("[ Server] Alert loop started");
 
-//     alert_check_timer = setInterval(function () {
-//         // console.log("[Timer] Alert Timer check");
-//         if (glass_config.leases_per_minute_threshold > 0) {
-//             // console.log("[Timer] lpm: %s lpm_th: %s", leases_per_minute, glass_config.leases_per_minute_threshold);
-//             if (leases_per_minute <= glass_config.leases_per_minute_threshold && alert_status['leases_per_minute'] == 0) {
-//                 alert_status['leases_per_minute'] = 1;
+    alert_check_timer = setInterval(function () {
+        // console.log("[Timer] Alert Timer check");
+        if (anter_config.leases_per_minute_threshold > 0) {
+            // console.log("[Timer] lpm: %s lpm_th: %s", leases_per_minute, anter_config.leases_per_minute_threshold);
+            if (leases_per_minute <= anter_config.leases_per_minute_threshold && alert_status['leases_per_minute'] == 0) {
+                alert_status['leases_per_minute'] = 1;
 
-//                 slack_message(":warning: CRITICAL: DHCP leases per minute have dropped below threshold " +
-//                     "(" + parseInt(glass_config.leases_per_minute_threshold).toLocaleString('en') + ") " +
-//                     "Current (" + parseInt(leases_per_minute).toLocaleString('en') + ")");
+                slack_message(":warning: CRITICAL: DHCP leases per minute have dropped below threshold " +
+                    "(" + parseInt(anter_config.leases_per_minute_threshold).toLocaleString('en') + ") " +
+                    "Current (" + parseInt(leases_per_minute).toLocaleString('en') + ")");
 
-//                 email_alert("CRITICAL: Leases Per Minute Threshold", "DHCP leases per minute dropped below critical threshold <br><br>" +
-//                     "Threshold: (" + parseInt(glass_config.leases_per_minute_threshold).toLocaleString('en') + ") <br>" +
-//                     "Current: (" + parseInt(leases_per_minute).toLocaleString('en') + ") <br><br>" +
-//                     "This is usually indicative of a process or hardware problem and needs to be addressed immediately");
-//             }
-//             else if (leases_per_minute >= glass_config.leases_per_minute_threshold && alert_status['leases_per_minute'] == 1) {
-//                 alert_status['leases_per_minute'] = 0;
+                email_alert("CRITICAL: Leases Per Minute Threshold", "DHCP leases per minute dropped below critical threshold <br><br>" +
+                    "Threshold: (" + parseInt(anter_config.leases_per_minute_threshold).toLocaleString('en') + ") <br>" +
+                    "Current: (" + parseInt(leases_per_minute).toLocaleString('en') + ") <br><br>" +
+                    "This is usually indicative of a process or hardware problem and needs to be addressed immediately");
+            }
+            else if (leases_per_minute >= anter_config.leases_per_minute_threshold && alert_status['leases_per_minute'] == 1) {
+                alert_status['leases_per_minute'] = 0;
 
-//                 slack_message(":white_check_mark: CLEAR: DHCP leases per minute have returned to above threshold " +
-//                     "(" + parseInt(glass_config.leases_per_minute_threshold).toLocaleString('en') + ") " +
-//                     "Current (" + parseInt(leases_per_minute).toLocaleString('en') + ")");
+                slack_message(":white_check_mark: CLEAR: DHCP leases per minute have returned to above threshold " +
+                    "(" + parseInt(anter_config.leases_per_minute_threshold).toLocaleString('en') + ") " +
+                    "Current (" + parseInt(leases_per_minute).toLocaleString('en') + ")");
 
-//                 email_alert("CLEAR: Leases Per Minute Threshold", "DHCP leases per minute have returned to normal <br><br>" +
-//                     "Threshold: (" + parseInt(glass_config.leases_per_minute_threshold).toLocaleString('en') + ") <br>" +
-//                     "Current: (" + parseInt(leases_per_minute).toLocaleString('en') + ")"
-//                 );
+                email_alert("CLEAR: Leases Per Minute Threshold", "DHCP leases per minute have returned to normal <br><br>" +
+                    "Threshold: (" + parseInt(anter_config.leases_per_minute_threshold).toLocaleString('en') + ") <br>" +
+                    "Current: (" + parseInt(leases_per_minute).toLocaleString('en') + ")"
+                );
 
-//             }
-//         }
-//     }, (5 * 1000));
+            }
+        }
+    }, (5 * 1000));
 
-//     alert_status_networks_warning = [];
-//     alert_status_networks_critical = [];
+    alert_status_networks_warning = [];
+    alert_status_networks_critical = [];
 
-//     alert_subnet_check_timer = setInterval(function () {
-//         // console.log("[Timer] Alert Timer check - subnets");
+    alert_subnet_check_timer = setInterval(function () {
+        // console.log("[Timer] Alert Timer check - subnets");
 
-//         if (glass_config.shared_network_warning_threshold > 0 || glass_config.shared_network_critical_threshold > 0) {
-//             const execSync = require('child_process').execSync;
-//             output = execSync('./bin/dhcpd-pools -c ' + glass_config.config_file + ' -l ' + glass_config.leases_file + ' -f j -A -s e');
-//             var dhcp_data = JSON.parse(output);
+        if (anter_config.shared_network_warning_threshold > 0 || anter_config.shared_network_critical_threshold > 0) {
+            const execSync = require('child_process').execSync;
+            output = execSync('./bin/dhcpd-pools -c ' + anter_config.config_file + ' -l ' + anter_config.leases_file + ' -f j -A -s e');
+            var dhcp_data = JSON.parse(output);
 
-//             /*
-//              * Iterate through Shared Networks
-//              */
-//             for (var i = 0; i < dhcp_data['shared-networks'].length; i++) {
-//                 utilization = round(parseFloat(dhcp_data['shared-networks'][i].used / dhcp_data['shared-networks'][i].defined) * 100, 2);
+            /*
+             * Iterate through Shared Networks
+             */
+            for (var i = 0; i < dhcp_data['shared-networks'].length; i++) {
+                utilization = round(parseFloat(dhcp_data['shared-networks'][i].used / dhcp_data['shared-networks'][i].defined) * 100, 2);
 
-//                 if (isNaN(utilization))
-//                     utilization = 0;
+                if (isNaN(utilization))
+                    utilization = 0;
 
 
-//                 /* Initialize these array buckets */
-//                 if (typeof alert_status_networks_warning[dhcp_data['shared-networks'][i].location] === "undefined")
-//                     alert_status_networks_warning[dhcp_data['shared-networks'][i].location] = 0;
+                /* Initialize these array buckets */
+                if (typeof alert_status_networks_warning[dhcp_data['shared-networks'][i].location] === "undefined")
+                    alert_status_networks_warning[dhcp_data['shared-networks'][i].location] = 0;
 
-//                 if (typeof alert_status_networks_critical[dhcp_data['shared-networks'][i].location] === "undefined")
-//                     alert_status_networks_critical[dhcp_data['shared-networks'][i].location] = 0;
+                if (typeof alert_status_networks_critical[dhcp_data['shared-networks'][i].location] === "undefined")
+                    alert_status_networks_critical[dhcp_data['shared-networks'][i].location] = 0;
 
-//                 /*
-//                  console.log("Location: %s", dhcp_data['shared-networks'][i].location);
-//                  console.log("Used: %s", dhcp_data['shared-networks'][i].used.toLocaleString('en'));
-//                  console.log("Defined: %s", dhcp_data['shared-networks'][i].defined.toLocaleString('en'));
-//                  console.log("Free: %s", dhcp_data['shared-networks'][i].free.toLocaleString('en'));
-//                  console.log("Utilization: %s", utilization);
-//                  console.log(" \n");
-//                  */
+                /*
+                 console.log("Location: %s", dhcp_data['shared-networks'][i].location);
+                 console.log("Used: %s", dhcp_data['shared-networks'][i].used.toLocaleString('en'));
+                 console.log("Defined: %s", dhcp_data['shared-networks'][i].defined.toLocaleString('en'));
+                 console.log("Free: %s", dhcp_data['shared-networks'][i].free.toLocaleString('en'));
+                 console.log("Utilization: %s", utilization);
+                 console.log(" \n");
+                 */
 
-//                 /* Check Warnings */
-//                 if (glass_config.shared_network_warning_threshold > 0) {
-//                     if (
-//                         utilization >= glass_config.shared_network_warning_threshold &&
-//                         utilization <= glass_config.shared_network_critical_threshold &&
-//                         alert_status_networks_warning[dhcp_data['shared-networks'][i].location] == 0
-//                     ) {
-//                         alert_status_networks_warning[dhcp_data['shared-networks'][i].location] = 1;
+                /* Check Warnings */
+                if (anter_config.shared_network_warning_threshold > 0) {
+                    if (
+                        utilization >= anter_config.shared_network_warning_threshold &&
+                        utilization <= anter_config.shared_network_critical_threshold &&
+                        alert_status_networks_warning[dhcp_data['shared-networks'][i].location] == 0
+                    ) {
+                        alert_status_networks_warning[dhcp_data['shared-networks'][i].location] = 1;
 
-//                         slack_message(":warning: WARNING: DHCP shared network utilization (" + dhcp_data['shared-networks'][i].location + ") " +
-//                             "Current: (" + utilization + "%) " +
-//                             "Threshold: (" + glass_config.shared_network_warning_threshold + "%)"
-//                         );
+                        slack_message(":warning: WARNING: DHCP shared network utilization (" + dhcp_data['shared-networks'][i].location + ") " +
+                            "Current: (" + utilization + "%) " +
+                            "Threshold: (" + anter_config.shared_network_warning_threshold + "%)"
+                        );
 
-//                         email_alert("WARNING: DHCP shared network utilization",
-//                             "WARNING: DHCP shared network utilization (" + dhcp_data['shared-networks'][i].location + ") <br><br>" +
-//                             "Threshold: (" + glass_config.shared_network_warning_threshold + "%) <br>" +
-//                             "Current: (" + utilization + "%)"
-//                         );
+                        email_alert("WARNING: DHCP shared network utilization",
+                            "WARNING: DHCP shared network utilization (" + dhcp_data['shared-networks'][i].location + ") <br><br>" +
+                            "Threshold: (" + anter_config.shared_network_warning_threshold + "%) <br>" +
+                            "Current: (" + utilization + "%)"
+                        );
 
-//                     }
-//                     else if (
-//                         utilization <= glass_config.shared_network_warning_threshold &&
-//                         alert_status_networks_warning[dhcp_data['shared-networks'][i].location] == 1
-//                     ) {
-//                         alert_status_networks_warning[dhcp_data['shared-networks'][i].location] = 0;
+                    }
+                    else if (
+                        utilization <= anter_config.shared_network_warning_threshold &&
+                        alert_status_networks_warning[dhcp_data['shared-networks'][i].location] == 1
+                    ) {
+                        alert_status_networks_warning[dhcp_data['shared-networks'][i].location] = 0;
 
-//                         slack_message(":white_check_mark: CLEAR: Warning DHCP shared network utilization (" + dhcp_data['shared-networks'][i].location + ") " +
-//                             "Current: (" + utilization + "%) " +
-//                             "Threshold: (" + glass_config.shared_network_warning_threshold + "%)"
-//                         );
+                        slack_message(":white_check_mark: CLEAR: Warning DHCP shared network utilization (" + dhcp_data['shared-networks'][i].location + ") " +
+                            "Current: (" + utilization + "%) " +
+                            "Threshold: (" + anter_config.shared_network_warning_threshold + "%)"
+                        );
 
-//                         email_alert("CLEAR: DHCP shared network utilization warning",
-//                             "CLEAR: DHCP shared network utilization (" + dhcp_data['shared-networks'][i].location + ") <br><br>" +
-//                             "Threshold: (" + glass_config.shared_network_warning_threshold + "%) <br>" +
-//                             "Current: (" + utilization + "%)"
-//                         );
+                        email_alert("CLEAR: DHCP shared network utilization warning",
+                            "CLEAR: DHCP shared network utilization (" + dhcp_data['shared-networks'][i].location + ") <br><br>" +
+                            "Threshold: (" + anter_config.shared_network_warning_threshold + "%) <br>" +
+                            "Current: (" + utilization + "%)"
+                        );
 
-//                     }
-//                 }
+                    }
+                }
 
-//                 /* Check Critical */
-//                 if (glass_config.shared_network_critical_threshold > 0) {
-//                     if (
-//                         utilization >= glass_config.shared_network_critical_threshold &&
-//                         alert_status_networks_critical[dhcp_data['shared-networks'][i].location] == 0
-//                     ) {
-//                         alert_status_networks_critical[dhcp_data['shared-networks'][i].location] = 1;
-//                         slack_message(":fire: CRITICAL: DHCP shared network utilization (" + dhcp_data['shared-networks'][i].location + ") " +
-//                             "Current: (" + utilization + "%) " +
-//                             "Threshold: (" + glass_config.shared_network_critical_threshold + "%)"
-//                         );
+                /* Check Critical */
+                if (anter_config.shared_network_critical_threshold > 0) {
+                    if (
+                        utilization >= anter_config.shared_network_critical_threshold &&
+                        alert_status_networks_critical[dhcp_data['shared-networks'][i].location] == 0
+                    ) {
+                        alert_status_networks_critical[dhcp_data['shared-networks'][i].location] = 1;
+                        slack_message(":fire: CRITICAL: DHCP shared network utilization (" + dhcp_data['shared-networks'][i].location + ") " +
+                            "Current: (" + utilization + "%) " +
+                            "Threshold: (" + anter_config.shared_network_critical_threshold + "%)"
+                        );
 
-//                         email_alert("CRITICAL: DHCP shared network utilization",
-//                             "CRITICAL: DHCP shared network utilization (" + dhcp_data['shared-networks'][i].location + ") <br><br>" +
-//                             "Threshold: (" + glass_config.shared_network_critical_threshold + "%) <br>" +
-//                             "Current: (" + utilization + "%)"
-//                         );
+                        email_alert("CRITICAL: DHCP shared network utilization",
+                            "CRITICAL: DHCP shared network utilization (" + dhcp_data['shared-networks'][i].location + ") <br><br>" +
+                            "Threshold: (" + anter_config.shared_network_critical_threshold + "%) <br>" +
+                            "Current: (" + utilization + "%)"
+                        );
 
-//                     }
-//                     else if (
-//                         utilization <= glass_config.shared_network_critical_threshold &&
-//                         alert_status_networks_critical[dhcp_data['shared-networks'][i].location] == 1
-//                     ) {
-//                         alert_status_networks_critical[dhcp_data['shared-networks'][i].location] = 0;
-//                         slack_message(":white_check_mark: CLEAR: Critical DHCP shared network utilization (" + dhcp_data['shared-networks'][i].location + ") " +
-//                             "Current: (" + utilization + "%) " +
-//                             "Threshold: (" + glass_config.shared_network_critical_threshold + "%)"
-//                         );
+                    }
+                    else if (
+                        utilization <= anter_config.shared_network_critical_threshold &&
+                        alert_status_networks_critical[dhcp_data['shared-networks'][i].location] == 1
+                    ) {
+                        alert_status_networks_critical[dhcp_data['shared-networks'][i].location] = 0;
+                        slack_message(":white_check_mark: CLEAR: Critical DHCP shared network utilization (" + dhcp_data['shared-networks'][i].location + ") " +
+                            "Current: (" + utilization + "%) " +
+                            "Threshold: (" + anter_config.shared_network_critical_threshold + "%)"
+                        );
 
-//                         email_alert("CLEAR: DHCP shared network utilization",
-//                             "CLEAR: DHCP shared network utilization (" + dhcp_data['shared-networks'][i].location + ") <br><br>" +
-//                             "Threshold: (" + glass_config.shared_network_critical_threshold + "%) <br>" +
-//                             "Current: (" + utilization + "%)"
-//                         );
-//                     }
-//                 }
-//             }
-//         }
-//     }, (5 * 1000));
-// }, 60 * 1000);
+                        email_alert("CLEAR: DHCP shared network utilization",
+                            "CLEAR: DHCP shared network utilization (" + dhcp_data['shared-networks'][i].location + ") <br><br>" +
+                            "Threshold: (" + anter_config.shared_network_critical_threshold + "%) <br>" +
+                            "Current: (" + utilization + "%)"
+                        );
+                    }
+                }
+            }
+        }
+    }, (5 * 1000));
+}, 60 * 1000);
 
 // function round(num, places) {
 //     var multiplier = Math.pow(10, places);
@@ -758,10 +758,10 @@ fs.watch('config/anterius_config.json', function (event, filename) {
 //     /* E-Mail Template Load */
 //     console.log("[Glass Server] Sending E-Mail Alert...\n");
 
-//     if (typeof glass_config.email_alert_to === "undefined" && typeof glass_config.sms_alert_to === "undefined")
+//     if (typeof anter_config.email_alert_to === "undefined" && typeof anter_config.sms_alert_to === "undefined")
 //         return false;
 
-//     if (glass_config.email_alert_to == "" && glass_config.sms_alert_to != "") {
+//     if (anter_config.email_alert_to == "" && anter_config.sms_alert_to != "") {
 //         console.log("[Glass Server] No email_to specified - returning...");
 //         return false;
 //     }
@@ -772,13 +772,13 @@ fs.watch('config/anterius_config.json', function (event, filename) {
 //     email_body = email_body.replace("[local_time]", new Date().toString());
 
 //     /* Clean extra commas etc. */
-//     glass_config.email_alert_to = glass_config.email_alert_to.replace(/^[,\s]+|[,\s]+$/g, '').replace(/,[,\s]*,/g, ',');
+//     anter_config.email_alert_to = anter_config.email_alert_to.replace(/^[,\s]+|[,\s]+$/g, '').replace(/,[,\s]*,/g, ',');
 
 //     /* Send regular HTML E-Mails */
-//     if (glass_config.email_alert_to.trim() != "") {
+//     if (anter_config.email_alert_to.trim() != "") {
 //         var mailOptions = {
 //             from: "Glass Alerting Monitor glass@noreply.com",
-//             to: glass_config.email_alert_to,
+//             to: anter_config.email_alert_to,
 //             subject: "[Glass] " + "(" + host_name + ") " + alert_title,
 //             html: email_body,
 //         };
@@ -793,10 +793,10 @@ fs.watch('config/anterius_config.json', function (event, filename) {
 //     }
 
 //     /* Send SMS */
-//     if (glass_config.sms_alert_to.trim() != "") {
+//     if (anter_config.sms_alert_to.trim() != "") {
 //         var mailOptions = {
 //             from: "Glass Alerting Monitor glass@noreply.com",
-//             to: glass_config.sms_alert_to,
+//             to: anter_config.sms_alert_to,
 //             subject: "[Glass] " + "(" + host_name + ") " + alert_title,
 //             html: (alert_message.substring(0, 130) + "..."),
 //         };
@@ -811,4 +811,4 @@ fs.watch('config/anterius_config.json', function (event, filename) {
 //     }
 // }
 
-console.log("[Anterius Server] Bootup complete");
+console.log("<Anterius Server> Bootup complete");

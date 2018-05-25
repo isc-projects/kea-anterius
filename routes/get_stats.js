@@ -9,8 +9,6 @@ router.get('/', function (req, res, next) {
 	// var json_file = require('jsonfile');
 	// var ante_config = json_file.readFileSync('config/anterius_config.json');
 
-	
-
 	// TODO: see if dhcpd-pools will work for Kea files, if parsing lease files
 	// Third-party lib dhcpd-pools to parse config and lease files
 	// const execSync = require('child_process').execSync;
@@ -22,6 +20,7 @@ router.get('/', function (req, res, next) {
 	shared_nw_count = kea_config['Dhcp4']['shared-networks'].length;
 	shared_nw_util = [];
 	for (var i = 0; i < shared_nw_count; i++) {
+		// TODO: verify shared nw stats are received as below usage
 		utilization = round(parseFloat(kea_stats['shared-network[' + i + '].assigned-addresses'][0][0] / kea_stats['shared-network[' + i + '].total-addresses'][0][0]) * 100, 2);
 
 		if (isNaN(utilization))
@@ -64,7 +63,7 @@ router.get('/', function (req, res, next) {
 
 	// Calculate Subnet utilization
 	// TODO: Find source for subnet count
-	subnet_count = kea_config['Dhcp4']['subnets'].length;
+	subnet_count = kea_config['Dhcp4']['subnet4'].length;
 	subnet_util = [];
 	for (var i = 1; i <= subnet_count; i++) {
 		utilization = round(parseFloat(kea_stats['subnet[' + i + '].assigned-addresses'][0][0] / kea_stats['subnet[' + i + '].total-addresses'][0][0]) * 100, 2);
@@ -81,13 +80,13 @@ router.get('/', function (req, res, next) {
 
 	subnet_table = '';
 
-	for (var i = 0; i < kea_stats.subnets.length; i++) {
+	for (var i = 0; i < subnet_count; i++) {
 		utilization = kea_stats.subnets[i].utilization;
 
 		// TODO: Find and replace correct attribute value source from API
 		// Define subnet row for table
 		table_row = '';
-		table_row = table_row + '<td><b>' + kea_stats.subnets[i].location + '</b></td>';
+		table_row = table_row + '<td><b>' + kea_config.subnet4[i].subnet + '</b></td>'; //Subnet Range
 		table_row = table_row + '<td>' + kea_stats.subnets[i].range + '</td>';
 		table_row = table_row + '<td>' + kea_stats.subnets[i].used.toLocaleString('en') + ' (' + utilization + '%)</td>';
 		table_row = table_row + '<td class="hide_col">' + kea_stats.subnets[i].defined.toLocaleString('en') + '</td>';
