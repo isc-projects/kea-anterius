@@ -133,7 +133,7 @@ if (fs.existsSync(oui_database_file)) {
                 if (typeof oui_line_data[1] !== "undefined")
                     oui_data[oui_line_data[0].trim()] = oui_line_data[1].trim();
             }
-            console.log("<Anterius Server> OUI Database Loaded");
+            console.log("Anterius Server> OUI Database Loaded");
         }
     });
 }
@@ -341,7 +341,7 @@ fs.watch('config/anterius_config.json', function (event, filename) {
     if (filename) {
         setTimeout(function () {
             anter_config = json_file.readFileSync('config/anterius_config.json');
-            console.log("<Anterius Server> Config Loaded");
+            console.log("Anterius Server> Config Loaded");
         }, 1000);
     } else {
         console.log('filename not provided');
@@ -580,7 +580,7 @@ fs.watch('config/anterius_config.json', function (event, filename) {
 alert_status = [];
 alert_status['leases_per_minute'] = 0;
 setTimeout(function () {
-    console.log("[ Server] Alert loop started");
+    console.log("Anterius Server> Alert loop started");
 
     alert_check_timer = setInterval(function () {
         // console.log("[Timer] Alert Timer check");
@@ -811,4 +811,4 @@ setTimeout(function () {
 //     }
 // }
 
-console.log("<Anterius Server> Bootup complete");
+console.log("Anterius Server> Bootup complete");

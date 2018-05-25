@@ -87,26 +87,26 @@
                 <ul class="list">
                     <li class="header menuitems">Kea Monitoring Options</li>
                     <li class="active">
-                        <a href="/" pjax="1">
+                        <a href="/" pjax="1" onclick="navtoggle()">
                             <i class="material-icons menuitems">home</i>
                             <span class="menuitems">Home</span>
                         </a>
                     </li>
                     <li>
-                        <a href="/dhcp_statistics" pjax="1">
+                        <a href="/dhcp_statistics" pjax="1" onclick="navtoggle()">
                             <i class="material-icons menuitems">pie_chart</i>
                             <span class="menuitems">Statistics</span>
                         </a>
                     </li>
                     <li>
-                        <a href="/dhcp_leases" pjax="1">
+                        <a href="/dhcp_leases" pjax="1" onclick="navtoggle()">
                             <i class="material-icons menuitems">layers</i>
                             <span class="menuitems">Leases</span>
                         </a>
                     </li>
 
                     <li>
-                        <a href="/dhcp_log" pjax="1">
+                        <a href="/dhcp_log" pjax="1" onclick="navtoggle()">
                             <i class="material-icons menuitems">view_stream</i>
                             <span class="menuitems">Logs</span>
                         </a>
@@ -114,19 +114,19 @@
 
                     <li class="header menuitems">Kea Configuration Options</li>
                     <li>
-                        <a href="/dhcp_config" pjax="1">
+                        <a href="/dhcp_config" pjax="1" onclick="navtoggle()">
                             <i class="material-icons menuitems">mode_edit</i>
                             <span class="menuitems">DHCP Config</span>
                         </a>
                     </li>
                     <li>
-                        <a href="/dhcp_config_snapshots" pjax="1">
+                        <a href="/dhcp_config_snapshots" pjax="1" onclick="navtoggle()">
                             <i class="material-icons menuitems">cloud_download</i>
                             <span class="menuitems">DHCP Config Snapshots</span>
                         </a>
                     </li>
                     <li>
-                        <a href="/dhcp_start_stop_restart" pjax="1">
+                        <a href="/dhcp_start_stop_restart" pjax="1" onclick="navtoggle()">
                             <i class="material-icons menuitems">refresh</i>
                             <span class="menuitems">Start / Stop / Restart</span>
                         </a>
@@ -134,14 +134,14 @@
 
                     <li class="header menuitems">Settings</li>
                     <li>
-                        <a href="/glass_settings" pjax="1">
+                        <a href="/glass_settings" pjax="1" onclick="navtoggle()">
                             <i class="material-icons menuitems">settings</i>
                             <span class="menuitems">Kea-Anterius Settings</span>
                         </a>
                     </li>
 
                     <li>
-                        <a href="/glass_alerts" pjax="1">
+                        <a href="/glass_alerts" pjax="1" onclick="navtoggle()">
                             <i class="material-icons menuitems">add_alert</i>
                             <span class="menuitems">Kea-Anterius Alerts Config</span>
                         </a>
@@ -149,7 +149,7 @@
 
                     <!-- <li class="header">Glass API</li>
                 <li>
-                    <a href="/api_examples" pjax="1">
+                    <a href="/api_examples" pjax="1" onclick="navtoggle()">
                         <i class="material-icons menuitems">widgets</i>
                         <span class="menuitems">API Examples</span>
                     </a>
@@ -341,7 +341,7 @@
                 setTimeout(function () {
                     side_nav.style.width = "0px";
                     document.getElementById("content").style.marginLeft = "15px";
-                }, 150);
+                }, 350);
             } else {
                 side_nav.style.width = "300px";
                 document.getElementById("content").style.marginLeft = "315px";
