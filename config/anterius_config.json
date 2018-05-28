@@ -1,4 +1,6 @@
 {
+  "server_addr": "localhost",
+  "server_port": "8000",
   "admin_user": "keaadmin",
   "admin_password": "keaadmin",
   "leases_file": "/usr/local/var/kea/kea-leases4.csv",

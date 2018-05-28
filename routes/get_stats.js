@@ -40,6 +40,7 @@ router.get('/', function (req, res, next) {
 		utilization = shared_nw_util[i];
 
 		// TODO: Find and replace correct attribute value source from API
+		// TODO: Verify shared network attrbute 'location' used as promary index
 		// Define shared network row for table
 		table_row = '';
 		table_row = table_row + '<td><b>' + kea_stats['shared-networks'][i].location + '</b></td>';
