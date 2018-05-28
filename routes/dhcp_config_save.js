@@ -37,7 +37,7 @@ router.post('/', authorize.auth, function(req, res, next) {
 			);
 			/* Read Config */
 			var json_file = require('jsonfile');
-			var glass_config = json_file.readFileSync('config/anterius_config.json');
+			var anterius_config = json_file.readFileSync('config/anterius_config.json');
 
 			/* Make Dir if not exist */
 			var dir = './config_backups';
@@ -46,12 +46,12 @@ router.post('/', authorize.auth, function(req, res, next) {
 			}
 
 			//date +"%Y-%m-%d_%H:%M:%S"
-			exec('/bin/cp ' + glass_config.config_file + ' ./config_backups/`basename ' + glass_config.config_file + '`_`date +"%Y-%m-%d_%H:%M:%S"`',
+			exec('/bin/cp ' + anterius_config.config_file + ' ./config_backups/`basename ' + anterius_config.config_file + '`_`date +"%Y-%m-%d_%H:%M:%S"`',
 				function(err, stdout, stderr) {
 
 			});
 
-			fs.writeFileSync(glass_config.config_file, request.dhcp_config_data, 'utf8');
+			fs.writeFileSync(anterius_config.config_file, request.dhcp_config_data, 'utf8');
 
 			fs.unlinkSync("./verify_output");
 			fs.unlinkSync("./syntax_verify_config");

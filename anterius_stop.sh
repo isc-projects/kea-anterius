@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-pkill -f glass-
+pkill -f anterius-

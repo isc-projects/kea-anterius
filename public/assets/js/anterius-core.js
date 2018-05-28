@@ -152,10 +152,10 @@ function get_form_query_string(form_id) {
 }
 
 function save_config() {
-    glass_settings = get_form_query_string("glass-settings-form");
+    anterius_settings = get_form_query_string("anterius-settings-form");
 
-    $.post("/glass_settings_save", glass_settings, function (data) {
-        $("#glass_settings_result").html(data);
+    $.post("/anterius_settings_save", anterius_settings, function (data) {
+        $("#anterius_settings_result").html(data);
     });
 }
 

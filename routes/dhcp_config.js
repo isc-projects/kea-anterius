@@ -12,13 +12,13 @@ router.get('/', authorize.auth, function(req, res, next) {
 
 	/* Read Config */
 	var json_file = require('jsonfile');
-	var glass_config = json_file.readFileSync('config/anterius_config.json');
+	var anterius_config = json_file.readFileSync('config/anterius_config.json');
 
 	content = template_render.set_template_variable(content, "title", "DHCP Config");
 	content = template_render.set_template_variable(content, "c_content", "");
-	content = template_render.set_template_variable(content, "dhcp_config_location", glass_config.config_file);
+	content = template_render.set_template_variable(content, "dhcp_config_location", anterius_config.config_file);
 
-	var dhcp_config = fs.readFileSync(glass_config.config_file, 'utf8');
+	var dhcp_config = fs.readFileSync(anterius_config.config_file, 'utf8');
 	content = template_render.set_template_variable(content, "dhcp_config_content", dhcp_config);
 
 	res.send(template_render.get_index_template(content, req.url));
