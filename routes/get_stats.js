@@ -1,5 +1,5 @@
 /*
-© Anthrino
+© Anthrino > Home page statistics processor
 */
 
 var express = require('express');

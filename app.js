@@ -1,6 +1,5 @@
 var express = require('express');
 var path = require('path');
-var http = require('http');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
@@ -9,6 +8,8 @@ var bodyParser = require('body-parser');
 const execSync = require('child_process').execSync;
 
 var app = express();
+
+var api_agent = require('./lib/api_service.js');
 
 /* Read Config */
 var json_file = require('jsonfile');
@@ -39,7 +40,7 @@ app.use('/dhcp_log', require('./routes/dhcp_log'));
 app.use('/dhcp_config', require('./routes/dhcp_config'));
 app.use('/dhcp_config_snapshots', require('./routes/dhcp_config_snapshots'));
 app.use('/dhcp_config_snapshot_view', require('./routes/dhcp_config_snapshot_view'));
-app.use('/dhcp_config_save', require('./routes/dhcp_config_save'));
+app.use('/dhcp_config_update', require('./routes/dhcp_config_update'));
 app.use('/dhcp_start_stop_restart', require('./routes/dhcp_start_stop_restart'));
 app.use('/api_examples', require('./routes/api_examples'));
 app.use('/anterius_settings', require('./routes/anterius_settings'));
@@ -107,8 +108,8 @@ host_name = execSync("cat /etc/hostname").toString().replace("\n", "");
 stats_req_data = JSON.stringify({ "command": "statistic-get-all", "service": ["dhcp4"] });
 config_req_data = JSON.stringify({ "command": "config-get", "service": ["dhcp4"] });
 
-fire_kea_api(stats_req_data);
-fire_kea_api(config_req_data);
+api_agent.fire_kea_api(stats_req_data);
+api_agent.fire_kea_api(config_req_data);
 
 /**
  * Ingest OUI Database
@@ -221,8 +222,8 @@ var lpm_counter = 0;
 // Recurrent Loop for lease stats
 lease_stats_monitor = setInterval(function () {
 
-    fire_kea_api(stats_req_data);
-    fire_kea_api(config_req_data);
+    api_agent.fire_kea_api(stats_req_data);
+    api_agent.fire_kea_api(config_req_data);
 
     total_leases = 0;
     subnet_count = kea_config['Dhcp4']['subnet4'].length;
@@ -268,48 +269,6 @@ lease_stats_monitor = setInterval(function () {
     // }
 
 }, 1000);
-
-function fire_kea_api(req_data) {
-    var options = {
-        host: anter_config.server_addr,
-        port: anter_config.server_port,
-        path: '/',
-        headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': req_data.length
-        },
-        method: 'POST'
-    };
-    var req = http.request(options, function (res) {
-        // console.log('STATUS: ' + res.statusCode);
-        // console.log('HEADERS: ' + JSON.stringify(res.headers));
-        res.setEncoding('utf8');
-        res.on('data', function (body) {
-            // console.log('BODY: ' + body);
-            body = JSON.parse(body)[0].arguments;
-            set_stats(body, 'Dhcp4' in body);
-        });
-        res.on('end', function () {
-            // console.log(kea_stats);
-            return
-        });
-    });
-
-    req.on('error', (e) => {
-        console.error(`Request Error: ${e.message}`);
-    });
-    req.write(req_data);
-    req.end();
-}
-
-function set_stats(api_data, mode) {
-    // console.log(mode, api_data);
-    if (mode)
-        kea_config = api_data;
-    else
-        kea_stats = api_data;
-
-}
 
 /**
  * Poll: CPU Utilization
@@ -628,7 +587,7 @@ fs.watch('config/anterius_config.json', function (event, filename) {
 //         // console.log("[Timer] Alert Timer check - subnets");
 
 //         if (anter_config.shared_network_warning_threshold > 0 || anter_config.shared_network_critical_threshold > 0) {
-            
+
 //             // TODO: remove local dhcpd-pools parser tools if deemed not required 
 //             // const execSync = require('child_process').execSync;
 //             // output = execSync('./bin/dhcpd-pools -c ' + anter_config.config_file + ' -l ' + anter_config.leases_file + ' -f j -A -s e');

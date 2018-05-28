@@ -1,6 +1,6 @@
-/**
- * Created by cmiles on 8/9/2017.
- */
+/*
+© Anthrino > DHCP config update publisher [API config-set]
+*/
 
 var express = require('express');
 var router = express.Router();
