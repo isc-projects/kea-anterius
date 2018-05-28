@@ -43,18 +43,18 @@ app.use('/dhcp_config_save', require('./routes/dhcp_config_save'));
 app.use('/dhcp_start_stop_restart', require('./routes/dhcp_start_stop_restart'));
 app.use('/api_examples', require('./routes/api_examples'));
 app.use('/anterius_settings', require('./routes/anterius_settings'));
-app.use('/anterius_alerts', require('./routes/anterius_alerts'));
+app.use('/anterius_alerts', require('./routes/alerts_config'));
 app.use('/anterius_alert_settings_save', require('./routes/anterius_alert_settings_save'));
 app.use('/anterius_settings_save', require('./routes/anterius_settings_save'));
 
 /* Glass API Routes - disabled */
-// app.use('/api/get_active_leases/', require('./api/get_active_leases'));
-// app.use('/api/get_subnet_details/', require('./api/get_subnet_details'));
-// app.use('/api/get_vendor_count/', require('./api/get_vendor_count'));
-// app.use('/api/get_mac_oui_count_by_vendor/', require('./api/get_mac_oui_count_by_vendor'));
-// app.use('/api/get_dhcp_requests/', require('./api/get_dhcp_requests'));
-// app.use('/api/get_server_info/', require('./api/get_server_info'));
-// app.use('/api/get_mac_oui_list/', require('./api/get_mac_oui_list'));
+app.use('/api/get_active_leases/', require('./api/get_active_leases'));
+app.use('/api/get_subnet_details/', require('./api/get_subnet_details'));
+app.use('/api/get_vendor_count/', require('./api/get_vendor_count'));
+app.use('/api/get_mac_oui_count_by_vendor/', require('./api/get_mac_oui_count_by_vendor'));
+app.use('/api/get_dhcp_requests/', require('./api/get_dhcp_requests'));
+app.use('/api/get_server_info/', require('./api/get_server_info'));
+app.use('/api/get_mac_oui_list/', require('./api/get_mac_oui_list'));
 
 app.set('view engine', 'html');
 

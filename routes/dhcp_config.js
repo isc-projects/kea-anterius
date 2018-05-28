@@ -14,12 +14,15 @@ router.get('/', authorize.auth, function(req, res, next) {
 	var json_file = require('jsonfile');
 	var anterius_config = json_file.readFileSync('config/anterius_config.json');
 
-	content = template_render.set_template_variable(content, "title", "DHCP Config");
-	content = template_render.set_template_variable(content, "c_content", "");
-	content = template_render.set_template_variable(content, "dhcp_config_location", anterius_config.config_file);
-
-	var dhcp_config = fs.readFileSync(anterius_config.config_file, 'utf8');
-	content = template_render.set_template_variable(content, "dhcp_config_content", dhcp_config);
+	content = template_render.set_template_variable(content, "title", "Kea DHCP4 Configuration");
+	
+	// Uncomment to display/modify Local configuration file
+	// content = template_render.set_template_variable(content, "c_content", "");
+	// content = template_render.set_template_variable(content, "dhcp_config_location", anterius_config.config_file);
+	// var dhcp_config = fs.readFileSync(anterius_config.config_file, 'utf8');
+	
+	// Display current config from API config-get
+	content = template_render.set_template_variable(content, "dhcp_config_content", JSON.stringify(kea_config.Dhcp4, null, 4));
 
 	res.send(template_render.get_index_template(content, req.url));
 });
