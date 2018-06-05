@@ -111,9 +111,15 @@ router.get('/', function (req, res, next) {
 
 		subnet_table = subnet_table + '<tr>' + table_row + '</tr>';
 	}
-
+	
+	svrun = run_status.replace('server:', ':').replace('server:', ':').replace("\n", "<br> \n")
+	.replace('active', '<span style="color: #00a90b">Active</span>')
+	.replace('inactive', '<span style="color: #D50000">Inactive</span>')
+	.split("\n").slice(0, 2);
+	
 	response_data = {
 		"cpu_utilization": cpu_utilization,
+		"run_status": svrun,
 		"leases_used": total_leases,
 		"leases_per_second": leases_per_sec,
 		"leases_per_minute": leases_per_minute,

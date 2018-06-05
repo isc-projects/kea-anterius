@@ -86,13 +86,13 @@ module.exports.anter_config = anter_config;
 kea_stats = {};
 kea_config = {};
 
-leases_per_minute = -1;
+leases_per_minute = 0;
 cpu_utilization = -1;
 total_leases = -1;
 
 current_time = 0;
 lps = -1;
-leases_per_sec = -1;
+leases_per_sec = 0;
 leases_last_update_time = -1;
 
 listening_to_log_file = 0;
@@ -102,7 +102,17 @@ options.interval = 1000;
 
 debug_watch_lease_parse_stream = 0;
 
+// TODO: Mechanism to execute command or get this data from remote machine
 host_name = execSync("cat /etc/hostname").toString().replace("\n", "");
+run_status = execSync("keactrl status").toString();
+
+/**
+ * Poll: CPU Utilization
+ */
+// cpu_utilization_poll = setInterval(function () {
+//     cpu_utilization = parseFloat(execSync("top -bn 1 | awk 'NR>7{s+=$9} END {print s/4}'").toString())
+// }, (15 * 1000));
+
 
 //Kea REST API call - config-get and statistics-get
 stats_req_data = JSON.stringify({ "command": "statistic-get-all", "service": ["dhcp4"] });
@@ -223,22 +233,24 @@ var lpm_counter = 0;
 lease_stats_monitor = setInterval(function () {
 
     api_agent.fire_kea_api(stats_req_data);
-    api_agent.fire_kea_api(config_req_data);
+    // api_agent.fire_kea_api(config_req_data);
 
+    // console.log(kea_stats);
+    
     total_leases = 0;
     subnet_count = kea_config['Dhcp4']['subnet4'].length;
     shared_nw_count = kea_config['Dhcp4']['shared-networks'].length;
-
+    
     for (var i = 0; i < shared_nw_count; i++) {
         total_leases += kea_stats['shared-network[' + i + '].assigned-addresses'][0][0];
     }
     for (var i = 1; i <= subnet_count; i++) {
         total_leases += kea_stats['subnet[' + i + '].assigned-addresses'][0][0];
     }
-
+    
     // Update metric - leases / sec 
     if (lpm_counter > 0)
-        leases_per_sec = total_leases - lps_list[lpm_counter - 1];
+        leases_per_sec = total_leases - tl0;
 
     lps_list[lpm_counter] = leases_per_sec;
     lpm_counter++;
@@ -257,6 +269,8 @@ lease_stats_monitor = setInterval(function () {
     if (lpm_counter == 60)
         lpm_counter = 0;
 
+    tl0 = total_leases
+    // console.log(leases_per_minute, leases_per_sec, total_leases);
 
     /* Websockets statistics subscription broadcast */
     // if (ws_event_subscribers('dhcp_statistics')) {
@@ -269,13 +283,6 @@ lease_stats_monitor = setInterval(function () {
     // }
 
 }, 1000);
-
-/**
- * Poll: CPU Utilization
- */
-cpu_utilization_poll = setInterval(function () {
-    cpu_utilization = parseFloat(execSync("top -bn 1 | awk 'NR>7{s+=$9} END {print s/4}'").toString())
-}, (15 * 1000));
 
 /**
  * Clean Expired Leases

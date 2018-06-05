@@ -247,8 +247,9 @@
     <script type="text/javascript">
 
         function get_stats() {
-            $.get("/get_stats", function (data) {
-                $('#cpu-utilization').html(data.cpu_utilization + "%");
+                $.get("/get_stats", function (data) {
+                // $('#cpu-utilization').html(data.cpu_utilization + "%");
+                $('#run-status').html(data.run_status);
                 $('#leases-sec').html(data.leases_per_second.toLocaleString('en') + ' / ' + data.leases_per_minute.toLocaleString('en'));
                 $('#total-leases').html(data.leases_used.toLocaleString('en'));
                 $('#server-name').html(data.host_name);
@@ -256,11 +257,11 @@
 
                 $('#subnets > tbody').html(data.subnet_table);
 
-                if (typeof shared_networks !== "undefined")
-                    shared_networks.destroy();
+                // if (typeof shared_networks !== "undefined")
+                shared_networks.destroy();
 
-                if (typeof display_subnets !== "undefined")
-                    display_subnets.destroy();
+                // if (typeof display_subnets !== "undefined")
+                display_subnets.destroy();
 
                 shared_networks = $('#shared-networks').DataTable({
                     dom: 'tip',
@@ -341,10 +342,12 @@
                 setTimeout(function () {
                     side_nav.style.width = "0px";
                     document.getElementById("content").style.marginLeft = "15px";
+                    document.getElementById("run-status").style.fontSize = "18px";
                 }, 350);
             } else {
                 side_nav.style.width = "300px";
                 document.getElementById("content").style.marginLeft = "315px";
+                document.getElementById("run-status").style.fontSize = "15px";                
                 setTimeout(function () {
                     for (i = 0; i < menuitems.length; i++) {
                         menuitems[i].style.opacity = 1;
