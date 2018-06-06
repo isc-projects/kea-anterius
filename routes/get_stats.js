@@ -1,7 +1,6 @@
 /*
 © Anthrino > Home page statistics processor
 */
-
 var express = require('express');
 var router = express.Router();
 var fs = require('fs');
@@ -23,14 +22,31 @@ router.get('/', function (req, res, next) {
 
 	// Calculate Shared network utilization
 	shared_nw_count = kea_config['Dhcp4']['shared-networks'].length;
-	shared_nw_util = [];
+	shared_nw_util = [], shared_nw_assgn_addr_list = [], shared_nw_total_addr_list = [], shared_nw_free_addr_list = [], shared_nw_snet_id_list = [];
+
 	for (var i = 0; i < shared_nw_count; i++) {
-		// TODO: verify shared nw stats are received as below usage
-		utilization = round(parseFloat(kea_stats['shared-network[' + i + '].assigned-addresses'][0][0] / kea_stats['shared-network[' + i + '].total-addresses'][0][0]) * 100, 2);
+
+		shared_nw_snet_id_list = [];
+		kea_config['Dhcp4']['shared-networks'][i]['subnet4'].forEach(x => {
+			shared_nw_snet_id_list.push(x['id']);
+		});
+
+		shared_nw_total_addr = 0, shared_nw_assgn_addr = 0;
+		shared_nw_snet_id_list.forEach(k => {
+			shared_nw_assgn_addr += kea_stats['subnet[' + k + '].assigned-addresses'][0][0];
+			shared_nw_total_addr += kea_stats['subnet[' + k + '].total-addresses'][0][0];
+		});
+
+		// console.log(shared_nw_assgn_addr, shared_nw_total_addr);		
+
+		utilization = round(parseFloat(shared_nw_assgn_addr / shared_nw_total_addr) * 100, 2);
 
 		if (isNaN(utilization))
 			utilization = 0;
 
+		shared_nw_assgn_addr_list.push(shared_nw_assgn_addr);
+		shared_nw_total_addr_list.push(shared_nw_total_addr);
+		shared_nw_free_addr_list.push(shared_nw_total_addr - shared_nw_assgn_addr);
 		shared_nw_util.push(utilization);
 	}
 	// TODO: Modify list sorting
@@ -40,7 +56,7 @@ router.get('/', function (req, res, next) {
 
 	shared_network_table = '';
 
-	for (var i = 1; i <= shared_nw_count; i++) {
+	for (var i = 0; i < shared_nw_count; i++) {
 
 		utilization = shared_nw_util[i];
 
@@ -48,10 +64,10 @@ router.get('/', function (req, res, next) {
 		// TODO: Verify shared network attrbute 'location' used as promary index
 		// Define shared network row for table
 		table_row = '';
-		table_row = table_row + '<td><b>' + kea_stats['shared-networks'][i].location + '</b></td>';
-		table_row = table_row + '<td>' + kea_stats['shared-networks'][i].used.toLocaleString('en') + ' (' + utilization + '%)</td>';
-		table_row = table_row + '<td class="hide_col">' + kea_stats['shared-networks'][i].defined.toLocaleString('en') + '</td>';
-		table_row = table_row + '<td class="hide_col">' + kea_stats['shared-networks'][i].free.toLocaleString('en') + '</td>';
+		table_row = table_row + '<td><b>' + kea_config['Dhcp4']['shared-networks'][i].name + '</b></td>';
+		table_row = table_row + '<td>' + shared_nw_assgn_addr_list[i].toLocaleString('en') + ' (' + utilization + '%)</td>';
+		table_row = table_row + '<td class="hide_col">' + shared_nw_total_addr_list[i].toLocaleString('en') + '</td>';
+		table_row = table_row + '<td class="hide_col">' + shared_nw_free_addr_list[i].toLocaleString('en') + '</td>';
 
 		utilization_color = 'green';
 
@@ -89,13 +105,13 @@ router.get('/', function (req, res, next) {
 		// console.log(kea_config.Dhcp4.subnet4[i].pools[0].pool, kea_stats['subnet[' + i+1 + '].assigned-addresses'][0][0], subnet_util[i].utilization, )
 		utilization = subnet_util[i];
 
-		// TODO: Find and replace correct attribute value source from API
+		// TODO: Determine subnet pools (disjoint/aggregate)
 		// Define subnet row for table
 		table_row = '';
-		table_row = table_row + '<td><b>' + kea_config.Dhcp4.subnet4[i].subnet + '</b></td>'; //Subnet Range
-		table_row = table_row + '<td>' + kea_config.Dhcp4.subnet4[i].pools[0].pool + '</td>';
-		table_row = table_row + '<td>' + kea_stats['subnet[' + (i+1) + '].assigned-addresses'][0][0].toLocaleString('en') + ' (' + utilization + '%)</td>';
-		table_row = table_row + '<td class="hide_col">' + kea_stats['subnet[' + (i+1) + '].total-addresses'][0][0].toLocaleString('en') + '</td>';
+		table_row = table_row + '<td><b>' + kea_config.Dhcp4.subnet4[i].subnet + '</b></td>'; //Subnet 
+		// table_row = table_row + '<td>' + kea_config.Dhcp4.subnet4[i].pools[0].pool + '</td>'; //Subnet Pool range
+		table_row = table_row + '<td>' + kea_stats['subnet[' + (i + 1) + '].assigned-addresses'][0][0].toLocaleString('en') + ' (' + utilization + '%)</td>';
+		table_row = table_row + '<td class="hide_col">' + kea_stats['subnet[' + (i + 1) + '].total-addresses'][0][0].toLocaleString('en') + '</td>';
 		// table_row = table_row + '<td class="hide_col">' + kea_stats.subnets[i].free.toLocaleString('en') + '</td>';
 
 		utilization_color = 'green';
@@ -111,12 +127,12 @@ router.get('/', function (req, res, next) {
 
 		subnet_table = subnet_table + '<tr>' + table_row + '</tr>';
 	}
-	
+
 	svrun = run_status.replace('server:', ':').replace('server:', ':').replace("\n", "<br> \n")
-	.replace('active', '<span style="color: #00a90b">Active</span>')
-	.replace('inactive', '<span style="color: #D50000">Inactive</span>')
-	.split("\n").slice(0, 2);
-	
+		.replace('active', '<span style="color: #00a90b">Active</span>')
+		.replace('inactive', '<span style="color: #D50000">Inactive</span>')
+		.split("\n").slice(0, 2);
+
 	response_data = {
 		"cpu_utilization": cpu_utilization,
 		"run_status": svrun,
@@ -134,9 +150,9 @@ router.get('/', function (req, res, next) {
 	// 	"leases_used": Math.random(200),
 	// 	"leases_per_second": Math.random(200),
 	// 	"leases_per_minute": Math.random(200),
-	// 	"shared_network_table": shared_network_table,
+	// 	"shared_network_table": '',
 	// 	"host_name": 'alcatraz',
-	// 	"subnet_table": subnet_table
+	// 	"subnet_table": ''
 	// };
 
 	res.setHeader('Content-Type', 'application/json');

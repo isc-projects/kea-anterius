@@ -1,3 +1,7 @@
+/*
+© Anthrino > Express APP
+*/
+
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -241,9 +245,6 @@ lease_stats_monitor = setInterval(function () {
     subnet_count = kea_config['Dhcp4']['subnet4'].length;
     shared_nw_count = kea_config['Dhcp4']['shared-networks'].length;
     
-    for (var i = 0; i < shared_nw_count; i++) {
-        total_leases += kea_stats['shared-network[' + i + '].assigned-addresses'][0][0];
-    }
     for (var i = 1; i <= subnet_count; i++) {
         total_leases += kea_stats['subnet[' + i + '].assigned-addresses'][0][0];
     }
