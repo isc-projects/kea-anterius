@@ -28,7 +28,7 @@ def replace_addr(item, index):
 
     return item
 
-def process_config(subnet_count, shared_nw_count):
+def process_config(mode, subnet_count, shared_nw_count):
     
     ''' Load default sample config file '''
     with open('/usr/local/etc/kea/kea-dhcp4.conf') as def_config:
@@ -48,8 +48,12 @@ def process_config(subnet_count, shared_nw_count):
         new_subnet = replace_addr(subnet_config, i)
         def_config['Dhcp4']['subnet4'].append(new_subnet)
 
-    pprint(def_config)
-    
+    if mode ==0:
+        pprint(def_config)
+    else:
+        with open('/usr/local/etc/kea/kea-dhcp4.conf', 'w') as file:
+            json.dump(def_config, file)
+
 if __name__ == '__main__':
-    ''' Read command line args [ subnet_count, shared_nw_count ] and call processor'''
-    process_config(sys.argv[1], sys.argv[2])
+    ''' Read command line args [mode, subnet_count, shared_nw_count ] and call processor'''
+    process_config(sys.argv[1], sys.argv[2], sys.argv[3])
