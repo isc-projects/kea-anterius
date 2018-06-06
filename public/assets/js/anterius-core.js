@@ -1,6 +1,6 @@
-/**
- * Created by cmiles on 8/9/2017.
- */
+/*
+© Anthrino > Cross Appn Core JS functions
+*/
 
 var loader_html = '<div class="preloader"> \
     <div class="spinner-layer pl-light-blue"> \
@@ -22,16 +22,16 @@ $(document).ready(function () {
     remove_init_form();
 
     /* Remove 'active' class from 'li' items */
-    setTimeout(function(){
+    setTimeout(function () {
         $('li.active').removeClass("active");
 
-        $('.list > li').each(function(){
+        $('.list > li').each(function () {
             var href = $(this).find('a').attr("href");
-            if(typeof href !== "undefined"){
+            if (typeof href !== "undefined") {
                 // console.log(href);
                 // console.log(document.location.pathname);
 
-                if(href == document.location.pathname){
+                if (href == document.location.pathname) {
                     $(this).addClass("active");
                 }
             }
@@ -40,8 +40,8 @@ $(document).ready(function () {
 
     }, 100);
 
-    setTimeout(function(){
-        handle_websocket_subscription_navigation ();
+    setTimeout(function () {
+        handle_websocket_subscription_navigation();
     }, 100);
 });
 
@@ -67,7 +67,7 @@ $(document).on('on_pjax_complete', function (e) {
         $('.overlay').css("display", "none");
     }
 
-    handle_websocket_subscription_navigation ();
+    handle_websocket_subscription_navigation();
 
     /*
      * Form input focus event
@@ -104,11 +104,11 @@ $(document).on('on_pjax_complete', function (e) {
     remove_init_form();
 });
 
-function handle_websocket_subscription_navigation () {
+function handle_websocket_subscription_navigation() {
     console.log(window.location.pathname);
 
     /* Stream dashboard stats */
-    if(document.location.pathname == "/"){
+    if (document.location.pathname == "/") {
         websockets_subscribe_event("dhcp_statistics");
     }
     else {
@@ -151,6 +151,37 @@ function get_form_query_string(form_id) {
     return query_string;
 }
 
+//Toggle show/hide feature for side nav menu
+function navtoggle() {
+    side_nav = document.getElementById("leftsidebar");
+    logo = document.getElementById("logo");
+    menuitems = document.getElementsByClassName("menuitems");
+
+    logo.style.transition = "opacity 0.5s ease";
+    for (i = 0; i < menuitems.length; i++) {
+        menuitems[i].style.transition = "opacity 0.5s ease";
+    }
+    if (side_nav.style.width == "300px" || side_nav.offsetWidth == 300) {
+        for (i = 0; i < menuitems.length; i++) {
+            menuitems[i].style.opacity = 0;
+        }
+        logo.style.opacity = 0;
+        setTimeout(function () {
+            side_nav.style.width = "0px";
+            document.getElementById("content").style.marginLeft = "15px";
+        }, 350);
+    } else {
+        side_nav.style.width = "300px";
+        document.getElementById("content").style.marginLeft = "315px";
+        setTimeout(function () {
+            for (i = 0; i < menuitems.length; i++) {
+                menuitems[i].style.opacity = 1;
+            }
+            logo.style.opacity = 1;
+        }, 100);
+    }
+}
+
 function save_config() {
     anterius_settings = get_form_query_string("anterius-settings-form");
 
@@ -166,8 +197,8 @@ function notification(text) {
     var allowDismiss = true;
 
     $.notify({
-            message: text
-        },
+        message: text
+    },
         {
             type: colorName,
             allow_dismiss: allowDismiss,
@@ -178,15 +209,15 @@ function notification(text) {
                 exit: animateExit
             },
             template: '<div data-notify="container" class="bootstrap-notify-container alert alert-dismissible {0} ' + (allowDismiss ? "p-r-35" : "") + '" role="alert">' +
-            '<button type="button" aria-hidden="true" class="close" data-notify="dismiss">×</button>' +
-            '<span data-notify="icon"></span> ' +
-            '<span data-notify="title">{1}</span> ' +
-            '<span data-notify="message">{2}</span>' +
-            '<div class="progress" data-notify="progressbar">' +
-            '<div class="progress-bar progress-bar-{0}" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>' +
-            '</div>' +
-            '<a href="{3}" target="{4}" data-notify="url"></a>' +
-            '</div>'
+                '<button type="button" aria-hidden="true" class="close" data-notify="dismiss">×</button>' +
+                '<span data-notify="icon"></span> ' +
+                '<span data-notify="title">{1}</span> ' +
+                '<span data-notify="message">{2}</span>' +
+                '<div class="progress" data-notify="progressbar">' +
+                '<div class="progress-bar progress-bar-{0}" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>' +
+                '</div>' +
+                '<a href="{3}" target="{4}" data-notify="url"></a>' +
+                '</div>'
         });
 }
 
@@ -218,7 +249,7 @@ $(document).on("click", ".option_data", function () {
 $(document).on("keypress", "#lease_search_criteria", function (e) {
     if (e.which == 13) {
         $('#search_result').html(loader_html);
-        $.post("/dhcp_lease_search", {search: $("#lease_search_criteria").val()}, function (result) {
+        $.post("/dhcp_lease_search", { search: $("#lease_search_criteria").val() }, function (result) {
             $("#search_result").html(result);
 
             if (typeof display_leases !== "undefined")
