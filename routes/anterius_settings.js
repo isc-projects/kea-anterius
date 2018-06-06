@@ -1,10 +1,14 @@
+/*
+© Anthrino > Anterius Settings Manager
+*/
+
 var express = require('express');
 var router = express.Router();
 var fs = require('fs');
 var template_render = require('../lib/render_template.js');
 var authorize = require('../lib/authorize.js');
 
-router.get('/', authorize.auth, function(req, res, next) {
+router.get('/', authorize.auth, function (req, res, next) {
 
 	anterius_settings_template = template_render.get_template("anterius_settings");
 
@@ -22,11 +26,14 @@ router.get('/', authorize.auth, function(req, res, next) {
 	/* Log File */
 	input = input + template_render.form_input('Log File', '<input type="input" class="form-control" id="log_file" placeholder="/var/log/dhcp.log" value="' + anterius_config.log_file + '">');
 
+	/* Stats Refresh interval */
+	input = input + template_render.form_input('Statistics Refresh Interval (s)', '<input type="input" class="form-control" id="stat_refr_int" placeholder="Enter refresh interval in secs" value="' + anterius_config.stat_refresh_interval + '">');
+
 	/* Admin User */
 	input = input + template_render.form_input('Admin User', '<input type="input" class="form-control" id="admin_user" placeholder="Username" value="' + anterius_config.admin_user + '">');
 	input = input + template_render.form_input('Admin Password', '<input type="input" class="form-control" id="admin_password" placeholder="Password" value="' + anterius_config.admin_password + '">');
 
-	input = input + '<br><button type="button" class="btn btn-info waves-effect" onclick="save_config()"><i class="material-icons">settings</i> <span>Save Config</span></button>';
+	input = input + '<br><button type="button" class="btn btn-info waves-effect" onclick="save_config()"><i class="material-icons">settings</i> <span>Save Anteris Settings</span></button>';
 	input = input + '<br><div id="anterius_settings_result"></div>';
 
 	form_data = template_render.form_body("anterius-settings-form", input);

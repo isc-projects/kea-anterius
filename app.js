@@ -282,7 +282,7 @@ lease_stats_monitor = setInterval(function () {
     //     wss.broadcast_event(JSON.stringify(return_data), 'dhcp_statistics');
     // }
 
-}, 1000);
+}, anter_config.stat_refresh_interval * 1000);
 
 /**
  * Clean Expired Leases
