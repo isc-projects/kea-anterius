@@ -22,7 +22,8 @@ router.get('/', function (req, res, next) {
 
 	// Calculate Shared network utilization
 	shared_nw_count = kea_config['Dhcp4']['shared-networks'].length;
-	shared_nw_util = [], shared_nw_assgn_addr_list = [], shared_nw_total_addr_list = [], shared_nw_free_addr_list = [], shared_nw_snet_id_list = [];
+	shared_nw_util = [], shared_nw_assgn_addr_list = [], shared_nw_total_addr_list = [],
+		shared_nw_free_addr_list = [], shared_nw_snet_id_list = [], subnet_pool_map = [];
 
 	for (var i = 0; i < shared_nw_count; i++) {
 
@@ -85,11 +86,20 @@ router.get('/', function (req, res, next) {
 
 	// Calculate Subnet utilization
 	// TODO: Find source for subnet count
-	subnet_count = kea_config['Dhcp4']['subnet4'].length;
+	subnet4_config = kea_config['Dhcp4']['subnet4'];
+	subnet_count = subnet4_config.length;
 	subnet_util = [];
 	for (var i = 1; i <= subnet_count; i++) {
 		utilization = round(parseFloat(kea_stats['subnet[' + i + '].assigned-addresses'][0][0] / kea_stats['subnet[' + i + '].total-addresses'][0][0]) * 100, 2);
-
+		pools = subnet4_config[i - 1]['pools'];
+		pool_range = '';
+		if (pools) {
+			pools.forEach(p => {
+				pool_range += p.pool + '<br>';
+			});
+			// console.log(pool_range);			
+		}
+		subnet_pool_map.splice(i - 1, 0, pool_range);
 		if (isNaN(utilization))
 			utilization = 0;
 
@@ -99,6 +109,9 @@ router.get('/', function (req, res, next) {
 	// kea_stats.subnets.sort(function (a, b) {
 	// 	return parseFloat(b.utilization) - parseFloat(a.utilization);
 	// });
+
+	// Subnet pools parser
+
 	subnet_table = '';
 
 	for (var i = 0; i < subnet_count; i++) {
@@ -109,7 +122,7 @@ router.get('/', function (req, res, next) {
 		// Define subnet row for table
 		table_row = '';
 		table_row = table_row + '<td><b>' + kea_config.Dhcp4.subnet4[i].subnet + '</b></td>'; //Subnet 
-		// table_row = table_row + '<td>' + kea_config.Dhcp4.subnet4[i].pools[0].pool + '</td>'; //Subnet Pool range
+		table_row = table_row + '<td>' + subnet_pool_map[i] + '</td>'; //Subnet Pool range
 		table_row = table_row + '<td>' + kea_stats['subnet[' + (i + 1) + '].assigned-addresses'][0][0].toLocaleString('en') + ' (' + utilization + '%)</td>';
 		table_row = table_row + '<td class="hide_col">' + kea_stats['subnet[' + (i + 1) + '].total-addresses'][0][0].toLocaleString('en') + '</td>';
 		// table_row = table_row + '<td class="hide_col">' + kea_stats.subnets[i].free.toLocaleString('en') + '</td>';
