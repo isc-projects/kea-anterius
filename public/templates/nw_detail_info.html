@@ -1,0 +1,73 @@
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+            <div class="header">
+                <h2>
+                    [title]
+                </h2>
+            </div>
+            <div style="width: 50%;">
+                <div class="progress">
+                    <!-- <div class="progress-bar bg-"+ [utilization_color] + '" role="progressbar" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100" style="width: ' + utilization + '%"></div>' -->
+                    <div class="progress-bar bg-red" role="progressbar" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+                </div>
+            </div>
+            <div class="body">
+                <div class="row clearfix">
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                        <div class="info-box hover-zoom-effect">
+                            <div class="content">
+                                <div class="text">IP Range [Pools]</div>
+                                <div class="number" id="pools" style="font-size: 20px">[pools]</div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                        <div class="info-box hover-zoom-effect">
+                            <div class="content">
+                                <div class="text">Total Leases</div>
+                                <div class="number" id="total-leases">[total_addr]</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                        <div class="info-box hover-zoom-effect">
+                            <div class="content">
+                                <div class="text">Assigned Leases</div>
+                                <div class="number" id="assgn-leases">[assgn_addr]</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                        <div class="info-box hover-zoom-effect">
+                            <div class="content">
+                                <div class="text">Available Leases</div>
+                                <div class="number" id="assgn-leases">[free_addr]</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+
+                    <table id="subnets" class="table table-bordered table-striped table-hover js-basic-example dataTable dashboard-task-infos">
+                        <thead>
+                            <tr>
+                                <!-- <th>ID</th> -->
+                                <th>Subnet</th>
+                                <th>IP Range (Pools)</th>
+                                <th>Total Active</th>
+                                <th>Size</th>
+                                <th>Free</th>
+                                <th style="width:100px">Utilization</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
