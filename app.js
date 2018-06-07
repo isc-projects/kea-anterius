@@ -237,7 +237,7 @@ var lpm_counter = 0;
 lease_stats_monitor = setInterval(function () {
 
     api_agent.fire_kea_api(stats_req_data);
-    // api_agent.fire_kea_api(config_req_data);
+    api_agent.fire_kea_api(config_req_data);
 
     // console.log(kea_stats);
     
