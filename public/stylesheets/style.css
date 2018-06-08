@@ -1,9 +1,24 @@
 body {
-  padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
-a {
-  color: #00B7FF;
+#nav_menu_ico {
+  color: aliceblue;
+  margin-left: -10px;
+  margin-top: 3px;
+  cursor: pointer;
 }
 
+#nav_title {
+  font-size: 20px;
+  float: right;
+  margin-left: 5px;
+}
+
+#ref_btn {
+  float: right;
+  font-size: 15px;
+  margin: 15px;
+  color: aliceblue;
+  background-color: #640000;
+}

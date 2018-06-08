@@ -156,6 +156,7 @@ function navtoggle() {
     side_nav = document.getElementById("leftsidebar");
     logo = document.getElementById("logo");
     menuitems = document.getElementsByClassName("menuitems");
+    content = document.getElementById("content");
 
     logo.style.transition = "opacity 0.5s ease";
     for (i = 0; i < menuitems.length; i++) {
@@ -166,20 +167,27 @@ function navtoggle() {
             menuitems[i].style.opacity = 0;
         }
         logo.style.opacity = 0;
+        content.style.opacity = 0;
         setTimeout(function () {
             side_nav.style.width = "0px";
-            document.getElementById("content").style.marginLeft = "15px";
+            content.style.marginLeft = "15px";
         }, 350);
+        setTimeout(function () {
+            content.style.opacity = 1;                
+        }, 700);
     } else {
         side_nav.style.width = "300px";
-        document.getElementById("content").style.marginLeft = "315px";
+        content.style.opacity = 0;
+        content.style.marginLeft = "315px";
         setTimeout(function () {
             for (i = 0; i < menuitems.length; i++) {
                 menuitems[i].style.opacity = 1;
             }
             logo.style.opacity = 1;
         }, 100);
-    }
+        setTimeout(function () {
+            content.style.opacity = 1;                
+        }, 700);    }
 }
 
 function save_config() {
