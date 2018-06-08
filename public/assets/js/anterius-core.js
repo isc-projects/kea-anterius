@@ -157,28 +157,30 @@ function navtoggle() {
     logo = document.getElementById("logo");
     menuitems = document.getElementsByClassName("menuitems");
     content = document.getElementById("content");
-
+    
+    content.style.visibility = 'hidden';
+    content.style.opacity = 0;
     logo.style.transition = "opacity 0.5s ease";
+    content.style.transition = "opacity 0.5s ease";
     for (i = 0; i < menuitems.length; i++) {
         menuitems[i].style.transition = "opacity 0.5s ease";
     }
+
     if (side_nav.style.width == "300px" || side_nav.offsetWidth == 300) {
         for (i = 0; i < menuitems.length; i++) {
             menuitems[i].style.opacity = 0;
         }
         logo.style.opacity = 0;
-        content.style.opacity = 0;
         setTimeout(function () {
             side_nav.style.width = "0px";
-            content.style.marginLeft = "15px";
         }, 350);
         setTimeout(function () {
-            content.style.opacity = 1;                
-        }, 700);
+            content.style.marginLeft = "15px";
+            content.style.opacity = 1;
+            content.style.visibility = 'visible';    
+        }, 600);
     } else {
         side_nav.style.width = "300px";
-        content.style.opacity = 0;
-        content.style.marginLeft = "315px";
         setTimeout(function () {
             for (i = 0; i < menuitems.length; i++) {
                 menuitems[i].style.opacity = 1;
@@ -186,8 +188,11 @@ function navtoggle() {
             logo.style.opacity = 1;
         }, 100);
         setTimeout(function () {
-            content.style.opacity = 1;                
-        }, 700);    }
+            content.style.opacity = 1;
+            content.style.marginLeft = "315px";
+            content.style.visibility = 'visible';                            
+        }, 500);
+    }
 }
 
 function save_config() {
