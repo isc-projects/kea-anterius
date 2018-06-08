@@ -17,14 +17,17 @@ router.get('/', authorize.auth, function (req, res, next) {
 	/* Read Config */
 	anterius_config = json_file.readFileSync('config/anterius_config.json');
 
-	/* Leases File */
-	input = template_render.form_input('Leases File', '<input type="input" class="form-control" id="leases_file" placeholder="/var/lib/dhcp/dhcpd.leases" value="' + anterius_config.leases_file + '">');
+	// /* Leases File */
+	// input = template_render.form_input('Leases File', '<input type="input" class="form-control" id="leases_file" placeholder="/var/lib/dhcp/dhcpd.leases" value="' + anterius_config.leases_file + '">');
 
-	/* Config File */
-	input = input + template_render.form_input('Config File', '<input type="input" class="form-control" id="config_file" placeholder="/etc/dhcp/dhcpd.conf" value="' + anterius_config.config_file + '">');
+	// /* Config File */
+	// input = input + template_render.form_input('Config File', '<input type="input" class="form-control" id="config_file" placeholder="/etc/dhcp/dhcpd.conf" value="' + anterius_config.config_file + '">');
 
-	/* Log File */
-	input = input + template_render.form_input('Log File', '<input type="input" class="form-control" id="log_file" placeholder="/var/log/dhcp.log" value="' + anterius_config.log_file + '">');
+	// /* Log File */
+	// input = input + template_render.form_input('Log File', '<input type="input" class="form-control" id="log_file" placeholder="/var/log/dhcp.log" value="' + anterius_config.log_file + '">');
+
+	/* Kea Control Agent address [host:port] */
+	input = template_render.form_input('Kea Control Agent Remote address [host:port]', '<input type="input" class="form-control" id="ca_remote_addr" placeholder="Enter host:port value for Kea control API" value="' + anterius_config.server_addr + ':' + anterius_config.server_port + '">');
 
 	/* Stats Refresh interval */
 	input = input + template_render.form_input('Statistics Refresh Interval (s)', '<input type="input" class="form-control" id="stat_refr_int" placeholder="Enter refresh interval in secs" value="' + anterius_config.stat_refresh_interval + '">');
