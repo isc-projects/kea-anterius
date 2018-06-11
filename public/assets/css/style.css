@@ -1847,7 +1847,14 @@
         color: #777; }
 
 .bg-red {
-  background-color: #F44336 !important;
+  background-color: #ff0000 !important;
+  color: #fff; }
+  .bg-red .content .text,
+  .bg-red .content .number {
+    color: #fff !important; }
+
+.bg-anterius-red {
+  background-color: #640000 !important;
   color: #fff; }
   .bg-red .content .text,
   .bg-red .content .number {
@@ -1931,7 +1938,7 @@
     color: #fff !important; }
 
 .bg-yellow {
-  background-color: #ffe821 !important;
+  background-color: #FF7E00 !important;
   color: #fff; }
   .bg-yellow .content .text,
   .bg-yellow .content .number {
@@ -2519,7 +2526,7 @@ section.content {
 .btn-info:hover,
 .btn-info:active,
 .btn-info:focus {
-  background-color: #00b0e4 !important; }
+  background-color: #640000 !important; }
 
 .btn-success,
 .btn-success:hover,

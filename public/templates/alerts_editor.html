@@ -4,7 +4,7 @@
             <div class="card">
                 <div class="header">
                     <h2>
-                        Kea Alert Settings
+                        Kea Alert Threshold Settings
                     </h2>
                 </div>
                 <div class="body">
@@ -31,15 +31,15 @@
 
     <div id="anterius_alerts_result"></div>
 </div>
-
-[save_button]
-
+<div class="row" align="center" style="margin-bottom: 5%; margin-top:-5%;">
+    [save_button]
+</div>
 <script type="text/javascript">
     function save_alarm_settings() {
-		anterius_alert_settings = get_form_query_string("alerts_config");
+        anterius_alert_settings = get_form_query_string("alerts_config");
 
-		$.post( "/anterius_alert_settings_save", anterius_alert_settings, function( data ) {
-			$( "#anterius_alerts_result" ).html( data );
-		});
+        $.post("/anterius_alert_settings_save", anterius_alert_settings, function (data) {
+            $("#anterius_alerts_result").html(data);
+        });
     }
 </script>

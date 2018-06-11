@@ -13,6 +13,8 @@
     <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css">
 
+    <link href="stylesheets/style.css" rel="stylesheet">
+
     <!-- Bootstrap Core Css -->
     <link href="assets/plugins/bootstrap/css/bootstrap.css" rel="stylesheet">
 
@@ -30,8 +32,6 @@
 
     <link href="assets/css/glass.css" rel="stylesheet">
 
-    <link href="stylesheets/style.css" rel="stylesheet">
-
     <link href="assets/plugins/jquery-datatable/skin/bootstrap/css/dataTables.bootstrap.css" rel="stylesheet">
 
     <!-- AdminBSB Themes. You can choose a theme from css/themes instead of get all themes -->
@@ -44,7 +44,7 @@
     <div class="page-loader-wrapper">
         <div class="loader">
             <div class="preloader">
-                <div class="spinner-layer pl-red">
+                <div class="spinner-layer spinner-red">
                     <div class="circle-clipper left">
                         <div class="circle"></div>
                     </div>
@@ -53,7 +53,7 @@
                     </div>
                 </div>
             </div>
-            <p>Loading console...</p>
+            <p><h4>Loading Dashboard...</h4></p>
         </div>
     </div>
     <!-- #END# Page Loader -->
@@ -73,7 +73,7 @@
                 <a class="navbar-brand" id="nav_title" href="/">
                     [application_name] </a>
             </div>
-            <button type="button" id="ref_btn" class="btn btn-alert waves-effect" onclick="alert()">
+            <button type="button" id="ref_btn" class="btn btn-info waves-effect ant-btn" onclick="refresh_info()">
                 <i class="material-icons">refresh</i>
                 <span>Refresh Info</span>
             </button>
@@ -260,7 +260,6 @@
                 $('#total-leases').html(data.leases_used.toLocaleString('en'));
                 $('#server-name').html(data.host_name);
                 $('#shared-networks > tbody').html(data.shared_network_table);
-
                 $('#subnets > tbody').html(data.subnet_table);
 
                 // if (typeof shared_networks !== "undefined")
@@ -268,7 +267,6 @@
 
                 // if (typeof display_subnets !== "undefined")
                 display_subnets.destroy();
-
                 shared_networks = $('#shared-networks').DataTable({
                     dom: 'tip',
                     responsive: true,

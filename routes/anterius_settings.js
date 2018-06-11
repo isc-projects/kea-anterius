@@ -36,7 +36,7 @@ router.get('/', authorize.auth, function (req, res, next) {
 	input = input + template_render.form_input('Admin User', '<input type="input" class="form-control" id="admin_user" placeholder="Username" value="' + anterius_config.admin_user + '">');
 	input = input + template_render.form_input('Admin Password', '<input type="input" class="form-control" id="admin_password" placeholder="Password" value="' + anterius_config.admin_password + '">');
 
-	input = input + '<br><button type="button" class="btn btn-info waves-effect" onclick="save_config()"><i class="material-icons">settings</i> <span>Save Anteris Settings</span></button>';
+	input = input + '<br><div class="row" align="center"><button type="button" class="btn btn-info waves-effect ant-btn" onclick="save_config()"><i class="material-icons">settings</i> <span>Save Anteris Settings</span></button></div>';
 	input = input + '<br><div id="anterius_settings_result"></div>';
 
 	form_data = template_render.form_body("anterius-settings-form", input);
@@ -46,4 +46,4 @@ router.get('/', authorize.auth, function (req, res, next) {
 	res.send(template_render.get_index_template(anterius_settings_template, req.url));
 });
 
-module.exports = router;
+module.exports = router;	
