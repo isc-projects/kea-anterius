@@ -9,7 +9,7 @@ var authorize = require('../lib/authorize.js');
 
 router.get('/', function (req, res, next) {
 
-    var pools, subnet;
+    var pools, subnet, host_res;
     let id = req.query.id.replace('?v_ajax', '');
 
     utilization = parseFloat(kea_stats['subnet[' + id + '].assigned-addresses'][0][0]
@@ -31,10 +31,35 @@ router.get('/', function (req, res, next) {
         if (s.id == id) {
             pools = s.pools;
             subnet = s.subnet;
+            host_res = s.reservations;
         }
     });
 
+    // console.log(host_res);
+    
+    // Host reservation parser
 
+	host_res_table = '';
+
+	for (var i = 0; i < host_res.length; i++) {
+		// console.log(kea_config.Dhcp4.subnet4[i].pools[0].pool, kea_stats['subnet[' + i+1 + '].assigned-addresses'][0][0], subnet_util[i].utilization, )
+
+		// Define reservation row for table
+		table_row = '';
+        table_row = table_row + '<td>' + host_res[i]['ip-address'] + '</td>';
+		table_row = table_row + '<td>' + host_res[i]['server-hostname'] + '</td>';        
+		table_row = table_row + '<td>' + host_res[i].hostname + '</td>';
+		table_row = table_row + '<td>' + host_res[i]['client-id'] + '</td>';
+		table_row = table_row + '<td>' + host_res[i]['next-server'] + '</td>';
+		table_row = table_row + '<td>' + host_res[i]['hw-address'] + '</td>';
+        
+        // TODO: modify for edit link
+        // table_row = table_row + '<td><b><a href="/nw_detail_info?id=' + kea_config.Dhcp4.subnet4[i].id + '" pjax="1">' + kea_config.Dhcp4.subnet4[i].subnet + '</a></b></td>'; //Subnet details link
+        table_row = table_row.replace(/<td><\/td>/g, '<td> -- </td>');
+        console.log(table_row);
+		host_res_table = host_res_table + '<tr>' + table_row + '</tr>';
+    }
+    
     pool_range = '';
     if (pools) {
         pools.forEach(p => {
@@ -43,7 +68,7 @@ router.get('/', function (req, res, next) {
         if (pool_range == '')
             pool_range = ' - undefined - ';
     }
-    console.log(pool_range, subnet);
+    // console.log(pool_range, subnet);
 
     var content = "";
     content = template_render.get_template("nw_detail_info");
@@ -51,6 +76,7 @@ router.get('/', function (req, res, next) {
     content = template_render.set_template_variable(content, "title", "Subnet [" + subnet + "] Information");
     content = template_render.set_template_variable(content, "subnet", subnet);
     content = template_render.set_template_variable(content, "utilzn_bar", utilization_html);
+    content = template_render.set_template_variable(content, "host_res_table", host_res_table);
     content = template_render.set_template_variable(content, "pools", pool_range)
     content = template_render.set_template_variable(content, "assgn_addr", kea_stats['subnet[' + id + '].assigned-addresses'][0][0]);
     content = template_render.set_template_variable(content, "total_addr", kea_stats['subnet[' + id + '].total-addresses'][0][0]);
