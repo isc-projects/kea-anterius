@@ -6,10 +6,9 @@
                     [title]
                 </h2>
             </div>
-            <div style="width: 50%;">
+            <div style="margin: 2%;">
                 <div class="progress">
-                    <!-- <div class="progress-bar bg-"+ [utilization_color] + '" role="progressbar" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100" style="width: ' + utilization + '%"></div>' -->
-                    <div class="progress-bar bg-red" role="progressbar" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+                    [utilzn_bar]
                 </div>
             </div>
             <div class="body">
@@ -26,7 +25,7 @@
                     <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
                         <div class="info-box hover-zoom-effect">
                             <div class="content">
-                                <div class="text">Total Leases</div>
+                                <div class="text">Total Active Leases</div>
                                 <div class="number" id="total-leases">[total_addr]</div>
                             </div>
                         </div>
@@ -54,11 +53,11 @@
                         <thead>
                             <tr>
                                 <!-- <th>ID</th> -->
-                                <th>Subnet</th>
-                                <th>IP Range (Pools)</th>
-                                <th>Total Active</th>
-                                <th>Size</th>
-                                <th>Free</th>
+                                <th>Lease IP Addr</th>
+                                <th>HW Addr [MAC]</th>                                
+                                <th>Valid Lifetime</th>
+                                <th>Device hostname</th>
+                                <th>Username</th>
                                 <th style="width:100px">Utilization</th>
                             </tr>
                         </thead>
