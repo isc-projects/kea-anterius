@@ -14,21 +14,24 @@ router.get('/', function (req, res, next) {
 
     var id = [], pools = [], subnets = [], subnet_util = [], host_res = [], shared_nw;
     var nw_total_addr = 0, nw_free_addr = 0, nw_assgn_addr = 0;
+    content_subnets = '', subnet_table = '', host_res_table = '';
 
     if (req.query.type == 'subnet') {
         id = req.query.id.replace('?v_ajax', '');
         kea_config['Dhcp4']['subnet4'].forEach(s => {
             if (s.id == id) {
                 pools.push(s.pools);
-                subnets.push(s.subnet);
-                host_res.push(s.reservations);
+                subnets.push(s);
+                s.reservations.forEach(resv => {
+                    host_res.push(resv);
+                });
                 // TODO: make effecient
                 // break;
             }
         });
         nw_assgn_addr += kea_stats['subnet[' + id + '].assigned-addresses'][0][0];
         nw_total_addr += kea_stats['subnet[' + id + '].total-addresses'][0][0];
-        content = template_render.set_template_variable(content, "title", "Subnet [" + subnets[0] + "] Information");
+        content = template_render.set_template_variable(content, "title", "Subnet [" + subnets[0].subnet + "] Information");
 
     }
     else {
@@ -43,11 +46,10 @@ router.get('/', function (req, res, next) {
                 kea_config['Dhcp4']['subnet4'].forEach(sn => {
                     if (id.includes(sn.id)) {
                         pools.push(sn.pools);
-                        subnets.push(sn.subnet);
+                        subnets.push(sn);
                         sn.reservations.forEach(resv => {
                             host_res.push(resv);
                         });
-
                         sn_assgn = kea_stats['subnet[' + sn.id + '].assigned-addresses'][0][0];
                         sn_total = kea_stats['subnet[' + sn.id + '].total-addresses'][0][0];
                         nw_assgn_addr += sn_assgn;
@@ -58,7 +60,7 @@ router.get('/', function (req, res, next) {
                 });
                 // TODO: make effecient
                 // break;
-                subnet_table = '';
+                // console.log(subnets);
 
                 for (var i = 0; i < subnets.length; i++) {
 
@@ -68,8 +70,11 @@ router.get('/', function (req, res, next) {
 
                     pool_range = '';
                     pools.forEach(p => {
-                        pool_range += p.pool + '<br>';
+                        if(p.pool != undefined)
+                            pool_range += p.pool + '<br>';
                     });
+                    if (pool_range == '')
+                        pool_range = ' - undefined - ';
 
                     table_row = '';
                     table_row = table_row + '<td>' + subnets[i].id + '</td>'; //Subnet ID
@@ -92,16 +97,22 @@ router.get('/', function (req, res, next) {
 
                     subnet_table = subnet_table + '<tr>' + table_row + '</tr>';
                 }
-                content = template_render.set_template_variable(content, "subnet_table", subnet_table);
+               
                 content = template_render.set_template_variable(content, "title", "Shared Network [" + shared_nw + "] Information");
 
+                /* Display Subnets table */
+                content_subnets = template_render.get_template("subnet_table");
+                content_subnets = template_render.set_template_variable(content_subnets, "title", "Shared Network Subnets");
+                content_subnets = template_render.set_template_variable(content_subnets, "table_id", "sharednw_subnet_table");
+                content_subnets = template_render.set_template_variable(content_subnets, "table_content", subnet_table);
+	            content_subnets = template_render.set_template_variable(content_subnets, "table_dim", "col-lg-12 col-md-12 col-sm-12 col-xs-12");
             }
         });
     }
     // console.log(pools, subnets, host_res, subnet_util);
 
     nw_free_addr = nw_total_addr - nw_assgn_addr;
-    utilization = parseFloat(nw_assgn_addr / nw_total_addr) * 100;
+    var utilization = parseFloat(nw_assgn_addr / nw_total_addr) * 100;
 
     if (isNaN(utilization))
         utilization = 0;
@@ -116,10 +127,8 @@ router.get('/', function (req, res, next) {
     utilization_html = '<div class="progress-bar bg-' + utilization_color +
         '" role="progressbar" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100" style="width: ' + utilization + '%"></div>';
 
+
     // Host reservation parser
-
-    host_res_table = '';
-
     for (var i = 0; i < host_res.length; i++) {
         // console.log(subnets[i].pools[0].pool, kea_stats['subnet[' + i+1 + '].assigned-addresses'][0][0], subnet_util[i].utilization, )
 
@@ -143,9 +152,10 @@ router.get('/', function (req, res, next) {
 
     pool_range = '';
     if (pools) {
-        pools.forEach(pool => {
-            pool.forEach(p => {
-                pool_range += p.pool + '<br>';
+        pools.forEach(pl => {
+            pl.forEach(p => {
+                if(p.pool != undefined)
+                    pool_range += p.pool + '<br>';
             });
         });
         if (pool_range == '')
@@ -156,7 +166,7 @@ router.get('/', function (req, res, next) {
 
     content = template_render.set_template_variable(content, "utilzn_bar", utilization_html);
     content = template_render.set_template_variable(content, "utilizn", utilization);
-    content = template_render.set_template_variable(content, "host_res_table", host_res_table);
+    content = template_render.set_template_variable(content, "subnet_table", content_subnets);
     content = template_render.set_template_variable(content, "host_res_table", host_res_table);
     content = template_render.set_template_variable(content, "pools", pool_range)
     content = template_render.set_template_variable(content, "assgn_addr", nw_assgn_addr);
