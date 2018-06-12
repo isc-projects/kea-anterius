@@ -2,16 +2,27 @@
     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
         <div class="card">
             <div class="header">
-                <h2>
-                    [title]
+                <h2 style="font-size: 150%;">
+                    <b> [title] </b>
                 </h2>
             </div>
-            <div style="margin: 2%;">
-                <div class="progress">
-                    [utilzn_bar]
+            <div style="margin-top: 1%; ">
+                <div class="text col-lg-1 col-md-2 col-sm-3 col-xs-6">
+                    <h5>
+                        <i>Utilization:</i>
+                    </h5>
+                </div>
+                <div align="center" class="number col-lg-1 col-md-2 col-sm-3 col-xs-6">
+                    <h5>([utilizn]%)</h5>
+                </div>
+                <div class="col-lg-10 col-md-8 col-sm-6 col-xs-6">
+                    <div class="progress" style="margin: 5px;">
+                        [utilzn_bar]
+                    </div>
                 </div>
             </div>
-            <div class="body">
+            <hr>
+            <div class="body" style="margin-top: 2%;">
                 <div class="row clearfix">
                     <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
                         <div class="info-box hover-zoom-effect">
@@ -20,7 +31,6 @@
                                 <div class="number" id="pools" style="font-size: 20px">[pools]</div>
                             </div>
                         </div>
-
                     </div>
                     <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
                         <div class="info-box hover-zoom-effect">
@@ -51,6 +61,36 @@
         </div>
     </div>
 </div>
+
+<div class="row" id="shared-nw-section">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+            <div class="header">
+                <h2>
+                    Shared Network Subnets
+                </h2>
+            </div>
+            <div class="table-responsive">
+                <table id="host_res_table" class="table table-bordered table-striped table-hover js-basic-example dataTable dashboard-task-infos">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Subnet</th>
+                            <th>IP Range (Pools)</th>
+                            <th>Total Active</th>
+                            <th>Size</th>
+                            <th>Free</th>
+                            <th style="width:100px">Utilization</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        [subnet_table]
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="row">
     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
         <div class="card">
@@ -68,7 +108,7 @@
                             <th>Server Hostname</th>
                             <th>Hostname</th>
                             <th>Client ID</th>
-                            <th>Next Server</th>    
+                            <th>Next Server</th>
                             <th>Hardware Addr [MAC]</th>
                         </tr>
                     </thead>
