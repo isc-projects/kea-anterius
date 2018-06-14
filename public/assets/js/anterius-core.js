@@ -157,7 +157,7 @@ function navtoggle() {
     logo = document.getElementById("logo");
     menuitems = document.getElementsByClassName("menuitems");
     content = document.getElementById("content");
-    
+
     content.style.visibility = 'hidden';
     content.style.opacity = 0;
     logo.style.transition = "opacity 0.5s ease";
@@ -177,7 +177,7 @@ function navtoggle() {
         setTimeout(function () {
             content.style.marginLeft = "15px";
             content.style.opacity = 1;
-            content.style.visibility = 'visible';    
+            content.style.visibility = 'visible';
         }, 600);
     } else {
         side_nav.style.width = "300px";
@@ -190,9 +190,31 @@ function navtoggle() {
         setTimeout(function () {
             content.style.opacity = 1;
             content.style.marginLeft = "315px";
-            content.style.visibility = 'visible';                            
+            content.style.visibility = 'visible';
         }, 500);
     }
+}
+
+function refresh_info() {
+    source = window.location.href;
+    get_stats();
+    window.location = source;
+    // window.location = source+'?v_ajax';
+
+    // TODO: disable refresh button for unnecessary pages
+    // if('nw_detail_info' in source){
+
+    // }
+}
+
+function edit_params(mode) {
+    source = window.location.href;
+    info = source.split('?')[1].split('&');
+    // console.log(info);
+    if (mode == 0)
+        window.location.replace('/dhcp_config?network=' + info[0].split('type=')[1] + '&id=' + info[1].split('id=')[1]);
+    else
+        window.location.replace('/dhcp_config?network=host&id=' + info[1].split('id=')[1]);
 }
 
 function save_config() {

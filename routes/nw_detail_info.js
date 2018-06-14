@@ -35,7 +35,7 @@ router.get('/', function (req, res, next) {
 
     }
     else {
-        shared_nw = req.query.nw.replace('?v_ajax', '');
+        shared_nw = req.query.id.replace('?v_ajax', '');
         kea_config['Dhcp4']['shared-networks'].forEach(s => {
 
             if (s.name == shared_nw) {
