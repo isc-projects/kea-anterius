@@ -65,7 +65,7 @@ router.get('/', function (req, res, next) {
 		// TODO: Verify shared network attrbute 'location' used as promary index
 		// Define shared network row for table
 		table_row = '';
-		table_row = table_row + '<td><b><a href="/nw_detail_info?type=shared&nw='+ kea_config['Dhcp4']['shared-networks'][i].name + '" pjax="1">' + kea_config['Dhcp4']['shared-networks'][i].name + '</a></b></td>';
+		table_row = table_row + '<td><b><a href="/nw_detail_info?type=shared&id='+ kea_config['Dhcp4']['shared-networks'][i].name + '" pjax="1">' + kea_config['Dhcp4']['shared-networks'][i].name + '</a></b></td>';
 		table_row = table_row + '<td>' + shared_nw_assgn_addr_list[i].toLocaleString('en') + ' (' + utilization + '%)</td>';
 		table_row = table_row + '<td>' + shared_nw_total_addr_list[i].toLocaleString('en') + '</td>';
 		table_row = table_row + '<td>' + shared_nw_free_addr_list[i].toLocaleString('en') + '</td>';

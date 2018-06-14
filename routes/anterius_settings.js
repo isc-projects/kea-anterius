@@ -23,11 +23,8 @@ router.get('/', authorize.auth, function (req, res, next) {
 	// /* Config File */
 	// input = input + template_render.form_input('Config File', '<input type="input" class="form-control" id="config_file" placeholder="/etc/dhcp/dhcpd.conf" value="' + anterius_config.config_file + '">');
 
-	// /* Log File */
-	// input = input + template_render.form_input('Log File', '<input type="input" class="form-control" id="log_file" placeholder="/var/log/dhcp.log" value="' + anterius_config.log_file + '">');
-
 	/* Kea Control Agent address [host:port] */
-	input = template_render.form_input('Kea Control Agent Remote address [host:port]', '<input type="input" class="form-control" id="ca_remote_addr" placeholder="Enter host:port value for Kea control API" value="' + anterius_config.server_addr + ':' + anterius_config.server_port + '">');
+	input = template_render.form_input('Kea Control Agent Address [host:port]', '<input type="input" class="form-control" id="ca_remote_addr" placeholder="Enter host:port value for Kea control API" value="' + anterius_config.server_addr + ':' + anterius_config.server_port + '">');
 
 	/* Stats Refresh interval */
 	input = input + template_render.form_input('Statistics Refresh Interval (s)', '<input type="input" class="form-control" id="stat_refr_int" placeholder="Enter refresh interval in secs" value="' + anterius_config.stat_refresh_interval + '">');
@@ -36,6 +33,12 @@ router.get('/', authorize.auth, function (req, res, next) {
 	input = input + template_render.form_input('Admin User', '<input type="input" class="form-control" id="admin_user" placeholder="Username" value="' + anterius_config.admin_user + '">');
 	input = input + template_render.form_input('Admin Password', '<input type="input" class="form-control" id="admin_password" placeholder="Password" value="' + anterius_config.admin_password + '">');
 
+	// /* Log File */
+	// input = input + template_render.form_input('Log File', '<input type="input" class="form-control" id="log_file" placeholder="/var/log/dhcp.log" value="' + anterius_config.log_file + '">');
+
+	/* Utilizn Table sort*/
+	// input = input + template_render.form_input('Statistics Refresh Interval (s)', '<input type="input" class="form-control" id="stat_refr_int" placeholder="Enter refresh interval in secs" value="' + anterius_config.stat_refresh_interval + '">');
+	
 	input = input + '<br><div class="row" align="center"><button type="button" class="btn btn-info waves-effect ant-btn" onclick="save_config()"><i class="material-icons">settings</i> <span>Save Anteris Settings</span></button></div>';
 	input = input + '<br><div id="anterius_settings_result"></div>';
 

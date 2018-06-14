@@ -24,48 +24,53 @@ router.get('/', authorize.auth, function (req, res, next) {
 	// content = template_render.set_template_variable(content, "dhcp_config_location", anterius_config.config_file);
 	// var dhcp_config = fs.readFileSync(anterius_config.config_file, 'utf8');
 
-	if (req.query.network == 'subnet') {
 
-		var subnet, pools;
-		kea_config['Dhcp4']['subnet4'].forEach(s => {
-			if (s.id == req.query.id) {
-				pools = s.pools;
-				subnet = s;
-				// TODO: make effecient
-				// break;
-			}
-		});
-		content = template_render.set_template_variable(content, "edit_title", "Subnet ID:" + subnet.id + " [" + subnet.subnet + "] Configuration options");
-
-		input = template_render.form_input('Subnet', '<input type="input" class="form-control" id="subnet" placeholder="Enter address/netmask" value="' + subnet.subnet + '">');
-		input += template_render.form_input('Valid Lifetime', '<input type="input" class="form-control" id="valid-lt" placeholder="Enter valid lifetime" value="' + subnet['valid-lifetime'] + '">');
-		input += template_render.form_input('Renew Timer', '<input type="input" class="form-control" id="stat_refr_int" placeholder="Enter renew time interval" value="' + subnet['renew-timer'] + '">');
-		input += template_render.form_input('Rebind Timer', '<input type="input" class="form-control" id="stat_refr_int" placeholder="Enter rebindtime interval" value="' + subnet['rebind-timer'] + '">');
-		input += template_render.form_input('Relay IP Address', '<input type="input" class="form-control" id="relay_ipaddr" placeholder="Enter relay address" value="' + subnet.relay['ip-address'] + '">');
-		// input += template_render.form_input('', '<input type="input" class="form-control" id="stat_refr_int" placeholder="Enter refresh interval in secs" value="' +  + '">');
-
-
-	}
-	else if (req.query.network == 'shared') {
-		kea_config['Dhcp4']['shared-networks'].forEach(s => {
-			if (s.name == req.query.id) {
-				s['subnet4'].forEach(x => {
-					id.push(x['id']);
-				});
-			}
-			// TODO: make effecient
-			// break;
-		});
-		content = template_render.set_template_variable(content, "edit_title", "Shared Network [" + subnet.subnet + "] Management <ID:" + subnet.id + ">");
+	if (req.query.network == 'host_res') {
+		input = input + template_render.form_input('', '<input type="input" class="form-control" id="stat_refr_int" placeholder="Enter refresh interval in secs" value="' + anterius_config.stat_refresh_interval + '">');
+		input = input + template_render.form_input('', '<input type="input" class="form-control" id="stat_refr_int" placeholder="Enter refresh interval in secs" value="' + anterius_config.stat_refresh_interval + '">');
+		input = input + template_render.form_input('', '<input type="input" class="form-control" id="stat_refr_int" placeholder="Enter refresh interval in secs" value="' + anterius_config.stat_refresh_interval + '">');
+		input = input + template_render.form_input('', '<input type="input" class="form-control" id="stat_refr_int" placeholder="Enter refresh interval in secs" value="' + anterius_config.stat_refresh_interval + '">');
 
 	}
 	else {
-		input = template_render.form_input('Subnet', '<input type="input" class="form-control" id="ca_remote_addr" placeholder="Enter host:port value for Kea control API" value="' + anterius_config.server_addr + ':' + anterius_config.server_port + '">');
 
-		input = input + template_render.form_input('', '<input type="input" class="form-control" id="stat_refr_int" placeholder="Enter refresh interval in secs" value="' + anterius_config.stat_refresh_interval + '">');
-		input = input + template_render.form_input('', '<input type="input" class="form-control" id="stat_refr_int" placeholder="Enter refresh interval in secs" value="' + anterius_config.stat_refresh_interval + '">');
-		input = input + template_render.form_input('', '<input type="input" class="form-control" id="stat_refr_int" placeholder="Enter refresh interval in secs" value="' + anterius_config.stat_refresh_interval + '">');
-		input = input + template_render.form_input('', '<input type="input" class="form-control" id="stat_refr_int" placeholder="Enter refresh interval in secs" value="' + anterius_config.stat_refresh_interval + '">');
+		var network;
+		if (req.query.network == 'subnet') {
+
+			kea_config['Dhcp4']['subnet4'].forEach(s => {
+				if (s.id == req.query.id) {
+					// pools = s.pools;
+					network = s;
+					// TODO: make effecient
+					// break;
+				}
+			});
+
+			content = template_render.set_template_variable(content, "edit_title", "Subnet ID:" + network.id + " [ <a href='/nw_detail_info?type=subnet&id=" + network.id + "'>" + network.subnet + "</a> ] Configuration options");
+			input = template_render.form_input('Subnet', '<input type="input" class="form-control" id="subnet" placeholder="Enter address/netmask" value="' + network.subnet + '">');
+		}
+		else {
+
+			kea_config['Dhcp4']['shared-networks'].forEach(s => {
+				if (s.name == req.query.id) {
+					// s['subnet4'].forEach(x => {
+					// 	id.push(x['id']);
+					// });
+					network = s;
+				}
+				// TODO: make effecient
+				// break;
+			});
+
+			content = template_render.set_template_variable(content, "edit_title", "Shared Network [ <a href='/nw_detail_info?type=shared&id=" + network.name + "'>" + network.name + "</a> ] Configuration options");
+			input = template_render.form_input('Shared NW name', '<input type="input" class="form-control" id="sharednw-name" placeholder="Enter shared network name" value="' + network.name + '">');
+		}
+
+		// Subnet, Shared nw common parameters
+		input += template_render.form_input('Valid Lifetime', '<input type="input" class="form-control" id="valid-lt" placeholder="Enter valid lifetime" value="' + network['valid-lifetime'] + '">');
+		input += template_render.form_input('Renew Timer', '<input type="input" class="form-control" id="stat_refr_int" placeholder="Enter renew time interval" value="' + network['renew-timer'] + '">');
+		input += template_render.form_input('Rebind Timer', '<input type="input" class="form-control" id="stat_refr_int" placeholder="Enter rebindtime interval" value="' + network['rebind-timer'] + '">');
+		input += template_render.form_input('Relay IP Address', '<input type="input" class="form-control" id="relay_ipaddr" placeholder="Enter relay address" value="' + network.relay['ip-address'] + '">');
 
 	}
 
