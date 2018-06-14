@@ -294,7 +294,7 @@ lease_stats_monitor = setInterval(function () {
 // }
 
 /**
- * Watch config changes so we reload it for core functions...
+ * Watch config file changes and reload
  */
 fs.watch('config/anterius_config.json', function (event, filename) {
     if (filename) {

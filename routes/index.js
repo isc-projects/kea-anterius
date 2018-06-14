@@ -17,7 +17,7 @@ router.get('/', function (req, res, next) {
 	content_subnets = template_render.set_template_variable(content_subnets, "title", "Subnets");
 	content_subnets = template_render.set_template_variable(content_subnets, "table_id", "subnets");
 	content_subnets = template_render.set_template_variable(content_subnets, "table_dim", "col-xs-12 col-sm-12 col-md-6 col-lg-6");
-	// content_subnets = template_render.set_template_variable(content_subnets, "table_content", "");
+	content_subnets = template_render.set_template_variable(content_subnets, "table_content", "");
 
 	res.send(
 		template_render.get_index_template(
