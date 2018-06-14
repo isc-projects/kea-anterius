@@ -8,6 +8,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var tail_module = require('always-tail2');
 
 const execSync = require('child_process').execSync;
 
@@ -37,6 +38,7 @@ if (anter_config.ip_ranges_to_allow != "") {
 app.use('/', require('./routes/index'));
 app.use('/users', require('./routes/users'));
 app.use('/get_stats', require('./routes/get_stats'));
+app.use('/nw_detail_info', require('./routes/nw_detail_info'));
 app.use('/dhcp_statistics', require('./routes/dhcp_statistics_page'));
 app.use('/dhcp_leases', require('./routes/dhcp_leases'));
 app.use('/dhcp_lease_search', require('./routes/dhcp_lease_search'));
@@ -53,13 +55,13 @@ app.use('/anterius_alert_settings_save', require('./routes/anterius_alert_settin
 app.use('/anterius_settings_save', require('./routes/anterius_settings_save'));
 
 /* Glass API Routes - disabled */
-app.use('/api/get_active_leases/', require('./api/get_active_leases'));
-app.use('/api/get_subnet_details/', require('./api/get_subnet_details'));
-app.use('/api/get_vendor_count/', require('./api/get_vendor_count'));
-app.use('/api/get_mac_oui_count_by_vendor/', require('./api/get_mac_oui_count_by_vendor'));
-app.use('/api/get_dhcp_requests/', require('./api/get_dhcp_requests'));
-app.use('/api/get_server_info/', require('./api/get_server_info'));
-app.use('/api/get_mac_oui_list/', require('./api/get_mac_oui_list'));
+// app.use('/api/get_active_leases/', require('./api/get_active_leases'));
+// app.use('/api/get_subnet_details/', require('./api/get_subnet_details'));
+// app.use('/api/get_vendor_count/', require('./api/get_vendor_count'));
+// app.use('/api/get_mac_oui_count_by_vendor/', require('./api/get_mac_oui_count_by_vendor'));
+// app.use('/api/get_dhcp_requests/', require('./api/get_dhcp_requests'));
+// app.use('/api/get_server_info/', require('./api/get_server_info'));
+// app.use('/api/get_mac_oui_list/', require('./api/get_mac_oui_list'));
 
 app.set('view engine', 'html');
 
@@ -174,7 +176,6 @@ if (fs.existsSync(oui_database_file)) {
 /**
  * Leases File Listener <memfile> - calculate leases/sec
  */
-// var tail_module = require('always-tail2');
 // tail = new tail_module(
 //     anter_config.leases_file,
 //     "\n",
@@ -205,15 +206,6 @@ if (fs.existsSync(oui_database_file)) {
 //     }
 // });
 
-/**
- * Watch DHCP Log File
- */
-
-var json_file = require('jsonfile');
-var anter_config = json_file.readFileSync('config/anterius_config.json');
-
-var options = {};
-options.interval = 1000;
 
 var dashboard_timer = setInterval(function () {
     // console.log("Checking timers...");
@@ -319,68 +311,71 @@ fs.watch('config/anterius_config.json', function (event, filename) {
  * Websocket Server
  */
 
-// const WebSocket = require('ws');
-// const wss = new WebSocket.Server({port: 8080});
+const WebSocket = require('ws');
+const wss = new WebSocket.Server({port: 8080});
 
-// options.interval = 300;
-// var tail_dhcp_log = new tail_module(
-//     anter_config.log_file,
-//     "\n",
-//     options
-// );
+options.interval = 300;
+var tail_dhcp_log = new tail_module(
+    anter_config.log_file,
+    "\n",
+    options
+);
 
-// dhcp_requests = {};
+dhcp_requests = {};
 
-// tail_dhcp_log.on("line", function (data) {
-//     if (listening_to_log_file) {
-//         wss.broadcast_event(data, 'dhcp_log_subscription');
-//     }
+/**
+ * Watch DHCP Log File
+ */
+tail_dhcp_log.on("line", function (data) {
+    if (listening_to_log_file) {
+        wss.broadcast_event(data, 'dhcp_log_subscription');
+    }
 
-//     /* Collect Excessive DHCP Request Data */
-//     if (/DHCPREQUEST/i.test(data)) {
+    /* Collect Excessive DHCP Request Data */
+    if (/DHCPREQUEST/i.test(data)) {
 
-//         var request_from = "";
-//         var request_for = "";
-//         var request_via = "";
+        var request_from = "";
+        var request_for = "";
+        var request_via = "";
 
-//         var request_data = data.split(" ");
-//         var length = request_data.length;
-//         for (var i = 0; i < length; i++) {
-//             if (request_data[i] == "from") {
-//                 request_from = request_data[i + 1];
-//             }
-//             if (request_data[i] == "for") {
-//                 request_for = request_data[i + 1];
-//             }
-//             if (request_data[i] == "via") {
-//                 request_via = request_data[i + 1];
-//             }
-//         }
+        var request_data = data.split(" ");
+        var length = request_data.length;
+        for (var i = 0; i < length; i++) {
+            if (request_data[i] == "from") {
+                request_from = request_data[i + 1];
+            }
+            if (request_data[i] == "for") {
+                request_for = request_data[i + 1];
+            }
+            if (request_data[i] == "via") {
+                request_via = request_data[i + 1];
+            }
+        }
 
-//         if (typeof dhcp_requests[request_from] === "undefined")
-//             dhcp_requests[request_from] = {};
+        if (typeof dhcp_requests[request_from] === "undefined")
+            dhcp_requests[request_from] = {};
 
-//         if (typeof dhcp_requests[request_from].request_for === "undefined")
-//             dhcp_requests[request_from].request_for = request_for;
+        if (typeof dhcp_requests[request_from].request_for === "undefined")
+            dhcp_requests[request_from].request_for = request_for;
 
-//         if (typeof dhcp_requests[request_from].request_via === "undefined")
-//             dhcp_requests[request_from].request_via = request_via;
+        if (typeof dhcp_requests[request_from].request_via === "undefined")
+            dhcp_requests[request_from].request_via = request_via;
 
-//         if (typeof dhcp_requests[request_from].request_count === "undefined")
-//             dhcp_requests[request_from].request_count = 0;
+        if (typeof dhcp_requests[request_from].request_count === "undefined")
+            dhcp_requests[request_from].request_count = 0;
 
-//         if (typeof request_from !== "undefined") {
-//             if (request_from.length == 17 && /:/.test(request_from)) {
-//                 var mac_oui = request_from.split(":").join("").toUpperCase().slice(0, 6);
+        if (typeof request_from !== "undefined") {
+            if (request_from.length == 17 && /:/.test(request_from)) {
+                var mac_oui = request_from.split(":").join("").toUpperCase().slice(0, 6);
 
-//                 if (typeof dhcp_requests[request_from].request_vendor === "undefined")
-//                     dhcp_requests[request_from].request_vendor = oui_data[mac_oui];
-//             }
-//         }
+                if (typeof dhcp_requests[request_from].request_vendor === "undefined")
+                    dhcp_requests[request_from].request_vendor = oui_data[mac_oui];
+            }
+        }
 
-//         dhcp_requests[request_from].request_count++;
-//     }
-// });
+        dhcp_requests[request_from].request_count++;
+    }
+});
 
 // const purge_request_data = setInterval(function () {
 //     for (var key in dhcp_requests) {
@@ -395,125 +390,124 @@ fs.watch('config/anterius_config.json', function (event, filename) {
 // }, 3600 * 1000);
 /* 60 Minutes */
 
-// wss.on('connection', function connection(ws) {
-//     socket_clients++;
-//     console.log("[WS] CLIENT_CONNECT: Socket clients (" + socket_clients + ")");
+wss.on('connection', function connection(ws) {
+    socket_clients++;
+    console.log("[WS] CLIENT_CONNECT: Socket clients (" + socket_clients + ")");
 
-//     if (!listening_to_log_file) {
-//         /* Watch log file for new information */
-//         var tail_module = require('always-tail2');
+    if (!listening_to_log_file) {
+        /* Watch log file for new information */
+        var tail_module = require('always-tail2');
 
-//         listening_to_log_file = 1;
-//     }
+        listening_to_log_file = 1;
+    }
 
-// });
+});
 
-// wss.on('close', function close() {
-//     socket_clients--;
-//     console.log("[WS] CLIENT_DISCONNECT: Socket clients (" + socket_clients + ")");
-// });
+wss.on('close', function close() {
+    socket_clients--;
+    console.log("[WS] CLIENT_DISCONNECT: Socket clients (" + socket_clients + ")");
+});
 
-// function heartbeat() {
-//     this.isAlive = true;
-// }
+function heartbeat() {
+    this.isAlive = true;
+}
 
-// function isJson(str) {
-//     try {
-//         JSON.parse(str);
-//     } catch (e) {
-//         return false;
-//     }
-//     return true;
-// }
+function isJson(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
 
-// function ws_event_subscribers(event) {
-//     if (typeof wss === "undefined")
-//         return false;
+function ws_event_subscribers(event) {
+    if (typeof wss === "undefined")
+        return false;
 
-//     var is_listening = false;
+    var is_listening = false;
 
-//     wss.clients.forEach(function each(ws) {
+    wss.clients.forEach(function each(ws) {
 
-//         /* Count event listeners */
-//         for (var event_listening in ws.event_subscription) {
-//             if (event_listening == event) {
-//                 is_listening = true;
-//                 return true;
-//             }
-//         }
+        /* Count event listeners */
+        for (var event_listening in ws.event_subscription) {
+            if (event_listening == event) {
+                is_listening = true;
+                return true;
+            }
+        }
 
-//     });
+    });
 
-//     if (is_listening) {
-//         return true;
-//     }
+    if (is_listening) {
+        return true;
+    }
 
-//     return false;
-// }
+    return false;
+}
 
-// wss.on('connection', function connection(ws) {
-//     ws.isAlive = true;
-//     ws.on('pong', heartbeat);
-//     ws.event_subscription = [];
+wss.on('connection', function connection(ws) {
+    ws.isAlive = true;
+    ws.on('pong', heartbeat);
+    ws.event_subscription = [];
+    ws.on('message', function incoming(data) {
+        if (data != "" && isJson(data)) {
+            var json = JSON.parse(data);
+            if (typeof json["event_subscription"] !== "undefined") {
+                console.log("[WS] Incoming Subscription '%s'", json['event_subscription']);
+                ws.event_subscription[json["event_subscription"]] = 1;
+            }
+            if (typeof json["event_unsubscribe"] !== "undefined") {
+                console.log("[WS] event_unsubscribe '%s'", json['event_unsubscribe']);
+                delete ws.event_subscription[json["event_unsubscribe"]];
+            }
+            if (typeof json["all_events"] !== "undefined") {
+                console.log("[WS] event_unsubscribe '%s'", json['event_unsubscribe']);
+                ws.event_subscription = [];
+            }
+        }
+    });
 
-//     ws.on('message', function incoming(data) {
-//         if (data != "" && isJson(data)) {
-//             var json = JSON.parse(data);
-//             if (typeof json["event_subscription"] !== "undefined") {
-//                 console.log("[WS] Incoming Subscription '%s'", json['event_subscription']);
-//                 ws.event_subscription[json["event_subscription"]] = 1;
-//             }
-//             if (typeof json["event_unsubscribe"] !== "undefined") {
-//                 console.log("[WS] event_unsubscribe '%s'", json['event_unsubscribe']);
-//                 delete ws.event_subscription[json["event_unsubscribe"]];
-//             }
-//             if (typeof json["all_events"] !== "undefined") {
-//                 console.log("[WS] event_unsubscribe '%s'", json['event_unsubscribe']);
-//                 ws.event_subscription = [];
-//             }
-//         }
-//     });
+    stale_connections_audit();
+});
 
-//     stale_connections_audit();
-// });
+wss.broadcast = function broadcast(data) {
+    wss.clients.forEach(function each(client) {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(data);
+        }
+    });
+};
 
-// wss.broadcast = function broadcast(data) {
-//     wss.clients.forEach(function each(client) {
-//         if (client.readyState === WebSocket.OPEN) {
-//             client.send(data);
-//         }
-//     });
-// };
+wss.broadcast_event = function broadcast(data, event) {
+    wss.clients.forEach(function each(client) {
+        if (client.readyState === WebSocket.OPEN) {
+            if (client.event_subscription[event])
+                client.send(JSON.stringify({"event": event, "data": data}));
+        }
+    });
+};
 
-// wss.broadcast_event = function broadcast(data, event) {
-//     wss.clients.forEach(function each(client) {
-//         if (client.readyState === WebSocket.OPEN) {
-//             if (client.event_subscription[event])
-//                 client.send(JSON.stringify({"event": event, "data": data}));
-//         }
-//     });
-// };
+function stale_connections_audit() {
+    socket_clients = 0;
+    wss.clients.forEach(function each(ws) {
+        if (ws.isAlive === false) return ws.terminate();
 
-// function stale_connections_audit() {
-//     socket_clients = 0;
-//     wss.clients.forEach(function each(ws) {
-//         if (ws.isAlive === false) return ws.terminate();
+        ws.isAlive = false;
+        ws.ping('', false, true);
 
-//         ws.isAlive = false;
-//         ws.ping('', false, true);
+        socket_clients++;
+    });
 
-//         socket_clients++;
-//     });
+    console.log("[WS] STATUS: Socket clients (" + socket_clients + ")");
+}
 
-//     console.log("[WS] STATUS: Socket clients (" + socket_clients + ")");
-// }
+/* Keepalive - kill stale connections (30s poll) */
+const interval = setInterval(function ping() {
+    stale_connections_audit();
+}, 30000);
 
-// /* Keepalive - kill stale connections (30s poll) */
-// const interval = setInterval(function ping() {
-//     stale_connections_audit();
-// }, 30000);
-
-// var socket_clients = 0;
+var socket_clients = 0;
 
 
 /**

@@ -1,4 +1,4 @@
-function log_action (action) {
+function log_action(action) {
     switch (action) {
         case "stop":
             websockets_unsubscribe_event("dhcp_log_subscription");
@@ -13,7 +13,7 @@ function log_action (action) {
             break;
         case "download_logs":
             if (editor.getValue() == '') {
-                notification('There is nothing to save!');
+                notification('Nothing to save!');
                 return;
             }
 
@@ -22,7 +22,7 @@ function log_action (action) {
             var df = d.getMonth() + '-' + d.getDate() + '-' + d.getFullYear() + '_' + (d.getHours()) + '-' + d.getMinutes() + ' ' + am_pm;
             var filename = "dhcp_logs_" + df;
             var text = editor.getValue();
-            var blob = new Blob([text], {type: "text/plain;charset=utf-8"});
+            var blob = new Blob([text], { type: "text/plain;charset=utf-8" });
             saveAs(blob, filename + ".txt");
 
             break;
@@ -32,10 +32,10 @@ function log_action (action) {
 }
 
 function format_am_pm(date) {
-	var hours = date.getHours();
-	var minutes = date.getMinutes();
-	var am_pm = hours >= 12 ? 'PM' : 'AM';
-	return am_pm;
+    var hours = date.getHours();
+    var minutes = date.getMinutes();
+    var am_pm = hours >= 12 ? 'PM' : 'AM';
+    return am_pm;
 }
 
 $('#dhcp_log').height($(window).height() * 0.6);
@@ -47,19 +47,19 @@ editor.$blockScrolling = Infinity;
 get_mac_oui_data();
 
 function get_mac_oui_data() {
-	if(typeof mac_oui_data === "undefined") {
-		mac_oui_data = {};
+    if (typeof mac_oui_data === "undefined") {
+        mac_oui_data = {};
         $.getJSON("/api/get_mac_oui_list", function (data) {
             mac_oui_data = data;
         });
     }
 }
 
-function parse_log_stream (console_data){
+function parse_log_stream(console_data) {
 
     if (!document.getElementById("dhcp_log")) {
         console.log("[Websocket] DHCP Log unsubscribed");
-        socket.send(JSON.stringify({"event_unsubscribe": "dhcp_log_subscription"}));
+        socket.send(JSON.stringify({ "event_unsubscribe": "dhcp_log_subscription" }));
         killed_connection = 1;
         return false;
     }

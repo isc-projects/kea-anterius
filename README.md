@@ -62,7 +62,7 @@ sudo npm start
 
 ![anterius_settings_ca_address](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_settings.png)
 
-- From Anterius Settings option in the menu, set the CA address(port:host) accordingly to select mode of operation.
+- To select mode of operation, from the Anterius Settings option in the menu, set the CA address(host:port) accordingly.
 
   - For local server (default mode), set address = localhost:8000
   - For remote server, set address = <public_ip:port>
