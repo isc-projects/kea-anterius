@@ -40,8 +40,7 @@
                         [edit_title]
                     </h4>
                 </div>
-                <br>
-                [config_form]
+                <br> [config_form]
             </div>
         </div>
     </div>
@@ -58,9 +57,12 @@
     </div>
 </div>
 <script>
+
     $('#config-tab a').on('click', function (e) {
         e.preventDefault();
-        $(this).tab('show');
+        if ($(this).parent('li').hasClass('disabled')) {
+            return false;
+        }; $(this).tab('show');
     });
 </script>
 <script src="assets/js/ace_editor/ace.js" type="text/javascript" charset="utf-8"></script>

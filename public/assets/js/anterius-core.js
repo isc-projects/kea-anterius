@@ -210,11 +210,11 @@ function refresh_info() {
 function edit_params(mode) {
     source = window.location.href;
     info = source.split('?')[1].split('&');
-    // console.log(info);
+    console.log(info);
     if (mode == 0)
         window.location.replace('/dhcp_config?network=' + info[0].split('type=')[1] + '&id=' + info[1].split('id=')[1]);
     else
-        window.location.replace('/dhcp_config?network=host&id=' + info[1].split('id=')[1]);
+        window.location.replace('/dhcp_config?network=host&id=' + mode);
 }
 
 function save_config() {

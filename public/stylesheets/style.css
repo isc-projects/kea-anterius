@@ -17,8 +17,16 @@ body {
 
 #ref_btn {
   float: right;
-  font-size: 15px;
   margin: 15px;
+}
+#edit_btn {
+  float: right;
+  font-size: 12px;  
+  margin-top: -30px;
+}
+
+.ant-btn {
+  font-size: 15px;
   color: aliceblue;
   background-color: #640000;
 }

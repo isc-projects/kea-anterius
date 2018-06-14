@@ -23,6 +23,7 @@ router.get('/', function (req, res, next) {
                 pools.push(s.pools);
                 subnets.push(s);
                 s.reservations.forEach(resv => {
+                    resv['subnet-id'] = s.id;
                     host_res.push(resv);
                 });
                 // TODO: make effecient
@@ -48,6 +49,7 @@ router.get('/', function (req, res, next) {
                         pools.push(sn.pools);
                         subnets.push(sn);
                         sn.reservations.forEach(resv => {
+                            resv['subnet-id'] = sn.id;
                             host_res.push(resv);
                         });
                         sn_assgn = kea_stats['subnet[' + sn.id + '].assigned-addresses'][0][0];
@@ -70,7 +72,7 @@ router.get('/', function (req, res, next) {
 
                     pool_range = '';
                     pools.forEach(p => {
-                        if(p.pool != undefined)
+                        if (p.pool != undefined)
                             pool_range += p.pool + '<br>';
                     });
                     if (pool_range == '')
@@ -97,7 +99,7 @@ router.get('/', function (req, res, next) {
 
                     subnet_table = subnet_table + '<tr>' + table_row + '</tr>';
                 }
-               
+
                 content = template_render.set_template_variable(content, "title", "Shared Network [" + shared_nw + "] Information");
 
                 /* Display Subnets table */
@@ -105,7 +107,7 @@ router.get('/', function (req, res, next) {
                 content_subnets = template_render.set_template_variable(content_subnets, "title", "Shared Network Subnets");
                 content_subnets = template_render.set_template_variable(content_subnets, "table_id", "sharednw_subnet_table");
                 content_subnets = template_render.set_template_variable(content_subnets, "table_content", subnet_table);
-	            content_subnets = template_render.set_template_variable(content_subnets, "table_dim", "col-lg-12 col-md-12 col-sm-12 col-xs-12");
+                content_subnets = template_render.set_template_variable(content_subnets, "table_dim", "col-lg-12 col-md-12 col-sm-12 col-xs-12");
             }
         });
     }
@@ -140,6 +142,9 @@ router.get('/', function (req, res, next) {
         table_row = table_row + '<td>' + host_res[i]['client-id'] + '</td>';
         table_row = table_row + '<td>' + host_res[i]['next-server'] + '</td>';
         table_row = table_row + '<td>' + host_res[i]['hw-address'] + '</td>';
+        table_row = table_row + '<td><button type="button" class="btn waves-effect" onclick="edit_params(\'' + host_res[i]['ip-address'] + ':' + host_res[i]['subnet-id'] + '\')">'
+            + '<i class="material-icons">edit</i></button></td >';
+
 
         // TODO: modify for edit link
         // table_row = table_row + '<td><b><a href="/nw_detail_info?id=' + subnets[i].id + '" pjax="1">' + subnets[i].subnet + '</a></b></td>'; //Subnet details link
@@ -154,7 +159,7 @@ router.get('/', function (req, res, next) {
     if (pools) {
         pools.forEach(pl => {
             pl.forEach(p => {
-                if(p.pool != undefined)
+                if (p.pool != undefined)
                     pool_range += p.pool + '<br>';
             });
         });
