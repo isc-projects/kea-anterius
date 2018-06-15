@@ -17,14 +17,42 @@ function gen_dhcp_config(nw_id, nw_type) {
 
 	configformData = $("#config-form").serializeArray();
 	// console.log(configformData)
-	
+
 	// Instantiate a temp test file
 	test_config_file = JSON.parse(dhcp_config.getValue());
 	// console.log(test_config_file['Dhcp4']['subnet4'][0]);
 
-	if (nw_type == 'subnet') {
+	if (nw_type == 'reservations') {
+
+		hr_addr = nw_id.split(':')[0];
+		subnet_id = nw_id.split(':')[1];
+
 		test_config_file['Dhcp4']['subnet4'].forEach(s => {
-			if (s.id == nw_id) {
+			if (s.id == subnet_id) {
+
+				s['reservations'].forEach(h => {
+					if (h['ip-address'] == hr_addr)
+						configformData.forEach(fd => {
+							if (fd.name.includes('_')) {
+								tags = fd.name.split('_');
+								h[tags[0]][tags[1]] = fd.value;
+							}
+							else
+								h[fd.name] = fd.value;
+						});
+				});
+				// TODO: make effecient
+				// break;
+				console.log(s)
+			}
+		});
+	} else {
+		if (nw_type == 'shared-networks')
+				x = 'name';
+			else
+				x = 'id';
+		test_config_file['Dhcp4'][nw_type].forEach(s => {
+			if (s[x] == nw_id) {
 				configformData.forEach(fd => {
 					if (fd.name.includes('_')) {
 						tags = fd.name.split('_');
@@ -38,13 +66,10 @@ function gen_dhcp_config(nw_id, nw_type) {
 				console.log(s)
 			}
 		});
-	} else if (nw_type == 'shared') {
-
-	} else {
-
 	}
 
 	dhcp_config.setValue(JSON.stringify(test_config_file, null, 4), -1);
+	
 
 	// $.post("/dhcp_config_update", dhcp_config_form_data, function (data) {
 	// 	$("#dhcp_config_result").html(data);

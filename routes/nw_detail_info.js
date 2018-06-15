@@ -16,7 +16,7 @@ router.get('/', function (req, res, next) {
     var nw_total_addr = 0, nw_free_addr = 0, nw_assgn_addr = 0;
     content_subnets = '', subnet_table = '', host_res_table = '';
 
-    if (req.query.type == 'subnet') {
+    if (req.query.type == 'subnet4') {
         id = req.query.id.replace('?v_ajax', '');
         kea_config['Dhcp4']['subnet4'].forEach(s => {
             if (s.id == id) {
@@ -80,7 +80,7 @@ router.get('/', function (req, res, next) {
 
                     table_row = '';
                     table_row = table_row + '<td>' + subnets[i].id + '</td>'; //Subnet ID
-                    table_row = table_row + '<td><b><a href="/nw_detail_info?type=subnet&id=' + subnets[i].id + '" pjax="1">' + subnets[i].subnet + '</a></b></td>'; //Subnet details link
+                    table_row = table_row + '<td><b><a href="/nw_detail_info?type=subnet4&id=' + subnets[i].id + '" pjax="1">' + subnets[i].subnet + '</a></b></td>'; //Subnet details link
                     table_row = table_row + '<td>' + pool_range + '</td>'; //Subnet Pool range
                     table_row = table_row + '<td>' + subnet_util[i][0].toLocaleString('en') + ' (' + sn_utilzn + '%)</td>';
                     table_row = table_row + '<td>' + subnet_util[i][1].toLocaleString('en') + '</td>';

@@ -21,7 +21,7 @@ router.get('/', authorize.auth, function (req, res, next) {
 	var nw_id = req.query.id;
 
 	if (nw_type) {
-		if (nw_type == 'host') {
+		if (nw_type == 'reservations') {
 
 			var nw_entity;
 			hr_addr = req.query.id.split(':')[0];
@@ -33,6 +33,7 @@ router.get('/', authorize.auth, function (req, res, next) {
 						if (h['ip-address'] == hr_addr)
 							nw_entity = h;
 					});
+ 
 					// TODO: make effecient
 					// break;
 				}
@@ -50,7 +51,7 @@ router.get('/', authorize.auth, function (req, res, next) {
 		else {
 
 			var nw_entity;
-			if (nw_type == 'subnet') {
+			if (nw_type == 'subnet4') {
 
 				kea_config['Dhcp4']['subnet4'].forEach(s => {
 					if (s.id == req.query.id) {
@@ -61,7 +62,7 @@ router.get('/', authorize.auth, function (req, res, next) {
 					}
 				});
 
-				content = template_render.set_template_variable(content, "edit_title", "Subnet ID : " + nw_entity.id + " [ <a href='/nw_detail_info?type=subnet&id=" + nw_entity.id + "'>" + nw_entity.subnet + "</a> ] Configuration options");
+				content = template_render.set_template_variable(content, "edit_title", "Subnet ID : " + nw_entity.id + " [ <a href='/nw_detail_info?type=subnet4&id=" + nw_entity.id + "'>" + nw_entity.subnet + "</a> ] Configuration options");
 				input = template_render.form_input('Subnet', '<input type="input" class="form-control" name="subnet" id="subnet" placeholder="Enter address/netmask" value="' + nw_entity.subnet + '">');
 			}
 			else {
@@ -77,7 +78,7 @@ router.get('/', authorize.auth, function (req, res, next) {
 					// break;
 				});
 
-				content = template_render.set_template_variable(content, "edit_title", "Shared Network [ <a href='/nw_detail_info?type=shared&id=" + nw_entity.name + "'>" + nw_entity.name + "</a> ] Configuration options");
+				content = template_render.set_template_variable(content, "edit_title", "Shared Network [ <a href='/nw_detail_info?type=shared-networks&id=" + nw_entity.name + "'>" + nw_entity.name + "</a> ] Configuration options");
 				input = template_render.form_input('Shared NW name', '<input type="input" class="form-control"  name="sharednw-name" id="sharednw-name" placeholder="Enter shared network name" value="' + nw_entity.name + '">');
 			}
 
@@ -85,11 +86,11 @@ router.get('/', authorize.auth, function (req, res, next) {
 			input += template_render.form_input('Valid Lifetime', '<input type="input" class="form-control" name="valid-lifetime" id="valid-lifetime" placeholder="Enter valid lifetime" value="' + nw_entity['valid-lifetime'] + '">');
 			input += template_render.form_input('Renew Timer', '<input type="input" class="form-control" name="renew-timer" id="renew-timer" placeholder="Enter renew time interval" value="' + nw_entity['renew-timer'] + '">');
 			input += template_render.form_input('Rebind Timer', '<input type="input" class="form-control" name="rebind-timer"  id="rebind-timer" placeholder="Enter rebindtime interval" value="' + nw_entity['rebind-timer'] + '">');
-			input += template_render.form_input('Relay IP Address', '<input type="input" class="form-control" name="relay_ipaddr" id="relay_ipaddr" placeholder="Enter relay address" value="' + nw_entity.relay['ip-address'] + '">');
+			input += template_render.form_input('Relay IP Address', '<input type="input" class="form-control" name="relay_ip-address" id="relay_ipaddr" placeholder="Enter relay address" value="' + nw_entity.relay['ip-address'] + '">');
 		}
 
-		input = input + '<br><div class="row" align="center"><button type="button" class="btn btn-info waves-effect ant-btn" onclick=\'gen_dhcp_config('
-			+ nw_id + ',"' + nw_type + '")\'><i class="material-icons">settings</i> <span>Write Changes to Test file</span></button></div>';
+		input += '<div class="row" align="center"><button type="button" class="btn btn-info waves-effect ant-btn" style="margin-bottom: 2%; width: 25%;" onclick=\'gen_dhcp_config("'
+			+ nw_id + '","' + nw_type + '")\'><i class="material-icons">settings</i> <span>Write Changes to Test file</span></button></div>';
 
 		form_data = template_render.form_body("config-form", input);
 
@@ -102,6 +103,7 @@ router.get('/', authorize.auth, function (req, res, next) {
 	else {
 		console.log(req.query);
 
+		content = template_render.set_template_variable(content, "write_config_btn", '');
 		content = template_render.set_template_variable(content, "file_focus", "active", 1);
 		content = template_render.set_template_variable(content, "form_focus", "disabled disabledTab", 1);
 		content = template_render.set_template_variable(content, "file_selected", "true", 1);

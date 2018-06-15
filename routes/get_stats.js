@@ -65,7 +65,7 @@ router.get('/', function (req, res, next) {
 		// TODO: Verify shared network attrbute 'location' used as promary index
 		// Define shared network row for table
 		table_row = '';
-		table_row = table_row + '<td><b><a href="/nw_detail_info?type=shared&id='+ kea_config['Dhcp4']['shared-networks'][i].name + '" pjax="1">' + kea_config['Dhcp4']['shared-networks'][i].name + '</a></b></td>';
+		table_row = table_row + '<td><b><a href="/nw_detail_info?type=shared-networks&id='+ kea_config['Dhcp4']['shared-networks'][i].name + '" pjax="1">' + kea_config['Dhcp4']['shared-networks'][i].name + '</a></b></td>';
 		table_row = table_row + '<td>' + shared_nw_assgn_addr_list[i].toLocaleString('en') + ' (' + utilization + '%)</td>';
 		table_row = table_row + '<td>' + shared_nw_total_addr_list[i].toLocaleString('en') + '</td>';
 		table_row = table_row + '<td>' + shared_nw_free_addr_list[i].toLocaleString('en') + '</td>';
@@ -134,7 +134,7 @@ router.get('/', function (req, res, next) {
 		// Define subnet row for table
 		table_row = '';
 		table_row = table_row + '<td>' + kea_config.Dhcp4.subnet4[i].id + '</td>'; //Subnet ID
-		table_row = table_row + '<td><b><a href="/nw_detail_info?type=subnet&id=' + kea_config.Dhcp4.subnet4[i].id + '" pjax="1">' + kea_config.Dhcp4.subnet4[i].subnet + '</a></b></td>'; //Subnet details link
+		table_row = table_row + '<td><b><a href="/nw_detail_info?type=subnet4&id=' + kea_config.Dhcp4.subnet4[i].id + '" pjax="1">' + kea_config.Dhcp4.subnet4[i].subnet + '</a></b></td>'; //Subnet details link
 		table_row = table_row + '<td>' + subnet_pool_map[i] + '</td>'; //Subnet Pool range
 		table_row = table_row + '<td>' + subnet_assgn_addr_list[i].toLocaleString('en') + ' (' + utilization + '%)</td>';
 		table_row = table_row + '<td>' + subnet_total_addr_list[i].toLocaleString('en') + '</td>';
