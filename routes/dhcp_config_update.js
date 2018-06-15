@@ -8,13 +8,14 @@ var router = express.Router();
 var authorize = require('../lib/authorize.js');
 
 router.post('/', authorize.auth, function(req, res, next) {
+	
 	var request = req.body;
 
+	// ISC DHCP Local config verification - replaced by CA API
+	// fs.writeFileSync("./syntax_verify_config", request.dhcp_config_data, 'utf8');
+	// var exec = require('child_process').exec;
 
-	fs.writeFileSync("./syntax_verify_config", request.dhcp_config_data, 'utf8');
-
-	var exec = require('child_process').exec;
-
+	
 	exec('/usr/sbin/dhcpd -t -cf ./syntax_verify_config > verify_output 2> verify_output', function(err, stdout, stderr)
 	{
 		var output = fs.readFileSync('./verify_output', "utf8");
