@@ -10,18 +10,20 @@ router.get('/', authorize.auth, function (req, res, next) {
 	// var anterius_config = json_file.readFileSync('config/anterius_config.json');
 	content = template_render.get_template("dhcp_config");
 	// Display current config file from API config-get
-	content = template_render.set_template_variable(content, "dhcp_config_content", JSON.stringify(kea_config.Dhcp4, null, 4));
+	content = template_render.set_template_variable(content, "dhcp_config_content", JSON.stringify(kea_config, null, 4));
 	// content = template_render.set_template_variable(content, "title", "Kea DHCP4 Configuration");
 
 	// Uncomment to display/modify Local configuration file
 	// content = template_render.set_template_variable(content, "c_content", "");
 	// content = template_render.set_template_variable(content, "dhcp_config_location", anterius_config.config_file);
 	// var dhcp_config = fs.readFileSync(anterius_config.config_file, 'utf8');
+	var nw_type = req.query.network;
+	var nw_id = req.query.id;
 
-	if (req.query.network) {
-		if (req.query.network == 'host') {
+	if (nw_type) {
+		if (nw_type == 'host') {
 
-			var host_res;
+			var nw_entity;
 			hr_addr = req.query.id.split(':')[0];
 			subnet_id = req.query.id.split(':')[1];
 			kea_config['Dhcp4']['subnet4'].forEach(s => {
@@ -29,38 +31,38 @@ router.get('/', authorize.auth, function (req, res, next) {
 					// pools = s.pools;
 					s['reservations'].forEach(h => {
 						if (h['ip-address'] == hr_addr)
-							host_res = h;
+							nw_entity = h;
 					});
 					// TODO: make effecient
 					// break;
 				}
 			});
 
-			content = template_render.set_template_variable(content, "edit_title", "Host Reservation [ " + host_res['ip-address'] + " ] Configuration options");
+			content = template_render.set_template_variable(content, "edit_title", "Host Reservation [ " + nw_entity['ip-address'] + " ] Configuration options");
 
-			input = template_render.form_input('IP Address', '<input type="input" class="form-control" id="hr-addr" placeholder="Enter address to be reserved" value="' + host_res['ip-address'] + '">');
-			input = input + template_render.form_input('Hostname', '<input type="input" class="form-control" id="hostname" placeholder="Enter device hostname" value="' + host_res.hostname + '">');
-			input = input + template_render.form_input('Server-Hostname', '<input type="input" class="form-control" id="svr-hostname" placeholder="Enter hostname for server" value="' + host_res['server-hostname'] + '">');
-			input = input + template_render.form_input('Hardware Address', '<input type="input" class="form-control" id="hw-addr" placeholder="Enter MAC address for device" value="' + host_res['hw-address'] + '">');
-			input = input + template_render.form_input('Next Server', '<input type="input" class="form-control" id="next-svr" placeholder="Enter next server address" value="' + host_res['next-server'] + '">');
+			input = template_render.form_input('IP Address', '<input type="input" class="form-control" name="hr-addr" id="hr-addr" placeholder="Enter address to be reserved" value="' + nw_entity['ip-address'] + '">');
+			input = input + template_render.form_input('Hostname', '<input type="input" class="form-control" name="hostname" id="hostname" placeholder="Enter device hostname" value="' + nw_entity.hostname + '">');
+			input = input + template_render.form_input('Server-Hostname', '<input type="input" class="form-control" name="svr-hostname" id="svr-hostname" placeholder="Enter hostname for server" value="' + nw_entity['server-hostname'] + '">');
+			input = input + template_render.form_input('Hardware Address', '<input type="input" class="form-control" name="hw-addr" id="hw-addr" placeholder="Enter MAC address for device" value="' + nw_entity['hw-address'] + '">');
+			input = input + template_render.form_input('Next Server', '<input type="input" class="form-control" name="next-svr" id="next-svr" placeholder="Enter next server address" value="' + nw_entity['next-server'] + '">');
 
 		}
 		else {
 
-			var network;
-			if (req.query.network == 'subnet') {
+			var nw_entity;
+			if (nw_type == 'subnet') {
 
 				kea_config['Dhcp4']['subnet4'].forEach(s => {
 					if (s.id == req.query.id) {
 						// pools = s.pools;
-						network = s;
+						nw_entity = s;
 						// TODO: make effecient
 						// break;
 					}
 				});
 
-				content = template_render.set_template_variable(content, "edit_title", "Subnet ID:" + network.id + " [ <a href='/nw_detail_info?type=subnet&id=" + network.id + "'>" + network.subnet + "</a> ] Configuration options");
-				input = template_render.form_input('Subnet', '<input type="input" class="form-control" id="subnet" placeholder="Enter address/netmask" value="' + network.subnet + '">');
+				content = template_render.set_template_variable(content, "edit_title", "Subnet ID : " + nw_entity.id + " [ <a href='/nw_detail_info?type=subnet&id=" + nw_entity.id + "'>" + nw_entity.subnet + "</a> ] Configuration options");
+				input = template_render.form_input('Subnet', '<input type="input" class="form-control" name="subnet" id="subnet" placeholder="Enter address/netmask" value="' + nw_entity.subnet + '">');
 			}
 			else {
 
@@ -69,26 +71,25 @@ router.get('/', authorize.auth, function (req, res, next) {
 						// s['subnet4'].forEach(x => {
 						// 	id.push(x['id']);
 						// });
-						network = s;
+						nw_entity = s;
 					}
 					// TODO: make effecient
 					// break;
 				});
 
-				content = template_render.set_template_variable(content, "edit_title", "Shared Network [ <a href='/nw_detail_info?type=shared&id=" + network.name + "'>" + network.name + "</a> ] Configuration options");
-				input = template_render.form_input('Shared NW name', '<input type="input" class="form-control" id="sharednw-name" placeholder="Enter shared network name" value="' + network.name + '">');
+				content = template_render.set_template_variable(content, "edit_title", "Shared Network [ <a href='/nw_detail_info?type=shared&id=" + nw_entity.name + "'>" + nw_entity.name + "</a> ] Configuration options");
+				input = template_render.form_input('Shared NW name', '<input type="input" class="form-control"  name="sharednw-name" id="sharednw-name" placeholder="Enter shared network name" value="' + nw_entity.name + '">');
 			}
 
 			// Subnet, Shared nw common parameters
-			input += template_render.form_input('Valid Lifetime', '<input type="input" class="form-control" id="valid-lt" placeholder="Enter valid lifetime" value="' + network['valid-lifetime'] + '">');
-			input += template_render.form_input('Renew Timer', '<input type="input" class="form-control" id="stat_refr_int" placeholder="Enter renew time interval" value="' + network['renew-timer'] + '">');
-			input += template_render.form_input('Rebind Timer', '<input type="input" class="form-control" id="stat_refr_int" placeholder="Enter rebindtime interval" value="' + network['rebind-timer'] + '">');
-			input += template_render.form_input('Relay IP Address', '<input type="input" class="form-control" id="relay_ipaddr" placeholder="Enter relay address" value="' + network.relay['ip-address'] + '">');
-
+			input += template_render.form_input('Valid Lifetime', '<input type="input" class="form-control" name="valid-lifetime" id="valid-lifetime" placeholder="Enter valid lifetime" value="' + nw_entity['valid-lifetime'] + '">');
+			input += template_render.form_input('Renew Timer', '<input type="input" class="form-control" name="renew-timer" id="renew-timer" placeholder="Enter renew time interval" value="' + nw_entity['renew-timer'] + '">');
+			input += template_render.form_input('Rebind Timer', '<input type="input" class="form-control" name="rebind-timer"  id="rebind-timer" placeholder="Enter rebindtime interval" value="' + nw_entity['rebind-timer'] + '">');
+			input += template_render.form_input('Relay IP Address', '<input type="input" class="form-control" name="relay_ipaddr" id="relay_ipaddr" placeholder="Enter relay address" value="' + nw_entity.relay['ip-address'] + '">');
 		}
 
-		input = input + '<br><div class="row" align="center"><button type="button" class="btn btn-info waves-effect ant-btn" onclick="save_config()"><i class="material-icons">settings</i> <span>Write Changes to Test file</span></button></div>';
-		input = input + '<br><div id="anterius_settings_result"></div>';
+		input = input + '<br><div class="row" align="center"><button type="button" class="btn btn-info waves-effect ant-btn" onclick=\'gen_dhcp_config('
+			+ nw_id + ',"' + nw_type + '")\'><i class="material-icons">settings</i> <span>Write Changes to Test file</span></button></div>';
 
 		form_data = template_render.form_body("config-form", input);
 
