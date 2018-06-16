@@ -41,11 +41,11 @@ router.get('/', authorize.auth, function (req, res, next) {
 
 			content = template_render.set_template_variable(content, "edit_title", "Host Reservation [ " + nw_entity['ip-address'] + " ] Configuration options");
 
-			input = template_render.form_input('IP Address', '<input type="input" class="form-control" name="hr-addr" id="hr-addr" placeholder="Enter address to be reserved" value="' + nw_entity['ip-address'] + '">');
+			input = template_render.form_input('IP Address', '<input type="input" class="form-control" name="ip-address" id="ip-address" placeholder="Enter address to be reserved" value="' + nw_entity['ip-address'] + '">');
 			input = input + template_render.form_input('Hostname', '<input type="input" class="form-control" name="hostname" id="hostname" placeholder="Enter device hostname" value="' + nw_entity.hostname + '">');
-			input = input + template_render.form_input('Server-Hostname', '<input type="input" class="form-control" name="svr-hostname" id="svr-hostname" placeholder="Enter hostname for server" value="' + nw_entity['server-hostname'] + '">');
-			input = input + template_render.form_input('Hardware Address', '<input type="input" class="form-control" name="hw-addr" id="hw-addr" placeholder="Enter MAC address for device" value="' + nw_entity['hw-address'] + '">');
-			input = input + template_render.form_input('Next Server', '<input type="input" class="form-control" name="next-svr" id="next-svr" placeholder="Enter next server address" value="' + nw_entity['next-server'] + '">');
+			input = input + template_render.form_input('Server-Hostname', '<input type="input" class="form-control" name="server-hostname" id="server-hostname" placeholder="Enter hostname for server" value="' + nw_entity['server-hostname'] + '">');
+			input = input + template_render.form_input('Hardware Address', '<input type="input" class="form-control" name="hw-address" id="hw-address" placeholder="Enter MAC address for device" value="' + nw_entity['hw-address'] + '">');
+			input = input + template_render.form_input('Next Server', '<input type="input" class="form-control" name="next-server" id="next-server" placeholder="Enter next server address" value="' + nw_entity['next-server'] + '">');
 
 		}
 		else {
@@ -89,7 +89,7 @@ router.get('/', authorize.auth, function (req, res, next) {
 			input += template_render.form_input('Relay IP Address', '<input type="input" class="form-control" name="relay_ip-address" id="relay_ipaddr" placeholder="Enter relay address" value="' + nw_entity.relay['ip-address'] + '">');
 		}
 
-		input += '<div class="row" align="center"><button type="button" class="btn btn-info waves-effect ant-btn" style="margin-bottom: 2%; width: 25%;" onclick=\'gen_dhcp_config("'
+		input += '<div class="row" align="center"><button type="button" id="gen_btn" class="btn btn-info waves-effect ant-btn" disabled style="margin-bottom: 2%; width: 25%;" onclick=\'gen_dhcp_config("'
 			+ nw_id + '","' + nw_type + '")\'><i class="material-icons">settings</i> <span>Write Changes to Test file</span></button></div>';
 
 		form_data = template_render.form_body("config-form", input);

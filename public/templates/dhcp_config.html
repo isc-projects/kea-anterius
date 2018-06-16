@@ -13,7 +13,7 @@
                 <a class="nav-link" data-toggle="tab" role="tab" aria-controls="file" aria-selected="[file_selected]" href="#file">Config File Editor</a>
             </li>
         </ul>
-        <div class="tab-content">
+        <div class="tab-content" style="margin-bottom: -5%;">
             <div id="file" class="tab-pane [file_focus]" role="tabpanel" aria-labelledby="file">
 
                 <!-- [c_content] -->
@@ -40,13 +40,14 @@
                 <br> [config_form]
             </div>
         </div>
+        <hr>
         <div class="row" align="center">
-            <button type="button" class="btn btn-info waves-effect ant-btn" disabled style="margin-bottom: 2%; width: 20%;" onclick="test_dhcp_config()">
+            <button id="test_btn" type="button" class="btn btn-info waves-effect ant-btn" disabled style="margin-bottom: 2%; width: 20%;" onclick="test_dhcp_config()">
                 <i class="material-icons">system_update_alt</i>
                 <span>Test Config</span>
             </button>
             <span style="margin-left:5%; margin-right:5%"></span>
-            <button type="button" class="btn btn-info waves-effect ant-btn" disabled style="margin-bottom: 2%;  width: 20%;" onclick="save_dhcp_config()">
+            <button id="update_btn" type="button" class="btn btn-info waves-effect ant-btn" disabled style="margin-bottom: 2%;  width: 20%;" onclick="save_dhcp_config()">
                 <i class="material-icons">system_update_alt</i>
                 <span>Update Config</span>
             </button>
@@ -62,6 +63,11 @@
             return false;
         }; $(this).tab('show');
     });
+
+    $('input').change(function() { 
+        document.getElementById("gen_btn").disabled = false;
+   }); 
+
 </script>
 <script src="assets/js/ace_editor/ace.js" type="text/javascript" charset="utf-8"></script>
 <script src="assets/js/ace_editor/theme-terminal.js" type="text/javascript" charset="utf-8"></script>

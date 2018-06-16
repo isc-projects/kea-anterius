@@ -145,7 +145,9 @@ router.get('/', function (req, res, next) {
         table_row = table_row + '<td><button type="button" class="btn waves-effect" onclick="edit_params(\'' + host_res[i]['ip-address'] + ':' + host_res[i]['subnet-id'] + '\')">'
             + '<i class="material-icons">edit</i></button></td >';
 
-
+        // remove subnet-id external property  
+        delete host_res[i]['subnet-id'];
+        
         // TODO: modify for edit link
         // table_row = table_row + '<td><b><a href="/nw_detail_info?id=' + subnets[i].id + '" pjax="1">' + subnets[i].subnet + '</a></b></td>'; //Subnet details link
         table_row = table_row.replace(/<td><\/td>/g, '<td> -- </td>');
