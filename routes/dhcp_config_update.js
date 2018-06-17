@@ -16,10 +16,19 @@ router.post('/', authorize.auth, function (req, res, next) {
 	// fs.writeFileSync("./syntax_verify_config", request.dhcp_config_file, 'utf8');
 	// var exec = require('child_process').exec;
 
-	config_req_data = JSON.stringify({ "command": "config-test", "service": ["dhcp4"] , "arguments": JSON.parse(request.dhcp_config_file) });
+	config_test_req_data = JSON.stringify({ "command": "config-test", "service": ["dhcp4"], "arguments": JSON.parse(request.dhcp_config_file) });
 
-	console.log(api_agent.fire_kea_api(config_req_data));
+	/* Fetch and set server config*/
+	var response_data = api_agent.fire_kea_api(config_test_req_data).then(function (api_data) {
+		// console.log(api_data);
+		return api_data;
+	});
+	console.log(response_data);
 
+	setTimeout(function () {
+		console.log(response_data);
+		res.send({ "message": response_data });
+	});
 
 	// exec('/usr/sbin/dhcpd -t -cf ./syntax_verify_config > verify_output 2> verify_output', function(err, stdout, stderr)
 	// {

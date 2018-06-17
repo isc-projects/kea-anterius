@@ -72,7 +72,7 @@ app.use(function (req, res, next) {
     next(err);
 });
 
-// error handler
+/* Error handler */
 app.use(function (err, req, res, next) {
     // set locals, only providing error in development
     res.locals.message = err.message;
@@ -86,9 +86,7 @@ app.use(function (err, req, res, next) {
 module.exports = app;
 module.exports.anter_config = anter_config;
 
-/**
- Anterius Data Model - Global Statistics Variables
- */
+/* Anterius Data Model - Global Statistics Variables */
 kea_stats = {};
 kea_config = {};
 
@@ -108,30 +106,35 @@ options.interval = 1000;
 
 debug_watch_lease_parse_stream = 0;
 
-// TODO: Mechanism to execute command or get this data from remote machine
+// TODO: Mechanism to retrieve below sections from remote machine
 host_name = execSync("cat /etc/hostname").toString().replace("\n", "");
 run_status = execSync("keactrl status").toString();
-
-/**
- * Poll: CPU Utilization
- */
+/* Poll: CPU Utilization */
 // cpu_utilization_poll = setInterval(function () {
 //     cpu_utilization = parseFloat(execSync("top -bn 1 | awk 'NR>7{s+=$9} END {print s/4}'").toString())
 // }, (15 * 1000));
 
 
-//Kea REST API call - config-get and statistics-get
+/* Kea CA REST API call - config-get and statistics-get */
 stats_req_data = JSON.stringify({ "command": "statistic-get-all", "service": ["dhcp4"] });
 config_req_data = JSON.stringify({ "command": "config-get", "service": ["dhcp4"] });
 
-api_agent.fire_kea_api(stats_req_data);
-api_agent.fire_kea_api(config_req_data);
+/* Fetch and set server stats*/
+api_agent.fire_kea_api(stats_req_data).then(function (api_data) {
+    console.log(api_data);
+    kea_stats = api_data;
+});
 
-/**
- * Ingest OUI Database
- */
+/* Fetch and set server config*/
+api_agent.fire_kea_api(config_req_data).then(function (api_data) {
+    console.log(api_data);
+    kea_config = api_data;
+});
+
+/* Ingest OUI Database */
 fs = require('fs');
 var oui_database_file = "bin/oui_table.txt";
+
 /* Global oui_data bucket */
 oui_data = {};
 if (fs.existsSync(oui_database_file)) {
@@ -219,29 +222,34 @@ var dashboard_timer = setInterval(function () {
 }, 5000);
 
 
-/**
- * Calculate leases per minute
- */
+/* Leases per minute calculator */
 var lps_list = [0];
 var lpm_counter = 0;
 
-// Recurrent Loop for lease stats
+/* Recurrent Loop for lease stats */
 lease_stats_monitor = setInterval(function () {
 
-    api_agent.fire_kea_api(stats_req_data);
-    api_agent.fire_kea_api(config_req_data);
+    /* Fetch and set server stats*/
+    api_agent.fire_kea_api(stats_req_data).then(function (api_data) {
+        kea_stats = api_data;
+    });
 
-    // console.log(kea_stats);
-    
+    /* Fetch and set server config*/
+    api_agent.fire_kea_api(config_req_data).then(function (api_data) {
+        kea_config = api_data;
+    });
+
+    // console.log(kea_stats, kea_config);
+
     total_leases = 0;
     subnet_count = kea_config['Dhcp4']['subnet4'].length;
     shared_nw_count = kea_config['Dhcp4']['shared-networks'].length;
-    
+
     for (var i = 1; i <= subnet_count; i++) {
         total_leases += kea_stats['subnet[' + i + '].assigned-addresses'][0][0];
     }
-    
-    // Update metric - leases / sec 
+
+    /* Update metric - leases / sec  */
     if (lpm_counter > 0)
         leases_per_sec = total_leases - tl0;
 
@@ -293,9 +301,7 @@ lease_stats_monitor = setInterval(function () {
 //     return socket_clients;
 // }
 
-/**
- * Watch config file changes and reload
- */
+/* Watch Anterius settings file changes and reload */
 fs.watch('config/anterius_config.json', function (event, filename) {
     if (filename) {
         setTimeout(function () {
@@ -307,12 +313,10 @@ fs.watch('config/anterius_config.json', function (event, filename) {
     }
 });
 
-/**
- * Websocket Server
- */
+/* Websocket Server */
 
 const WebSocket = require('ws');
-const wss = new WebSocket.Server({port: 8080});
+const wss = new WebSocket.Server({ port: 8080 });
 
 options.interval = 300;
 var tail_dhcp_log = new tail_module(
@@ -323,9 +327,7 @@ var tail_dhcp_log = new tail_module(
 
 dhcp_requests = {};
 
-/**
- * Watch DHCP Log File
- */
+/* Watch DHCP Log File */
 tail_dhcp_log.on("line", function (data) {
     if (listening_to_log_file) {
         wss.broadcast_event(data, 'dhcp_log_subscription');
@@ -483,7 +485,7 @@ wss.broadcast_event = function broadcast(data, event) {
     wss.clients.forEach(function each(client) {
         if (client.readyState === WebSocket.OPEN) {
             if (client.event_subscription[event])
-                client.send(JSON.stringify({"event": event, "data": data}));
+                client.send(JSON.stringify({ "event": event, "data": data }));
         }
     });
 };

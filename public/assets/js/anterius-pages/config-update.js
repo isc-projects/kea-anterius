@@ -83,7 +83,8 @@ function test_dhcp_config() {
 	params = "mode=test&dhcp_config_file=" + encodeURIComponent(dhcp_config.getValue());
 
 	$.post("/dhcp_config_update", params, function (data) {
-		$("#dhcp_config_result").html(data);
+		console.log(data.message);
+		notification(data.message);
 	});
 }
 
