@@ -225,8 +225,8 @@ function save_config() {
     });
 }
 
-function notification(text) {
-    colorName = 'bg-black';
+function notification(text, colorName = 'bg-black') {
+
     animateEnter = 'animated fadeInDown';
     animateExit = 'animated fadeOutUp';
     var allowDismiss = true;

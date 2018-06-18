@@ -223,7 +223,7 @@
     <script src="assets/plugins/raphael/raphael.min.js"></script>
     <script src="assets/plugins/morris/morris.min.js"></script>
 
-    <!-- Glass -->
+    <!-- Anterius Fns -->
     <script src="assets/js/api-examples.js"></script>
     <script src="assets/js/anterius-core.js"></script>
     <script src="assets/js/anterius-websockets.js"></script>
@@ -259,7 +259,7 @@
                 // $('#cpu-utilization').html(data.cpu_utilization + "%");
                 $('#run-status').html(data.run_status);
                 $('#leases-sec').html(data.leases_per_second.toLocaleString('en') + ' / ' + data.leases_per_minute.toLocaleString('en'));
-                $('#total-leases').html(data.leases_used.toLocaleString('en'));
+                $('#total-active').html(data.leases_used.toLocaleString('en'));
                 $('#server-name').html(data.host_name);
                 $('#shared-networks > tbody').html(data.shared_network_table);
                 $('#subnets > tbody').html(data.subnet_table);
