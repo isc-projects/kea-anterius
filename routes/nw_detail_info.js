@@ -64,6 +64,7 @@ router.get('/', function (req, res, next) {
                 // break;
                 // console.log(subnets);
 
+                /* Generate Subnet Table */
                 for (var i = 0; i < subnets.length; i++) {
 
                     sn_utilzn = subnet_util[i][2];
@@ -71,7 +72,7 @@ router.get('/', function (req, res, next) {
                         sn_utilzn = 0;
 
                     pool_range = '';
-                    pools.forEach(p => {
+                    pools[i].forEach(p => {
                         if (p.pool != undefined)
                             pool_range += p.pool + '<br>';
                     });
@@ -94,7 +95,7 @@ router.get('/', function (req, res, next) {
                         utilization_color = 'red';
 
                     table_row = table_row + '<td><div class="progress">' +
-                        '<div class="progress-bar bg-' + utilization_color + '" role="progressbar" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100" style="width: ' + utilization + '%"></div>' +
+                        '<div class="progress-bar bg-' + utilization_color + '" role="progressbar" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100" style="width: ' + sn_utilzn + '%"></div>' +
                         '</div></td>';
 
                     subnet_table = subnet_table + '<tr>' + table_row + '</tr>';
@@ -147,7 +148,7 @@ router.get('/', function (req, res, next) {
 
         // remove subnet-id external property  
         delete host_res[i]['subnet-id'];
-        
+
         // TODO: modify for edit link
         // table_row = table_row + '<td><b><a href="/nw_detail_info?id=' + subnets[i].id + '" pjax="1">' + subnets[i].subnet + '</a></b></td>'; //Subnet details link
         table_row = table_row.replace(/<td><\/td>/g, '<td> -- </td>');
@@ -164,9 +165,9 @@ router.get('/', function (req, res, next) {
                 if (p.pool != undefined)
                     pool_range += p.pool + '<br>';
             });
+            if (pool_range == '')
+                pool_range = ' - undefined - ';
         });
-        if (pool_range == '')
-            pool_range = ' - undefined - ';
     }
     // console.log(pool_range, subnet);
 
