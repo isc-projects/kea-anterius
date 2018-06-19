@@ -26,14 +26,14 @@ router.get('/', authorize.auth, function (req, res, next) {
 			var nw_entity;
 			hr_addr = req.query.id.split(':')[0];
 			subnet_id = req.query.id.split(':')[1];
-			kea_config['Dhcp4']['subnet4'].forEach(s => {
+			subnet_list.forEach(s => {
 				if (s.id == subnet_id) {
 					// pools = s.pools;
 					s['reservations'].forEach(h => {
 						if (h['ip-address'] == hr_addr)
 							nw_entity = h;
 					});
- 
+
 					// TODO: make effecient
 					// break;
 				}
@@ -53,7 +53,7 @@ router.get('/', authorize.auth, function (req, res, next) {
 			var nw_entity;
 			if (nw_type == 'subnet4') {
 
-				kea_config['Dhcp4']['subnet4'].forEach(s => {
+				subnet_list.forEach(s => {
 					if (s.id == req.query.id) {
 						// pools = s.pools;
 						nw_entity = s;

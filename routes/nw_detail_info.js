@@ -13,20 +13,9 @@ router.get('/', function (req, res, next) {
     content = template_render.get_template("nw_detail_info");
 
     /* Network Info variables */
-    var id = [], pools = [], subnet_list = [], subnets = [], subnet_util = [], host_res = [], shared_nw;
+    var id = [], pools = [], subnets = [], subnet_util = [], host_res = [], shared_nw;
     var nw_total_addr = 0, nw_free_addr = 0, nw_assgn_addr = 0;
     var content_subnets = '', subnet_table = '', host_res_table = '';
-
-    /* Retrieve and store subnets defined within shared nw */
-    kea_config['Dhcp4']['shared-networks'].forEach(shnw => {
-        shnw['subnet4'].forEach(x => {
-            subnet_list.push(x);
-        });
-    });
-    /* Retrieve and store subnets defined*/
-    kea_config['Dhcp4']['subnet4'].forEach(x => {
-        subnet_list.push(x);
-    });
 
     // console.log(subnet_list);
 

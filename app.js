@@ -93,13 +93,14 @@ kea_config = {};
 leases_per_minute = 0;
 cpu_utilization = -1;
 total_leases = -1;
-
 current_time = 0;
 lps = -1;
 leases_per_sec = 0;
 leases_last_update_time = -1;
 
 listening_to_log_file = 0;
+
+subnet_list = [];
 
 options = {};
 options.interval = 1000;
@@ -121,13 +122,13 @@ config_req_data = JSON.stringify({ "command": "config-get", "service": ["dhcp4"]
 
 /* Fetch and set server stats*/
 api_agent.fire_kea_api(stats_req_data).then(function (api_data) {
-    console.log(api_data);
+    // console.log(api_data);
     kea_stats = api_data;
 });
 
 /* Fetch and set server config*/
 api_agent.fire_kea_api(config_req_data).then(function (api_data) {
-    console.log(api_data);
+    // console.log(api_data);
     kea_config = api_data;
 });
 
@@ -241,8 +242,21 @@ lease_stats_monitor = setInterval(function () {
 
     // console.log(kea_stats, kea_config);
 
+    subnet_list = [];
+
+    /* Retrieve and store subnets defined within shared nw */
+    kea_config['Dhcp4']['shared-networks'].forEach(shnw => {
+        shnw['subnet4'].forEach(x => {
+            subnet_list.push(x);
+        });
+    });
+    /* Retrieve and store subnets defined*/
+    kea_config['Dhcp4']['subnet4'].forEach(x => {
+        subnet_list.push(x);
+    });
+
     total_leases = 0;
-    subnet_count = kea_config['Dhcp4']['subnet4'].length;
+    subnet_count = subnet_list.length;
     shared_nw_count = kea_config['Dhcp4']['shared-networks'].length;
 
     for (var i = 1; i <= subnet_count; i++) {
