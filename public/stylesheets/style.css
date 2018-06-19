@@ -19,10 +19,26 @@ body {
   float: right;
   margin: 15px;
 }
+
 #edit_btn {
   float: right;
-  font-size: 12px;  
+  font-size: 12px;
   margin-top: -30px;
+}
+
+.progress {
+  position: relative;
+  height: 15px !important;
+  vertical-align: middle;
+}
+
+.progress span {
+  position: absolute;
+  display: block;
+  width: 100%;
+  color: black;
+  font-size: 10px;
+  text-align: center;
 }
 
 .ant-btn {

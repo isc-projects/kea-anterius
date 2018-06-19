@@ -68,7 +68,7 @@ router.get('/', function (req, res, next) {
 		/* Define shared network row for table */
 		table_row = '';
 		table_row = table_row + '<td><b><a href="/nw_detail_info?type=shared-networks&id=' + kea_config['Dhcp4']['shared-networks'][i].name + '" pjax="1">' + kea_config['Dhcp4']['shared-networks'][i].name + '</a></b></td>';
-		table_row = table_row + '<td>' + shared_nw_assgn_addr_list[i].toLocaleString('en') + ' (' + utilization + '%)</td>';
+		table_row = table_row + '<td>' + shared_nw_assgn_addr_list[i].toLocaleString('en') + ' </td>';
 		table_row = table_row + '<td>' + shared_nw_total_addr_list[i].toLocaleString('en') + '</td>';
 		table_row = table_row + '<td>' + shared_nw_free_addr_list[i].toLocaleString('en') + '</td>';
 
@@ -81,7 +81,7 @@ router.get('/', function (req, res, next) {
 
 		table_row = table_row + '<td><div class="progress">' +
 			'<div class="progress-bar bg-' + utilization_color + '" role="progressbar" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100" style="width: ' + utilization + '%"></div>' +
-			'</div></td>';
+			'<span>' + utilization + '%</span></div></td>';
 
 		shared_network_table = shared_network_table + '<tr>' + table_row + '</tr>';
 	}
@@ -95,7 +95,7 @@ router.get('/', function (req, res, next) {
 		return parseInt(a.id) - parseInt(b.id);
 	});
 
-	console.log(subnet_list);
+	// console.log(subnet_list);
 
 	/* Calculate Subnet utilization */
 	subnet_count = subnet_list.length;
@@ -141,7 +141,7 @@ router.get('/', function (req, res, next) {
 		table_row = table_row + '<td>' + subnet_list[i].id + '</td>'; //Subnet ID
 		table_row = table_row + '<td><b><a href="/nw_detail_info?type=subnet4&id=' + subnet_list[i].id + '" pjax="1">' + subnet_list[i].subnet + '</a></b></td>'; //Subnet details link
 		table_row = table_row + '<td>' + subnet_pool_map[i] + '</td>'; //Subnet Pool range
-		table_row = table_row + '<td>' + subnet_assgn_addr_list[i].toLocaleString('en') + ' (' + utilization + '%)</td>';
+		table_row = table_row + '<td>' + subnet_assgn_addr_list[i].toLocaleString('en') + '</td>';
 		table_row = table_row + '<td>' + subnet_total_addr_list[i].toLocaleString('en') + '</td>';
 		table_row = table_row + '<td>' + subnet_free_addr_list[i].toLocaleString('en') + '</td>';
 
@@ -154,7 +154,7 @@ router.get('/', function (req, res, next) {
 
 		table_row = table_row + '<td><div class="progress">' +
 			'<div class="progress-bar bg-' + utilization_color + '" role="progressbar" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100" style="width: ' + utilization + '%"></div>' +
-			'</div></td>';
+			'<span>' + utilization + '%</span></div></td>';
 
 		subnet_table = subnet_table + '<tr>' + table_row + '</tr>';
 	}

@@ -264,11 +264,12 @@
                 $('#shared-networks > tbody').html(data.shared_network_table);
                 $('#subnets > tbody').html(data.subnet_table);
 
-                // if (typeof shared_networks !== "undefined")
-                shared_networks.destroy();
+                if (typeof shared_networks !== "undefined")
+                    shared_networks.destroy();
 
-                // if (typeof display_subnets !== "undefined")
-                display_subnets.destroy();
+                if (typeof display_subnets !== "undefined")
+                    display_subnets.destroy();
+                
                 shared_networks = $('#shared-networks').DataTable({
                     dom: 'tip',
                     responsive: true,
