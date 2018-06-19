@@ -6,6 +6,7 @@ var router = express.Router();
 var fs = require('fs');
 var template_render = require('../lib/render_template.js');
 var authorize = require('../lib/authorize.js');
+var api_agent = require('../lib/api_service.js');
 
 router.get('/', function (req, res, next) {
 
@@ -13,9 +14,9 @@ router.get('/', function (req, res, next) {
     content = template_render.get_template("nw_detail_info");
 
     /* Network Info variables */
-    var id = [], pools = [], subnets = [], subnet_util = [], host_res = [], shared_nw;
+    var id = [], pools = [], subnets = [], subnet_util = [], host_res = [], leases_data = [], shared_nw;
     var nw_total_addr = 0, nw_free_addr = 0, nw_assgn_addr = 0;
-    var content_subnets = '', subnet_table = '', host_res_table = '';
+    var content_subnets = '', subnet_table = '', host_res_table = '', leases_data_table = '';
 
     // console.log(subnet_list);
 
@@ -112,7 +113,7 @@ router.get('/', function (req, res, next) {
                 /* Display Subnets table */
                 content_subnets = template_render.get_template("subnet_table");
                 content_subnets = template_render.set_template_variable(content_subnets, "title", "Shared Network Subnets");
-                content_subnets = template_render.set_template_variable(content_subnets, "table_id", "sharednw_subnet_table");
+                content_subnets = template_render.set_template_variable(content_subnets, "table_id", "sharednw-subnet-table");
                 content_subnets = template_render.set_template_variable(content_subnets, "table_content", subnet_table);
                 content_subnets = template_render.set_template_variable(content_subnets, "table_dim", "col-lg-12 col-md-12 col-sm-12 col-xs-12");
             }
@@ -138,7 +139,7 @@ router.get('/', function (req, res, next) {
         '" role="progressbar" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100" style="width: ' + utilization + '%"></div>';
 
 
-    /* Host reservation parser */
+    /* Host reservation parser - generate table*/
     for (var i = 0; i < host_res.length; i++) {
         // console.log(subnets[i].pools[0].pool, kea_stats['subnet[' + i+1 + '].assigned-addresses'][0][0], subnet_util[i].utilization, )
 
@@ -163,32 +164,76 @@ router.get('/', function (req, res, next) {
         host_res_table = host_res_table + '<tr>' + table_row + '</tr>';
     }
 
-    // console.log(subnet_table, host_res_table);    
+    if (!Array.isArray(id))
+        id = [Number(id)];
 
-    pool_range = '';
-    if (pools) {
-        pools.forEach(pl => {
-            pl.forEach(p => {
-                if (p.pool != undefined)
-                    pool_range += p.pool + '<br>';
+    console.log(id);
+    /* Construct lease-get command for specified subnets */
+    lease_get_req_data = JSON.stringify({ "command": "lease4-get-all", "service": ["dhcp4"], "arguments": { "subnets": id } });
+
+    /* Fetch lease data for network*/
+    var response_data = api_agent.fire_kea_api(lease_get_req_data).then(function (api_data) {
+        // console.log(api_data);
+        return api_data;
+    });
+
+    response_data.then(function (ld) {
+
+        leases_data = ld.leases;
+        console.log(leases_data);
+
+        /* Leases Data parser - generate table */
+        for (var i = 0; i < leases_data.length; i++) {
+
+            /* Define lease row for table */
+            table_row = '';
+            table_row = table_row + '<td>' + leases_data[i]['ip-address'] + '</td>';
+            table_row = table_row + '<td>' + leases_data[i]['client-id'] + '</td>';
+            table_row = table_row + '<td>' + leases_data[i]['valid-lft'] + '</td>';
+            table_row = table_row + '<td>' + leases_data[i].hostname + '</td>';
+            table_row = table_row + '<td>' + '</td>';
+            table_row = table_row + '<td><button type="button" class="btn waves-effect" onclick="edit_params(\'' + leases_data[i]['ip-address'] + ':' + leases_data[i]['subnet-id'] + '\')">'
+                + '<i class="material-icons">edit</i></button></td >';
+
+            /* remove explicitly added property */
+            // delete leases_data[i]['username'];
+
+            // TODO: modify for edit link
+            // table_row = table_row + '<td><b><a href="/nw_detail_info?id=' + subnets[i].id + '" pjax="1">' + subnets[i].subnet + '</a></b></td>'; //Subnet details link
+            table_row = table_row.replace(/<td><\/td>/g, '<td> -- </td>');
+            // console.log(table_row);
+            leases_data_table = leases_data_table + '<tr>' + table_row + '</tr>';
+        }
+
+        // console.log(subnet_table, host_res_table);    
+
+        pool_range = '';
+        if (pools) {
+            pools.forEach(pl => {
+                pl.forEach(p => {
+                    if (p.pool != undefined)
+                        pool_range += p.pool + '<br>';
+                });
+                if (pool_range == '')
+                    pool_range = ' - undefined - ';
             });
-            if (pool_range == '')
-                pool_range = ' - undefined - ';
-        });
-    }
-    // console.log(pool_range, subnet);
+        }
+        // console.log(pool_range, subnet);
 
-    /* Load diplay element values onto template and return page */
-    content = template_render.set_template_variable(content, "utilzn_bar", utilization_html);
-    content = template_render.set_template_variable(content, "utilizn", utilization);
-    content = template_render.set_template_variable(content, "subnet_table", content_subnets);
-    content = template_render.set_template_variable(content, "host_res_table", host_res_table);
-    content = template_render.set_template_variable(content, "pools", pool_range)
-    content = template_render.set_template_variable(content, "assgn_addr", nw_assgn_addr);
-    content = template_render.set_template_variable(content, "total_addr", nw_total_addr);
-    content = template_render.set_template_variable(content, "free_addr", nw_free_addr);
+        /* Load diplay element values onto template and return page */
+        content = template_render.set_template_variable(content, "utilzn_bar", utilization_html);
+        content = template_render.set_template_variable(content, "utilizn", utilization);
+        content = template_render.set_template_variable(content, "subnet_table", content_subnets);
+        content = template_render.set_template_variable(content, "host_res_table", host_res_table);
+        content = template_render.set_template_variable(content, "leases_data_table", leases_data_table);
+        content = template_render.set_template_variable(content, "pools", pool_range)
+        content = template_render.set_template_variable(content, "assgn_addr", nw_assgn_addr);
+        content = template_render.set_template_variable(content, "total_addr", nw_total_addr);
+        content = template_render.set_template_variable(content, "free_addr", nw_free_addr);
 
-    res.send(template_render.get_index_template(content, req.url));
+        res.send(template_render.get_index_template(content, req.url) + '<script type="text/javascript">get_stats(); </script>');
+    });
+
 });
 
 module.exports = router;
