@@ -91,24 +91,26 @@
                     Host Reservations
                 </h2>
             </div>
-            <div class="table-responsive">
-                <table id="host_res_table" class="table table-bordered table-striped table-hover js-basic-example dataTable dashboard-task-infos">
-                    <thead>
-                        <tr>
-                            <!-- <th>ID</th> -->
-                            <th>IP Address</th>
-                            <th>Server Hostname</th>
-                            <th>Hostname</th>
-                            <th>Client ID</th>
-                            <th>Next Server</th>
-                            <th>Hardware Addr [MAC]</th>
-                            <th width="1%">Edit</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        [host_res_table]
-                    </tbody>
-                </table>
+            <div class="body">
+                <div class="table-responsive">
+                    <table id="host-res-table" class="table table-bordered table-striped table-hover js-basic-example dataTable dashboard-task-infos">
+                        <thead>
+                            <tr>
+                                <!-- <th>ID</th> -->
+                                <th>IP Address</th>
+                                <th>Server Hostname</th>
+                                <th>Hostname</th>
+                                <th>Client ID</th>
+                                <th>Next Server</th>
+                                <th>Hardware Addr [MAC]</th>
+                                <th width="1%">Edit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            [host_res_table]
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -121,24 +123,58 @@
                     Lease Information
                 </h2>
             </div>
-            <div class="table-responsive">
-                <table id="leases_table" class="table table-bordered table-striped table-hover js-basic-example dataTable dashboard-task-infos">
-                    <thead>
-                        <tr>
-                            <!-- <th>ID</th> -->
-                            <th>Lease IP Addr</th>
-                            <th>HW Addr [MAC]</th>
-                            <th>Valid Lifetime</th>
-                            <th>Device hostname</th>
-                            <th>Username</th>
-                            <th style="width:100px">Utilization</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-
-                    </tbody>
-                </table>
+            <div class="body">
+                <div class="table-responsive">
+                    <table id="leases-table" class="table table-bordered table-striped table-hover js-basic-example dataTable dashboard-task-infos">
+                        <thead>
+                            <tr>
+                                <!-- <th>ID</th> -->
+                                <th>Lease IP Addr</th>
+                                <th>Hardware Address [Client-ID]</th>
+                                <th>Valid Lifetime</th>
+                                <th>Device hostname</th>
+                                <th>Username</th>
+                                <!-- <th style="width:100px">Utilization</th> -->
+                                <th width="1%">Edit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            [leases_data_table]
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 </div>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        subnet_table = $('#sharednw-subnet-table').DataTable({
+            dom: 'tip',
+            responsive: true,
+            "pageLength": 100,
+            "aaSorting": []
+        });
+
+        host_res_table = $('#host-res-table').DataTable({
+            dom: 'tip',
+            responsive: true,
+            "pageLength": 100,
+            "aaSorting": []
+        });
+
+        leases_data_table = $('#leases-table').DataTable({
+            dom: 'tip',
+            responsive: true,
+            "pageLength": 100,
+            "aaSorting": []
+        });
+
+        $('#leases-table').fadeOut(100).fadeIn(100);
+        $('#host-res-table').fadeOut(100).fadeIn(100);
+        $('#subnets').fadeOut(100).fadeIn(100);
+    });
+
+</script>
