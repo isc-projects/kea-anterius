@@ -12,13 +12,28 @@ router.get('/', function (req, res, next) {
     var content = "";
     content = template_render.get_template("nw_detail_info");
 
-    var id = [], pools = [], subnets = [], subnet_util = [], host_res = [], shared_nw;
+    /* Network Info variables */
+    var id = [], pools = [], subnet_list = [], subnets = [], subnet_util = [], host_res = [], shared_nw;
     var nw_total_addr = 0, nw_free_addr = 0, nw_assgn_addr = 0;
-    content_subnets = '', subnet_table = '', host_res_table = '';
+    var content_subnets = '', subnet_table = '', host_res_table = '';
 
+    /* Retrieve and store subnets defined within shared nw */
+    kea_config['Dhcp4']['shared-networks'].forEach(shnw => {
+        shnw['subnet4'].forEach(x => {
+            subnet_list.push(x);
+        });
+    });
+    /* Retrieve and store subnets defined*/
+    kea_config['Dhcp4']['subnet4'].forEach(x => {
+        subnet_list.push(x);
+    });
+
+    // console.log(subnet_list);
+
+    /* Filter info specific to requested subnet */
     if (req.query.type == 'subnet4') {
         id = req.query.id.replace('?v_ajax', '');
-        kea_config['Dhcp4']['subnet4'].forEach(s => {
+        subnet_list.forEach(s => {
             if (s.id == id) {
                 pools.push(s.pools);
                 subnets.push(s);
@@ -35,6 +50,7 @@ router.get('/', function (req, res, next) {
         content = template_render.set_template_variable(content, "title", "Subnet [" + subnets[0].subnet + "] Information");
 
     }
+    /* Filter info specific to requested shared network */
     else {
         shared_nw = req.query.id.replace('?v_ajax', '');
         kea_config['Dhcp4']['shared-networks'].forEach(s => {
@@ -44,7 +60,8 @@ router.get('/', function (req, res, next) {
                     id.push(x['id']);
                 });
 
-                kea_config['Dhcp4']['subnet4'].forEach(sn => {
+                /* Identify subnets defined within shared nw */
+                subnet_list.forEach(sn => {
                     if (id.includes(sn.id)) {
                         pools.push(sn.pools);
                         subnets.push(sn);
@@ -112,6 +129,7 @@ router.get('/', function (req, res, next) {
             }
         });
     }
+
     // console.log(pools, subnets, host_res, subnet_util);
 
     nw_free_addr = nw_total_addr - nw_assgn_addr;
@@ -131,11 +149,11 @@ router.get('/', function (req, res, next) {
         '" role="progressbar" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100" style="width: ' + utilization + '%"></div>';
 
 
-    // Host reservation parser
+    /* Host reservation parser */
     for (var i = 0; i < host_res.length; i++) {
         // console.log(subnets[i].pools[0].pool, kea_stats['subnet[' + i+1 + '].assigned-addresses'][0][0], subnet_util[i].utilization, )
 
-        // Define reservation row for table
+        /* Define reservation row for table */
         table_row = '';
         table_row = table_row + '<td>' + host_res[i]['ip-address'] + '</td>';
         table_row = table_row + '<td>' + host_res[i]['server-hostname'] + '</td>';
@@ -146,7 +164,7 @@ router.get('/', function (req, res, next) {
         table_row = table_row + '<td><button type="button" class="btn waves-effect" onclick="edit_params(\'' + host_res[i]['ip-address'] + ':' + host_res[i]['subnet-id'] + '\')">'
             + '<i class="material-icons">edit</i></button></td >';
 
-        // remove subnet-id external property  
+        /* remove subnet-id explicitly added property */
         delete host_res[i]['subnet-id'];
 
         // TODO: modify for edit link
@@ -171,7 +189,7 @@ router.get('/', function (req, res, next) {
     }
     // console.log(pool_range, subnet);
 
-
+    /* Load diplay element values onto template and return page */
     content = template_render.set_template_variable(content, "utilzn_bar", utilization_html);
     content = template_render.set_template_variable(content, "utilizn", utilization);
     content = template_render.set_template_variable(content, "subnet_table", content_subnets);
