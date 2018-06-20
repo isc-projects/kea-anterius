@@ -32,6 +32,7 @@ router.get('/', function (req, res, next) {
 		shared_nw_snet_list = [];
 		kea_config['Dhcp4']['shared-networks'][i]['subnet4'].forEach(x => {
 			/* Retrieve and store subnets defined within shared nw */
+			x['shared_nw_name'] = kea_config['Dhcp4']['shared-networks'][i].name;
 			subnet_list.push(x);
 			shared_nw_snet_id_list.push(x['id']);
 		});
@@ -124,10 +125,6 @@ router.get('/', function (req, res, next) {
 		subnet_util.push(utilization);
 		// console.log(subnet_util);
 	}
-	// TODO: Modify list sorting
-	// kea_stats.subnets.sort(function (a, b) {
-	// 	return parseFloat(b.utilization) - parseFloat(a.utilization);
-	// });
 
 	/* Generate Subnet Table */
 	subnet_table = '';

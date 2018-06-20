@@ -90,7 +90,7 @@ router.get('/', authorize.auth, function (req, res, next) {
 		}
 
 		input += '<div class="row" align="center"><button type="button" id="gen_btn" class="btn btn-info waves-effect ant-btn" disabled style="margin-bottom: 2%; width: 25%;" onclick=\'gen_dhcp_config("'
-			+ nw_id + '","' + nw_type + '")\'><i class="material-icons">settings</i> <span>Write Changes to Test file</span></button></div>';
+			+ nw_id + '","' + nw_type + '","' + subnet_list +'")\'><i class="material-icons">settings</i> <span>Write Changes to Test file</span></button></div>';
 
 		form_data = template_render.form_body("config-form", input);
 

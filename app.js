@@ -247,12 +247,18 @@ lease_stats_monitor = setInterval(function () {
     /* Retrieve and store subnets defined within shared nw */
     kea_config['Dhcp4']['shared-networks'].forEach(shnw => {
         shnw['subnet4'].forEach(x => {
+            x['shared_nw_name'] = shnw.name;
             subnet_list.push(x);
         });
     });
     /* Retrieve and store subnets defined*/
     kea_config['Dhcp4']['subnet4'].forEach(x => {
         subnet_list.push(x);
+    });
+
+    /* Subnet sorting by ID */
+    subnet_list.sort(function (a, b) {
+        return parseInt(a.id) - parseInt(b.id);
     });
 
     total_leases = 0;
