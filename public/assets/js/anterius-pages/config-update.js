@@ -23,6 +23,8 @@ function gen_dhcp_config(nw_id, nw_type, subnet_list) {
 	test_config_file = JSON.parse(dhcp_config.getValue());
 	// console.log(test_config_file['Dhcp4']['subnet4'][0]);
 
+	console.log(subnet_list);
+
 	change_log = [];
 
 	/* remove explicitly added property */
@@ -71,11 +73,22 @@ function gen_dhcp_config(nw_id, nw_type, subnet_list) {
 			}
 		});
 	} else {
+
+		target_sn_list = test_config_file['Dhcp4'][nw_type];
+
 		if (nw_type == 'shared-networks')
 			x = 'name';
-		else
+		else {
+			if (subnet_list[nw_id - 1].shared_nw_name)
+				test_config_file['Dhcp4']['shared-networks'].forEach(shnw => {
+					if (shnw.name == subnet_list[nw_id - 1].shared_nw_name)
+						target_sn_list = shnw.subnet4;
+				});
 			x = 'id';
-		test_config_file['Dhcp4'][nw_type].forEach(s => {
+		}
+		// console.log(target_sn_list);
+
+		target_sn_list.forEach(s => {
 			if (s[x] == nw_id) {
 				configformData.forEach(fd => {
 					if (fd.value != 'undefined') {
@@ -99,15 +112,7 @@ function gen_dhcp_config(nw_id, nw_type, subnet_list) {
 			}
 		});
 	}
-
-	// console.log(change_log);
-
-	/* Set test config to editor and highlight changed lines */
-	dhcp_config.setValue(JSON.stringify(test_config_file, null, 4), -1);
-	change_log.forEach(param => {
-		findEditedLineNumbers(dhcp_config, param);
-	})
-
+	console.log(change_log);
 
 	notification('Test config_file generated.');
 	notification('Switch to config file editor to review changes(highlighted)!');

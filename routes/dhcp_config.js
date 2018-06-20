@@ -79,7 +79,7 @@ router.get('/', authorize.auth, function (req, res, next) {
 				});
 
 				content = template_render.set_template_variable(content, "edit_title", "Shared Network [ <a href='/nw_detail_info?type=shared-networks&id=" + nw_entity.name + "'>" + nw_entity.name + "</a> ] Configuration options");
-				input = template_render.form_input('Shared NW name', '<input type="input" class="form-control"  name="sharednw-name" id="sharednw-name" placeholder="Enter shared network name" value="' + nw_entity.name + '">');
+				input = template_render.form_input('Shared NW name', '<input type="input" class="form-control"  name="name" id="name" placeholder="Enter shared network name" value="' + nw_entity.name + '">');
 			}
 
 			// Subnet, Shared nw common parameters
