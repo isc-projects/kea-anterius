@@ -135,8 +135,9 @@ router.get('/', function (req, res, next) {
     if (utilization >= 90)
         utilization_color = 'red';
 
-    utilization_html = '<div class="progress-bar bg-' + utilization_color +
-        '" role="progressbar" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100" style="width: ' + utilization + '%"></div>';
+    utilization_html = '<td><div class="progress"><div class="progress-bar bg-' + utilization_color +
+        '" role="progressbar" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100" style="width: ' + utilization + '%"></div>' +
+        '<span>' + utilization + '%</span></div></td>';
 
 
     /* Host reservation parser - generate table*/
@@ -166,8 +167,8 @@ router.get('/', function (req, res, next) {
 
     if (!Array.isArray(id))
         id = [Number(id)];
+    // console.log(id);
 
-    console.log(id);
     /* Construct lease-get command for specified subnets */
     lease_get_req_data = JSON.stringify({ "command": "lease4-get-all", "service": ["dhcp4"], "arguments": { "subnets": id } });
 
@@ -180,7 +181,7 @@ router.get('/', function (req, res, next) {
     response_data.then(function (ld) {
 
         leases_data = ld.leases;
-        console.log(leases_data);
+        // console.log(leases_data);
 
         /* Leases Data parser - generate table */
         for (var i = 0; i < leases_data.length; i++) {
