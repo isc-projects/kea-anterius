@@ -19,16 +19,12 @@ function gen_dhcp_config(nw_id, nw_type, subnet_list) {
 	configformData = $("#config-form").serializeArray();
 	// console.log(configformData)
 
-	/* Instantiate a temp test file */
+	/* Instantiate a temp test file and Copy to identify file changes*/
+	config_copy = dhcp_config.session.doc.getAllLines();
 	test_config_file = JSON.parse(dhcp_config.getValue());
+
 	// console.log(test_config_file['Dhcp4']['subnet4'][0]);
-
-	console.log(subnet_list);
-
-	change_log = [];
-
-	/* remove explicitly added property */
-	// delete host_res[i]['subnet-id'];
+	// console.log(subnet_list);
 
 	if (nw_type == 'reservations') {
 
@@ -52,17 +48,17 @@ function gen_dhcp_config(nw_id, nw_type, subnet_list) {
 					if (h['ip-address'] == hr_addr)
 						configformData.forEach(fd => {
 							if (fd.value != 'undefined') {
+								if (!isNaN(fd.value))
+									fd.value = parseInt(fd.value);
 								if (fd.name.includes('_')) {
 									tags = fd.name.split('_');
 									if (h[tags[0]][tags[1]] != fd.value) {
 										h[tags[0]][tags[1]] = fd.value;
-										change_log.push('"' + tags[1] + '": "' + fd.value + '"');
 									}
 								}
 								else
 									if (h[fd.name] != fd.value) {
 										h[fd.name] = fd.value;
-										change_log.push('"' + fd.name + '": "' + fd.value + '"');
 									}
 							}
 						});
@@ -92,27 +88,31 @@ function gen_dhcp_config(nw_id, nw_type, subnet_list) {
 			if (s[x] == nw_id) {
 				configformData.forEach(fd => {
 					if (fd.value != 'undefined') {
+						if (!isNaN(fd.value))
+							fd.value = parseInt(fd.value);
 						if (fd.name.includes('_')) {
 							tags = fd.name.split('_');
 							if (s[tags[0]][tags[1]] != fd.value) {
 								s[tags[0]][tags[1]] = fd.value;
-								change_log.push('"' + tags[1] + '": "' + fd.value + '"');
 							}
 						}
 						else
 							if (s[fd.name] != fd.value) {
 								s[fd.name] = fd.value;
-								change_log.push('"' + fd.name + '": "' + fd.value + '"');
 							}
 					}
 				});
 				// TODO: make effecient
 				// break;
 				// console.log(s)
+				target_sn_list.push();
 			}
 		});
 	}
-	console.log(change_log);
+
+	/* Set test config to editor and highlight changed lines */
+	dhcp_config.setValue(JSON.stringify(test_config_file, null, 4), -1);
+	highlightEditedLineNumbers(dhcp_config, config_copy);
 
 	notification('Test config_file generated.');
 	notification('Switch to config file editor to review changes(highlighted)!');
@@ -140,4 +140,18 @@ function save_dhcp_config() {
 	$.post("/dhcp_config_update", dhcp_config_form_data, function (data) {
 		$("#dhcp_config_result").html(data);
 	});
+}
+
+/* Method to highlight lines with changes in config params */
+function highlightEditedLineNumbers(editor, config_og) {
+	var lines = editor.session.doc.getAllLines();
+	for (var i = 0, l = lines.length; i < l; i++) {
+		target_line = lines[i];
+
+		// TODO: Figure out way to highlight actual changes
+		if (!config_copy.includes(target_line)) {
+			// editor.session.insert({ row: i }, target_line.replace('>>>', ''));
+			dhcp_config.session.addMarker(new Range(i, 0, i, 1), "editMarker", "fullLine");
+		}
+	}
 }
