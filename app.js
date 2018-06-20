@@ -110,10 +110,11 @@ debug_watch_lease_parse_stream = 0;
 // TODO: Mechanism to retrieve below sections from remote machine
 host_name = execSync("cat /etc/hostname").toString().replace("\n", "");
 run_status = execSync("keactrl status").toString();
+
 /* Poll: CPU Utilization */
-// cpu_utilization_poll = setInterval(function () {
-//     cpu_utilization = parseFloat(execSync("top -bn 1 | awk 'NR>7{s+=$9} END {print s/4}'").toString())
-// }, (15 * 1000));
+cpu_utilization_poll = setInterval(function () {
+    cpu_utilization = parseFloat(execSync("top -bn 1 | awk 'NR>7{s+=$9} END {print s/4}'").toString())
+}, (15 * 1000));
 
 
 /* Kea CA REST API call - config-get and statistics-get */
