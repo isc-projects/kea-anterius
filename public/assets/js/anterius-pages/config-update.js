@@ -114,8 +114,8 @@ function gen_dhcp_config(nw_id, nw_type, subnet_list) {
 	dhcp_config.setValue(JSON.stringify(test_config_file, null, 4), -1);
 	highlightEditedLineNumbers(dhcp_config, config_copy);
 
-	notification('Test config_file generated.');
-	notification('Switch to config file editor to review changes(highlighted)!');
+	notification('Test config_file generated.', 'bg-green', 100);
+	notification('Switch to config file editor (second tab) to review highlighted changes');
 
 	document.getElementById('test_btn').disabled = false;
 	// $.post("/dhcp_config_update", dhcp_config_form_data, function (data) {
@@ -128,10 +128,13 @@ function test_dhcp_config() {
 	params = "mode=test&affirm=true&dhcp_config_file=" + encodeURIComponent(dhcp_config.getValue());
 
 	$.post("/dhcp_config_update", params, function (data) {
-		console.log(data.message);
-		notification(data.message, 'bg-black', 10000);
+		// console.log(data.message);
+		if (data.status == 0) {
+			notification(data.message, 'bg-green', 3000);
+			document.getElementById('update_btn').disabled = false;
+		} else
+			notification(data.message, 'bg-red', 3000);
 	});
-	document.getElementById('update_btn').disabled = false;
 }
 
 function save_dhcp_config() {
@@ -140,8 +143,13 @@ function save_dhcp_config() {
 	params = "mode=update&affirm=" + affirm + "&dhcp_config_file=" + encodeURIComponent(dhcp_config.getValue());
 
 	$.post("/dhcp_config_update", params, function (data) {
-		console.log(data.message);
-		notification(data.message, 'bg-black', 10000);
+		if (data.status == 0) {
+			notification(data.message, 'bg-green', 3000);
+			document.getElementById("gen_btn").disabled = true;
+			document.getElementById('update_btn').disabled = true;
+			document.getElementById('test_btn').disabled = true;
+		} else
+			notification(data.message, 'bg-red', 3000);
 	});
 }
 

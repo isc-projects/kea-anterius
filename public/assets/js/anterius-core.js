@@ -225,7 +225,7 @@ function save_config() {
     });
 }
 
-function notification(text, colorName = 'bg-black') {
+function notification(text, colorName = 'bg-black', timer = 1000) {
 
     animateEnter = 'animated fadeInDown';
     animateExit = 'animated fadeOutUp';
@@ -237,8 +237,8 @@ function notification(text, colorName = 'bg-black') {
         {
             type: colorName,
             allow_dismiss: allowDismiss,
-            newest_on_top: true,
-            timer: 1000,
+            newest_on_top: false,
+            timer: timer,
             animate: {
                 enter: animateEnter,
                 exit: animateExit

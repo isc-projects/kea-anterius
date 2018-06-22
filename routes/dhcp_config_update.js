@@ -30,9 +30,8 @@ router.post('/', authorize.auth, function (req, res, next) {
 		});
 		response_data.then(function (data) {
 			if (data.result == 0)
-				res.send({ "message": data.text });
-			else
 				console.log("CA Error: " + data.text);
+			res.send({ "message": data.text, "status": data.result });
 		});
 	}
 

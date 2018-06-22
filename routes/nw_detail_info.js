@@ -178,48 +178,54 @@ router.get('/', function (req, res, next) {
         return api_data;
     });
 
-    response_data.then(function (ld) {
+    response_data.then(function (data) {
 
-        leases_data = ld.leases;
-        // console.log(leases_data);
-
-        /* Leases Data parser - generate table */
-        for (var i = 0; i < leases_data.length; i++) {
-
-            /* Define lease row for table */
-            table_row = '';
-            table_row = table_row + '<td>' + leases_data[i]['ip-address'] + '</td>';
-            table_row = table_row + '<td>' + leases_data[i]['client-id'] + '</td>';
-            table_row = table_row + '<td>' + leases_data[i]['valid-lft'] + '</td>';
-            table_row = table_row + '<td>' + leases_data[i].hostname + '</td>';
-            table_row = table_row + '<td>' + '</td>';
-            table_row = table_row + '<td><button type="button" class="btn waves-effect" onclick="edit_params(\'' + leases_data[i]['ip-address'] + ':' + leases_data[i]['subnet-id'] + '\')">'
-                + '<i class="material-icons">edit</i></button></td >';
-
-            /* remove explicitly added property */
-            // delete leases_data[i]['username'];
-
-            // TODO: modify for edit link
-            // table_row = table_row + '<td><b><a href="/nw_detail_info?id=' + subnets[i].id + '" pjax="1">' + subnets[i].subnet + '</a></b></td>'; //Subnet details link
-            table_row = table_row.replace(/<td><\/td>/g, '<td> -- </td>');
-            // console.log(table_row);
-            leases_data_table = leases_data_table + '<tr>' + table_row + '</tr>';
+        if (data.result == 1) {
+            notification(data.text, 'bg-red', 3000);
+            console.log("CA Error:" + data.text);
         }
+        else {
+            leases_data = data.arguments.leases;
+            // console.log(leases_data);
 
-        // console.log(subnet_table, host_res_table);    
+            /* Leases Data parser - generate table */
+            for (var i = 0; i < leases_data.length; i++) {
 
-        pool_range = '';
-        if (pools) {
-            pools.forEach(pl => {
-                pl.forEach(p => {
-                    if (p.pool != undefined)
-                        pool_range += p.pool + '<br>';
+                /* Define lease row for table */
+                table_row = '';
+                table_row = table_row + '<td>' + leases_data[i]['ip-address'] + '</td>';
+                table_row = table_row + '<td>' + leases_data[i]['client-id'] + '</td>';
+                table_row = table_row + '<td>' + leases_data[i]['valid-lft'] + '</td>';
+                table_row = table_row + '<td>' + leases_data[i].hostname + '</td>';
+                table_row = table_row + '<td>' + '</td>';
+                table_row = table_row + '<td><button type="button" class="btn waves-effect" onclick="edit_params(\'' + leases_data[i]['ip-address'] + ':' + leases_data[i]['subnet-id'] + '\')">'
+                    + '<i class="material-icons">edit</i></button></td >';
+
+                /* remove explicitly added property */
+                // delete leases_data[i]['username'];
+
+                // TODO: modify for edit link
+                // table_row = table_row + '<td><b><a href="/nw_detail_info?id=' + subnets[i].id + '" pjax="1">' + subnets[i].subnet + '</a></b></td>'; //Subnet details link
+                table_row = table_row.replace(/<td><\/td>/g, '<td> -- </td>');
+                // console.log(table_row);
+                leases_data_table = leases_data_table + '<tr>' + table_row + '</tr>';
+            }
+
+            // console.log(subnet_table, host_res_table);    
+
+            pool_range = '';
+            if (pools) {
+                pools.forEach(pl => {
+                    pl.forEach(p => {
+                        if (p.pool != undefined)
+                            pool_range += p.pool + '<br>';
+                    });
+                    if (pool_range == '')
+                        pool_range = ' - undefined - ';
                 });
-                if (pool_range == '')
-                    pool_range = ' - undefined - ';
-            });
+            }
+            // console.log(pool_range, subnet);
         }
-        // console.log(pool_range, subnet);
 
         /* Load diplay element values onto template and return page */
         content = template_render.set_template_variable(content, "utilzn_bar", utilization_html);

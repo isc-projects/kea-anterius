@@ -42,12 +42,14 @@
         </div>
         <hr>
         <div class="row" align="center">
-            <button id="test_btn" type="button" class="btn btn-info waves-effect ant-btn" disabled style="margin-bottom: 2%; width: 20%;" onclick="test_dhcp_config()">
+            <button id="test_btn" type="button" class="btn btn-info waves-effect ant-btn" disabled style="margin-bottom: 2%; width: 20%;"
+                onclick="test_dhcp_config()">
                 <i class="material-icons">system_update_alt</i>
                 <span>Test Config</span>
             </button>
             <span style="margin-left:5%; margin-right:5%"></span>
-            <button id="update_btn" type="button" class="btn btn-info waves-effect ant-btn" disabled style="margin-bottom: 2%;  width: 20%;" onclick="save_dhcp_config()">
+            <button id="update_btn" type="button" class="btn btn-info waves-effect ant-btn" disabled style="margin-bottom: 2%;  width: 20%;"
+                onclick="save_dhcp_config()">
                 <i class="material-icons">system_update_alt</i>
                 <span>Update Config</span>
             </button>
@@ -64,9 +66,11 @@
         }; $(this).tab('show');
     });
 
-    $('input').change(function() { 
+    $('input').change(function () {
         document.getElementById("gen_btn").disabled = false;
-   }); 
+        document.getElementById('update_btn').disabled = true;
+        document.getElementById('test_btn').disabled = true;
+    });
 
 </script>
 <script src="assets/js/ace_editor/ace.js" type="text/javascript" charset="utf-8"></script>
