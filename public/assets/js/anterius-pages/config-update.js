@@ -47,7 +47,7 @@ function gen_dhcp_config(nw_id, nw_type, subnet_list) {
 				s['reservations'].forEach(h => {
 					if (h['ip-address'] == hr_addr)
 						configformData.forEach(fd => {
-							if (fd.value != 'undefined') {
+							if (fd.value != null && fd.value != 'undefined') {
 								if (!isNaN(fd.value))
 									fd.value = parseInt(fd.value);
 								if (fd.name.includes('_')) {
@@ -87,7 +87,7 @@ function gen_dhcp_config(nw_id, nw_type, subnet_list) {
 		target_sn_list.forEach(s => {
 			if (s[x] == nw_id) {
 				configformData.forEach(fd => {
-					if (fd.value != 'undefined') {
+					if (fd.value != null && fd.value != 'undefined') {
 						if (!isNaN(fd.value))
 							fd.value = parseInt(fd.value);
 						if (fd.name.includes('_')) {
@@ -125,20 +125,23 @@ function gen_dhcp_config(nw_id, nw_type, subnet_list) {
 
 function test_dhcp_config() {
 	// Fetch changed config file data as query string for verification
-	params = "mode=test&dhcp_config_file=" + encodeURIComponent(dhcp_config.getValue());
+	params = "mode=test&affirm=true&dhcp_config_file=" + encodeURIComponent(dhcp_config.getValue());
 
 	$.post("/dhcp_config_update", params, function (data) {
 		console.log(data.message);
 		notification(data.message, 'bg-black', 10000);
 	});
+	document.getElementById('update_btn').disabled = false;
 }
 
 function save_dhcp_config() {
 	// Push updated config file data as query string to server 
-	params = "mode=update&dhcp_config_file=" + encodeURIComponent(dhcp_config.getValue());
+	var affirm = confirm("Confirm: Apply changed config to server?");
+	params = "mode=update&affirm=" + affirm + "&dhcp_config_file=" + encodeURIComponent(dhcp_config.getValue());
 
-	$.post("/dhcp_config_update", dhcp_config_form_data, function (data) {
-		$("#dhcp_config_result").html(data);
+	$.post("/dhcp_config_update", params, function (data) {
+		console.log(data.message);
+		notification(data.message, 'bg-black', 10000);
 	});
 }
 

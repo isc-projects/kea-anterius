@@ -16,19 +16,26 @@ router.post('/', authorize.auth, function (req, res, next) {
 	// fs.writeFileSync("./syntax_verify_config", request.dhcp_config_file, 'utf8');
 	// var exec = require('child_process').exec;
 
-	config_test_req_data = JSON.stringify({ "command": "config-test", "service": ["dhcp4"], "arguments": JSON.parse(request.dhcp_config_file) });
+	if (request.mode == 'test') {
+		config_update_req_data = JSON.stringify({ "command": "config-test", "service": ["dhcp4"], "arguments": JSON.parse(request.dhcp_config_file) });
+	}
+	else {
+		config_update_req_data = JSON.stringify({ "command": "config-set", "service": ["dhcp4"], "arguments": JSON.parse(request.dhcp_config_file) });
+	}
+	if (request.affirm) {
+		/* Fetch and set server config*/
+		var response_data = api_agent.fire_kea_api(config_update_req_data).then(function (api_data) {
+			console.log(api_data);
+			return api_data;
+		});
+		response_data.then(function (data) {
+			if (data.result == 0)
+				res.send({ "message": data.text });
+			else
+				console.log("CA Error: " + data.text);
+		});
+	}
 
-	/* Fetch and set server config*/
-	var response_data = api_agent.fire_kea_api(config_test_req_data).then(function (api_data) {
-		// console.log(api_data);
-		return api_data;
-	});
-	console.log(response_data);
-
-	setTimeout(function () {
-		console.log(response_data);
-		res.send({ "message": response_data });
-	});
 
 	// exec('/usr/sbin/dhcpd -t -cf ./syntax_verify_config > verify_output 2> verify_output', function(err, stdout, stderr)
 	// {
