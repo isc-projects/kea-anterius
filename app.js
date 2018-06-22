@@ -119,18 +119,24 @@ cpu_utilization_poll = setInterval(function () {
 
 /* Kea CA REST API call - config-get and statistics-get */
 stats_req_data = JSON.stringify({ "command": "statistic-get-all", "service": ["dhcp4"] });
-config_req_data = JSON.stringify({ "command": "config-get", "service": ["dhcp4"] });
+config_get_req_data = JSON.stringify({ "command": "config-get", "service": ["dhcp4"] });
 
 /* Fetch and set server stats*/
 api_agent.fire_kea_api(stats_req_data).then(function (api_data) {
     // console.log(api_data);
-    kea_stats = api_data;
+    if (api_data.result == 0)
+        kea_stats = api_data.arguments;
+    else
+        console.log("CA Error:" + api_data.text);
 });
 
 /* Fetch and set server config*/
-api_agent.fire_kea_api(config_req_data).then(function (api_data) {
+api_agent.fire_kea_api(config_get_req_data).then(function (api_data) {
     // console.log(api_data);
-    kea_config = api_data;
+    if (api_data.result == 0)
+        kea_config = api_data.arguments;
+    else
+        console.log("CA Error:" + api_data.text);
 });
 
 /* Ingest OUI Database */
@@ -232,13 +238,25 @@ var lpm_counter = 0;
 lease_stats_monitor = setInterval(function () {
 
     /* Fetch and set server stats*/
-    api_agent.fire_kea_api(stats_req_data).then(function (api_data) {
-        kea_stats = api_data;
+    var response_data = api_agent.fire_kea_api(stats_req_data).then(function (api_data) {
+        return api_data;
+    });
+    response_data.then(function (data) {
+        if (data.result == 0)
+            kea_stats = data.arguments;
+        else
+            console.log("CA Error:" + api_data.text);
     });
 
     /* Fetch and set server config*/
-    api_agent.fire_kea_api(config_req_data).then(function (api_data) {
-        kea_config = api_data;
+    var response_data = api_agent.fire_kea_api(config_get_req_data).then(function (api_data) {
+        return api_data;
+    });
+    response_data.then(function (data) {
+        if (data.result == 0 && data.arguments != undefined)
+            kea_config = data.arguments;
+        else
+            console.log("CA Error:" + data.text);
     });
 
     // console.log(kea_stats, kea_config);
