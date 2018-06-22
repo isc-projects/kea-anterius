@@ -3,7 +3,6 @@
 
 '''
 
-
 import unittest
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -12,13 +11,12 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 
 def browser_open(browser, link):
-
 	browser.get(link)
 
-def fb_login_check(browser, username, passwd):
+def (browser, username, passwd):
 	
-	browser.get("http://www.facebook.com")
-	assert "Facebook" in browser.title
+	browser.get("http://localhost:3000")
+	assert "Kea-Anterius" in browser.title
 
 	elem = browser.find_element_by_id("email")
 	elem.send_keys(username)
