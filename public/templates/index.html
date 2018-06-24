@@ -254,6 +254,9 @@
 
     <script type="text/javascript">
 
+        $(document).ready(function () {
+            $(this).scrollTop(0);
+        });
         function get_stats() {
             $.get("/get_stats", function (data) {
                 $('#cpu-utilization').html(data.cpu_utilization + "%");
