@@ -61,7 +61,7 @@
                 </div>
             </div>
             <p>
-                <h4>Loading Dashboard...</h4>
+                <h4>Loading Anterius Dashboard...</h4>
             </p>
         </div>
     </div>
@@ -72,7 +72,7 @@
 
     <!-- #END# Search Bar -->
     <!-- Top Bar -->
-    <nav class="navbar">
+    <nav class="navbar" id="top-nav">
         <div class="container-fluid" style="background: url('images/bg1.jpg') no-repeat no-repeat; width: 100%; background-size: cover;">
 
             <div class="navbar-header">
@@ -254,9 +254,21 @@
 
     <script type="text/javascript">
 
+        var prevScrollpos = window.pageYOffset;
+        window.onscroll = function () {
+            var currentScrollPos = window.pageYOffset;
+            if (prevScrollpos > currentScrollPos) {
+                document.getElementById("top-nav").style.top = "0";
+            } else {
+                document.getElementById("top-nav").style.top = "-100px";
+            }
+            prevScrollpos = currentScrollPos;
+        }
+
         $(document).ready(function () {
             $(this).scrollTop(0);
         });
+
         function get_stats() {
             $.get("/get_stats", function (data) {
                 $('#cpu-utilization').html(data.cpu_utilization + "%");
