@@ -103,7 +103,6 @@ router.get('/', authorize.auth, function (req, res, next) {
 	else {
 		console.log(req.query);
 
-		content = template_render.set_template_variable(content, "write_config_btn", '');
 		content = template_render.set_template_variable(content, "file_focus", "active", 1);
 		content = template_render.set_template_variable(content, "form_focus", "disabled disabledTab", 1);
 		content = template_render.set_template_variable(content, "file_selected", "true", 1);

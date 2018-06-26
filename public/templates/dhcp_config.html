@@ -17,7 +17,7 @@
             <div id="file" class="tab-pane [file_focus]" role="tabpanel" aria-labelledby="file">
 
                 <!-- [c_content] -->
-                <form id="dhcp_config_form">
+                <form id="dhcp-config-form">
                     <label>DHCPv4 Config</label>
                     <!-- <div class="form-group">
                             <div class="form-line">
@@ -25,7 +25,7 @@
                             </div>
                         </div> -->
 
-                    <div id="dhcp_config" style="width:100%; height:800px; color: #95cd24">[dhcp_config_content]</div>
+                    <div id="dhcp-config" style="width:100%; height:800px; color: #95cd24">[dhcp_config_content]</div>
 
                     <br>
 
@@ -70,6 +70,12 @@
         document.getElementById("gen_btn").disabled = false;
         document.getElementById('update_btn').disabled = true;
         document.getElementById('test_btn').disabled = true;
+    });
+
+    $('#dhcp-config').on('keypress keydown keyup', function () {
+        document.getElementById('test_btn').disabled = false;
+        document.getElementById('update_btn').disabled = true;
+        file_highlight();
     });
 
 </script>

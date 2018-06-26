@@ -2,13 +2,15 @@
 © Anthrino > DHCP config update handler
 */
 
-$('#dhcp_config').height($(window).height() * 0.6);
+$('#dhcp-config').height($(window).height() * 0.6);
 
-var dhcp_config = ace.edit("dhcp_config");
+var dhcp_config = ace.edit("dhcp-config");
 dhcp_config.setTheme("ace/theme/terminal");
 dhcp_config.$blockScrolling = Infinity;
 
 var Range = ace.require('ace/range').Range;
+var config_copy = dhcp_config.session.doc.getAllLines();
+var markedList = [];
 
 function gen_dhcp_config(nw_id, nw_type, subnet_list) {
 
@@ -153,16 +155,31 @@ function save_dhcp_config() {
 	});
 }
 
+/* Method to invoke file editor changes highlighting */
+function file_highlight() {
+
+	/* Instantiate a temp test file and Copy to identify file changes*/
+	highlightEditedLineNumbers(dhcp_config, config_copy);
+}
+
 /* Method to highlight lines with changes in config params */
 function highlightEditedLineNumbers(editor, config_og) {
 	var lines = editor.session.doc.getAllLines();
+	markedList.forEach(mid => {
+		dhcp_config.session.removeMarker(mid);
+	})
+
+	markedList = [];
+	// console.log(markedList);
+
 	for (var i = 0, l = lines.length; i < l; i++) {
 		target_line = lines[i];
 
 		// TODO: Figure out way to highlight actual changes
 		if (!config_copy.includes(target_line)) {
 			// editor.session.insert({ row: i }, target_line.replace('>>>', ''));
-			dhcp_config.session.addMarker(new Range(i, 0, i, 1), "editMarker", "fullLine");
+			markedList.push(dhcp_config.session.addMarker(new Range(i, 0, i, 1), "editMarker", "fullLine"));
 		}
+
 	}
 }
