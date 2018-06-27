@@ -59,3 +59,11 @@ body {
   width: 100%;
   transition: top 0.3s;
 }
+
+[type="radio"]:checked+label::after, [type="radio"].with-gap:checked+label::after {
+  background-color: rgb(2, 79, 8) !important;
+}
+
+[type="radio"]:checked+label::after, [type="radio"].with-gap:checked+label::before, [type="radio"].with-gap:checked+label::after {
+  border: 2px solid rgb(2, 79, 8) !important;
+}

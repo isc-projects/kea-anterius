@@ -273,6 +273,7 @@
             $.get("/get_stats", function (data) {
                 $('#cpu-utilization').html(data.cpu_utilization + "%");
                 $('#run-status').html(data.run_status);
+                $(data.current_server).prop('checked', true);
                 $('#leases-sec').html(data.leases_per_second.toLocaleString('en') + ' / ' + data.leases_per_minute.toLocaleString('en'));
                 $('#total-active').html(data.leases_used.toLocaleString('en'));
                 $('#server-name').html(data.host_name);

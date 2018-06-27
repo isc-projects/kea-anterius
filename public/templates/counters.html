@@ -1,5 +1,29 @@
 <div class="row clearfix">
-    <div class="col-lg-2-5 col-md-2 col-sm-6 col-xs-12">
+    <div class="col-lg-3 col-md-2 col-sm-6 col-xs-12">
+        <div class="info-box hover-zoom-effect">
+            <div class="icon bg-deep-blue">
+                <i class="material-icons">dvr</i>
+            </div>
+            <div class="content">
+                <div class="text">Server Hostname</div>
+                <div class="number" id="server-name" style="font-size:12px; margin-top: 10px;">0</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-2 col-sm-6 col-xs-12">
+        <div class="info-box hover-zoom-effect">
+            <div class="icon bg-deep-blue">
+                <i class="material-icons">settings_power</i>
+            </div>
+            <div class="content">
+                <div class="text">Kea Server Status</div>
+                <form id="run-status" action="/anterius_settings_save">
+                    Loading..
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-2 col-md-2 col-sm-4 col-xs-12">
         <div class="info-box hover-zoom-effect">
             <div class="icon bg-deep-blue">
                 <i class="material-icons">new_releases</i>
@@ -11,7 +35,7 @@
         </div>
 
     </div>
-    <div class="col-lg-2-5 col-md-2 col-sm-6 col-xs-12">
+    <div class="col-lg-2 col-md-2 col-sm-4 col-xs-12">
         <div class="info-box hover-zoom-effect">
             <div class="icon bg-deep-blue">
                 <i class="material-icons">insert_chart</i>
@@ -22,29 +46,7 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-2-5 col-md-2 col-sm-6 col-xs-12">
-        <div class="info-box hover-zoom-effect">
-            <div class="icon bg-deep-blue">
-                <i class="material-icons">settings_power</i>
-            </div>
-            <div class="content">
-                <div class="text">Kea Server Status</div>
-                <div class="number" id="run-status" style="font-size:15px">Loading..</div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-2-5 col-md-2 col-sm-6 col-xs-12">
-        <div class="info-box hover-zoom-effect">
-            <div class="icon bg-deep-blue">
-                <i class="material-icons">dvr</i>
-            </div>
-            <div class="content">
-                <div class="text">Server Hostname</div>
-                <div class="number" id="server-name" style="font-size:12px; margin-top: 10px;">0</div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-2-5 col-md-2 col-sm-6 col-xs-12">
+    <div class="col-lg-2 col-md-2 col-sm-4 col-xs-12">
         <div class="info-box hover-zoom-effect">
             <div class="icon bg-deep-blue">
                 <i class="material-icons">devices</i>
@@ -56,3 +58,10 @@
         </div>
     </div>
 </div>
+<script>
+
+    $('input[type=radio]').click(function () {
+        $("#run-status").submit();
+    });
+
+</script>

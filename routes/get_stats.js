@@ -10,7 +10,6 @@ var template_render = require('../lib/render_template.js');
 router.get('/', function (req, res, next) {
 
 	// var json_file = require('jsonfile');
-	// var ante_config = json_file.readFileSync('config/anterius_config.json');
 
 	// TODO: see if dhcpd-pools will work for Kea files, if parsing lease files
 	// Third-party lib dhcpd-pools to parse config and lease files
@@ -158,13 +157,16 @@ router.get('/', function (req, res, next) {
 
 	/* Process server run status output for display */
 	svrun = run_status.replace(/server:/g, ':').replace("\n", "<br> \n")
-		.replace(/\bactive\b/g, '<span style="color: #00a90b">Active</span>')
-		.replace(/\binactive\b/g, '<span style="color: #D50000">Inactive</span>')
+		.replace(/\bDHCPv4\b/g, '<input name="svr-select" id="dhcp4" type="radio" class="with-gap" /><label for="dhcp4"><span>DHCPv4')
+		.replace(/\bDHCPv6\b/g, '<input name="svr-select" id="dhcp6" type="radio" class="with-gap" /><label for="dhcp6"><span>DHCPv6')
+		.replace(/\bactive\b/g, '<span style="color: #00a90b">Active</span></span></label>')
+		.replace(/\binactive\b/g, '<span style="color: #D50000">Inactive</span></span></label>')
 		.split("\n").slice(0, 2);
 
 	response_data = {
 		"cpu_utilization": cpu_utilization,
 		"run_status": svrun,
+		"current_server": '#' + anterius_config.current_server,
 		"leases_used": total_leases,
 		"leases_per_second": leases_per_sec,
 		"leases_per_minute": leases_per_minute,
