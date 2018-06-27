@@ -14,9 +14,6 @@ router.get('/', authorize.auth, function (req, res, next) {
 
 	var json_file = require('jsonfile');
 
-	/* Read Config */
-	anterius_config = json_file.readFileSync('config/anterius_config.json');
-
 	// /* Leases File */
 	// input = template_render.form_input('Leases File', '<input type="input" class="form-control" id="leases_file" placeholder="/var/lib/dhcp/dhcpd.leases" value="' + anterius_config.leases_file + '">');
 

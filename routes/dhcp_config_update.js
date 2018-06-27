@@ -58,7 +58,6 @@ router.post('/', authorize.auth, function (req, res, next) {
 	// 		);
 	// 		/* Read Config */
 	// 		var json_file = require('jsonfile');
-	// 		var anterius_config = json_file.readFileSync('config/anterius_config.json');
 
 	// 		/* Make Dir if not exist */
 	// 		var dir = './config_backups';

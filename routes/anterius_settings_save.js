@@ -10,8 +10,6 @@ router.post('/', authorize.auth, function (req, res, next) {
 	var request = req.body;
 	var json_file = require('jsonfile');
 
-	var anterius_config = json_file.readFileSync('config/anterius_config.json');
-
 	anterius_config.admin_user = request.admin_user;
 	anterius_config.admin_password = request.admin_password;
 	anterius_config.stat_refresh_interval = request.stat_refr_int;
@@ -26,6 +24,20 @@ router.post('/', authorize.auth, function (req, res, next) {
 	});
 
 	res.send('<script type="text/javascript">notification(\'Settings saved!\')</script>');
+});
+
+router.get('/', function (req, res, next) {
+	var request = req.body;
+	var json_file = require('jsonfile');
+
+	console.log(request);
+	// anterius_config.current_server = request.;
+
+	// json_file.writeFile('./config/anterius_config.json', anterius_config, { spaces: 2 }, function (err) {
+	// 	console.error(err)
+	// });
+
+	notification('Switched to' + 'server');
 });
 
 module.exports = router;

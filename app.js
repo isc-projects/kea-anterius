@@ -18,7 +18,6 @@ var api_agent = require('./lib/api_service.js');
 
 /* Read Config */
 var json_file = require('jsonfile');
-var anter_config = json_file.readFileSync('config/anterius_config.json');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -27,12 +26,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
-if (anter_config.ip_ranges_to_allow != "") {
-    var ip_filter = require('express-ipfilter').IpFilter;
-    var ips = anter_config.ip_ranges_to_allow;
-    app.use(ip_filter(ips, { mode: 'allow' }));
-}
 
 /* URL Routes */
 app.use('/', require('./routes/index'));
@@ -84,11 +77,11 @@ app.use(function (err, req, res, next) {
 });
 
 module.exports = app;
-module.exports.anter_config = anter_config;
 
 /* Anterius Data Model - Global Statistics Variables */
 kea_stats = {};
 kea_config = {};
+anterius_config = json_file.readFileSync('config/anterius_config.json');
 
 leases_per_minute = 0;
 cpu_utilization = -1;
@@ -106,6 +99,12 @@ options = {};
 options.interval = 1000;
 
 debug_watch_lease_parse_stream = 0;
+
+if (anterius_config.ip_ranges_to_allow != "") {
+    var ip_filter = require('express-ipfilter').IpFilter;
+    var ips = anterius_config.ip_ranges_to_allow;
+    app.use(ip_filter(ips, { mode: 'allow' }));
+}
 
 // TODO: Mechanism to retrieve below sections from remote machine
 host_name = execSync("cat /etc/hostname").toString().replace("\n", "");
@@ -174,7 +173,7 @@ if (fs.existsSync(oui_database_file)) {
 // lease_read_buffer = "";
 
 // fs = require('fs');
-// fs.readFile(anter_config.leases_file, 'utf8', function (err, data) {
+// fs.readFile(anterius_config.leases_file, 'utf8', function (err, data) {
 //     if (err) {
 //         return console.log(err);
 //     }
@@ -188,7 +187,7 @@ if (fs.existsSync(oui_database_file)) {
  * Leases File Listener <memfile> - calculate leases/sec
  */
 // tail = new tail_module(
-//     anter_config.leases_file,
+//     anterius_config.leases_file,
 //     "\n",
 //     options
 // );
@@ -327,7 +326,7 @@ lease_stats_monitor = setInterval(function () {
     //     wss.broadcast_event(JSON.stringify(return_data), 'dhcp_statistics');
     // }
 
-}, anter_config.stat_refresh_interval * 1000);
+}, anterius_config.stat_refresh_interval * 1000);
 
 /**
  * Clean Expired Leases
@@ -349,7 +348,7 @@ lease_stats_monitor = setInterval(function () {
 fs.watch('config/anterius_config.json', function (event, filename) {
     if (filename) {
         setTimeout(function () {
-            anter_config = json_file.readFileSync('config/anterius_config.json');
+            anterius_config = json_file.readFileSync('config/anterius_config.json');
             console.log("Anterius Server> Config Loaded");
         }, 1000);
     } else {
@@ -364,7 +363,7 @@ const wss = new WebSocket.Server({ port: 8080 });
 
 options.interval = 300;
 var tail_dhcp_log = new tail_module(
-    anter_config.log_file,
+    anterius_config.log_file,
     "\n",
     options
 );
@@ -562,7 +561,7 @@ var socket_clients = 0;
 
 // var Slack = require('slack-node');
 
-// webhookUri = anter_config.slack_webhook_url;
+// webhookUri = anterius_config.slack_webhook_url;
 
 // slack = new Slack();
 // slack.setWebhook(webhookUri);
@@ -571,7 +570,7 @@ var socket_clients = 0;
 //     console.log("[Slack] %s", message);
 
 //     slack.webhook({
-//         channel: anter_config.slack_alert_channel,
+//         channel: anterius_config.slack_alert_channel,
 //         username: "Glass",
 //         icon_emoji: "https://imgur.com/wD3CcBi",
 //         text: "(" + host_name + ") " + message
@@ -592,31 +591,31 @@ var socket_clients = 0;
 //     // Server LPM Alert timer - 5s loop
 //     alert_check_timer = setInterval(function () {
 //         // console.log("[Timer] Alert Timer check");
-//         if (anter_config.leases_per_minute_threshold > 0) {
-//             // console.log("[Timer] lpm: %s lpm_th: %s", leases_per_minute, anter_config.leases_per_minute_threshold);
-//             if (leases_per_minute <= anter_config.leases_per_minute_threshold && alert_status['leases_per_minute'] == 0) {
+//         if (anterius_config.leases_per_minute_threshold > 0) {
+//             // console.log("[Timer] lpm: %s lpm_th: %s", leases_per_minute, anterius_config.leases_per_minute_threshold);
+//             if (leases_per_minute <= anterius_config.leases_per_minute_threshold && alert_status['leases_per_minute'] == 0) {
 //                 alert_status['leases_per_minute'] = 1;
 
 //                 // TODO: enable slack warning hook if required
 //                 // slack_message(":warning: CRITICAL: DHCP leases per minute have dropped below threshold " +
-//                 //     "(" + parseInt(anter_config.leases_per_minute_threshold).toLocaleString('en') + ") " +
+//                 //     "(" + parseInt(anterius_config.leases_per_minute_threshold).toLocaleString('en') + ") " +
 //                 //     "Current (" + parseInt(leases_per_minute).toLocaleString('en') + ")");
 
 //                 email_alert("CRITICAL: Leases Per Minute Threshold", "DHCP leases per minute dropped below critical threshold <br><br>" +
-//                     "Threshold: (" + parseInt(anter_config.leases_per_minute_threshold).toLocaleString('en') + ") <br>" +
+//                     "Threshold: (" + parseInt(anterius_config.leases_per_minute_threshold).toLocaleString('en') + ") <br>" +
 //                     "Current: (" + parseInt(leases_per_minute).toLocaleString('en') + ") <br><br>" +
 //                     "This is usually indicative of a process or hardware problem and needs to be addressed immediately");
 //             }
-//             else if (leases_per_minute >= anter_config.leases_per_minute_threshold && alert_status['leases_per_minute'] == 1) {
+//             else if (leases_per_minute >= anterius_config.leases_per_minute_threshold && alert_status['leases_per_minute'] == 1) {
 //                 alert_status['leases_per_minute'] = 0;
 
 //                 // TODO: enable slack warning hook if required
 //                 // slack_message(":white_check_mark: CLEAR: DHCP leases per minute have returned to above threshold " +
-//                 //     "(" + parseInt(anter_config.leases_per_minute_threshold).toLocaleString('en') + ") " +
+//                 //     "(" + parseInt(anterius_config.leases_per_minute_threshold).toLocaleString('en') + ") " +
 //                 //     "Current (" + parseInt(leases_per_minute).toLocaleString('en') + ")");
 
 //                 email_alert("CLEAR: Leases Per Minute Threshold", "DHCP leases per minute have returned to normal <br><br>" +
-//                     "Threshold: (" + parseInt(anter_config.leases_per_minute_threshold).toLocaleString('en') + ") <br>" +
+//                     "Threshold: (" + parseInt(anterius_config.leases_per_minute_threshold).toLocaleString('en') + ") <br>" +
 //                     "Current: (" + parseInt(leases_per_minute).toLocaleString('en') + ")"
 //                 );
 
@@ -634,11 +633,11 @@ var socket_clients = 0;
 //     alert_subnet_check_timer = setInterval(function () {
 //         // console.log("[Timer] Alert Timer check - subnets");
 
-//         if (anter_config.shared_network_warning_threshold > 0 || anter_config.shared_network_critical_threshold > 0) {
+//         if (anterius_config.shared_network_warning_threshold > 0 || anterius_config.shared_network_critical_threshold > 0) {
 
 //             // TODO: remove local dhcpd-pools parser tools if deemed not required 
 //             // const execSync = require('child_process').execSync;
-//             // output = execSync('./bin/dhcpd-pools -c ' + anter_config.config_file + ' -l ' + anter_config.leases_file + ' -f j -A -s e');
+//             // output = execSync('./bin/dhcpd-pools -c ' + anterius_config.config_file + ' -l ' + anterius_config.leases_file + ' -f j -A -s e');
 //             // var dhcp_data = JSON.parse(output);
 
 //             // Calculate Shared network utilization
@@ -669,10 +668,10 @@ var socket_clients = 0;
 //                  */
 
 //                 /* Check Warnings */
-//                 if (anter_config.shared_network_warning_threshold > 0) {
+//                 if (anterius_config.shared_network_warning_threshold > 0) {
 //                     if (
-//                         utilization >= anter_config.shared_network_warning_threshold &&
-//                         utilization <= anter_config.shared_network_critical_threshold &&
+//                         utilization >= anterius_config.shared_network_warning_threshold &&
+//                         utilization <= anterius_config.shared_network_critical_threshold &&
 //                         alert_status_networks_warning[kea_stats['shared-networks'][i].location] == 0
 //                     ) {
 //                         alert_status_networks_warning[kea_stats['shared-networks'][i].location] = 1;
@@ -680,18 +679,18 @@ var socket_clients = 0;
 //                         // TODO: enable slack warning hook if required
 //                         // slack_message(":warning: WARNING: DHCP shared network utilization (" + kea_stats['shared-networks'][i].location + ") " +
 //                         //     "Current: (" + utilization + "%) " +
-//                         //     "Threshold: (" + anter_config.shared_network_warning_threshold + "%)"
+//                         //     "Threshold: (" + anterius_config.shared_network_warning_threshold + "%)"
 //                         // );
 
 //                         email_alert("WARNING: DHCP shared network utilization",
 //                             "WARNING: DHCP shared network utilization (" + kea_stats['shared-networks'][i].location + ") <br><br>" +
-//                             "Threshold: (" + anter_config.shared_network_warning_threshold + "%) <br>" +
+//                             "Threshold: (" + anterius_config.shared_network_warning_threshold + "%) <br>" +
 //                             "Current: (" + utilization + "%)"
 //                         );
 
 //                     }
 //                     else if (
-//                         utilization <= anter_config.shared_network_warning_threshold &&
+//                         utilization <= anterius_config.shared_network_warning_threshold &&
 //                         alert_status_networks_warning[kea_stats['shared-networks'][i].location] == 1
 //                     ) {
 //                         alert_status_networks_warning[kea_stats['shared-networks'][i].location] = 0;
@@ -699,12 +698,12 @@ var socket_clients = 0;
 //                         // TODO: enable slack warning hook if required
 //                         // slack_message(":white_check_mark: CLEAR: Warning DHCP shared network utilization (" + kea_stats['shared-networks'][i].location + ") " +
 //                         //     "Current: (" + utilization + "%) " +
-//                         //     "Threshold: (" + anter_config.shared_network_warning_threshold + "%)"
+//                         //     "Threshold: (" + anterius_config.shared_network_warning_threshold + "%)"
 //                         // );
 
 //                         email_alert("CLEAR: DHCP shared network utilization warning",
 //                             "CLEAR: DHCP shared network utilization (" + kea_stats['shared-networks'][i].location + ") <br><br>" +
-//                             "Threshold: (" + anter_config.shared_network_warning_threshold + "%) <br>" +
+//                             "Threshold: (" + anterius_config.shared_network_warning_threshold + "%) <br>" +
 //                             "Current: (" + utilization + "%)"
 //                         );
 
@@ -712,9 +711,9 @@ var socket_clients = 0;
 //                 }
 
 //                 /* Check Critical */
-//                 if (anter_config.shared_network_critical_threshold > 0) {
+//                 if (anterius_config.shared_network_critical_threshold > 0) {
 //                     if (
-//                         utilization >= anter_config.shared_network_critical_threshold &&
+//                         utilization >= anterius_config.shared_network_critical_threshold &&
 //                         alert_status_networks_critical[kea_stats['shared-networks'][i].location] == 0
 //                     ) {
 //                         alert_status_networks_critical[kea_stats['shared-networks'][i].location] = 1;
@@ -722,18 +721,18 @@ var socket_clients = 0;
 //                         // TODO: enable slack warning hook if required
 //                         // slack_message(":fire: CRITICAL: DHCP shared network utilization (" + kea_stats['shared-networks'][i].location + ") " +
 //                         //     "Current: (" + utilization + "%) " +
-//                         //     "Threshold: (" + anter_config.shared_network_critical_threshold + "%)"
+//                         //     "Threshold: (" + anterius_config.shared_network_critical_threshold + "%)"
 //                         // );
 
 //                         email_alert("CRITICAL: DHCP shared network utilization",
 //                             "CRITICAL: DHCP shared network utilization (" + kea_stats['shared-networks'][i].location + ") <br><br>" +
-//                             "Threshold: (" + anter_config.shared_network_critical_threshold + "%) <br>" +
+//                             "Threshold: (" + anterius_config.shared_network_critical_threshold + "%) <br>" +
 //                             "Current: (" + utilization + "%)"
 //                         );
 
 //                     }
 //                     else if (
-//                         utilization <= anter_config.shared_network_critical_threshold &&
+//                         utilization <= anterius_config.shared_network_critical_threshold &&
 //                         alert_status_networks_critical[kea_stats['shared-networks'][i].location] == 1
 //                     ) {
 //                         alert_status_networks_critical[kea_stats['shared-networks'][i].location] = 0;
@@ -741,12 +740,12 @@ var socket_clients = 0;
 //                         // TODO: enable slack warning hook if required
 //                         // slack_message(":white_check_mark: CLEAR: Critical DHCP shared network utilization (" + kea_stats['shared-networks'][i].location + ") " +
 //                         //     "Current: (" + utilization + "%) " +
-//                         //     "Threshold: (" + anter_config.shared_network_critical_threshold + "%)"
+//                         //     "Threshold: (" + anterius_config.shared_network_critical_threshold + "%)"
 //                         // );
 
 //                         email_alert("CLEAR: DHCP shared network utilization",
 //                             "CLEAR: DHCP shared network utilization (" + kea_stats['shared-networks'][i].location + ") <br><br>" +
-//                             "Threshold: (" + anter_config.shared_network_critical_threshold + "%) <br>" +
+//                             "Threshold: (" + anterius_config.shared_network_critical_threshold + "%) <br>" +
 //                             "Current: (" + utilization + "%)"
 //                         );
 //                     }
@@ -781,10 +780,10 @@ var socket_clients = 0;
 //     /* E-Mail Template Load */
 //     console.log("Anterius Server> Sending E-Mail Alert...\n");
 
-//     if (typeof anter_config.email_alert_to === "undefined" && typeof anter_config.sms_alert_to === "undefined")
+//     if (typeof anterius_config.email_alert_to === "undefined" && typeof anterius_config.sms_alert_to === "undefined")
 //         return false;
 
-//     if (anter_config.email_alert_to == "" && anter_config.sms_alert_to != "") {
+//     if (anterius_config.email_alert_to == "" && anterius_config.sms_alert_to != "") {
 //         console.log("Anterius Server> No email_to specified - returning...");
 //         return false;
 //     }
@@ -795,13 +794,13 @@ var socket_clients = 0;
 //     email_body = email_body.replace("[local_time]", new Date().toString());
 
 //     /* Clean extra commas etc. */
-//     anter_config.email_alert_to = anter_config.email_alert_to.replace(/^[,\s]+|[,\s]+$/g, '').replace(/,[,\s]*,/g, ',');
+//     anterius_config.email_alert_to = anterius_config.email_alert_to.replace(/^[,\s]+|[,\s]+$/g, '').replace(/,[,\s]*,/g, ',');
 
 //     /* Publish HTML E-Mail Alert (regular mail) */
-//     if (anter_config.email_alert_to.trim() != "") {
+//     if (anterius_config.email_alert_to.trim() != "") {
 //         var mailOptions = {
 //             from: "Kea-Anterius Monitor Alerts kea-anterius@noreply.com",
-//             to: anter_config.email_alert_to,
+//             to: anterius_config.email_alert_to,
 //             subject: "Kea-Anterius " + "(" + host_name + ") " + alert_title,
 //             html: email_body,
 //         };
@@ -816,10 +815,10 @@ var socket_clients = 0;
 //     }
 
 //     /* Publish SMS Alert */
-//     if (anter_config.sms_alert_to.trim() != "") {
+//     if (anterius_config.sms_alert_to.trim() != "") {
 //         var mailOptions = {
 //             from: "Kea-Anterius Monitor Alerts kea-anterius@noreply.com",
-//             to: anter_config.sms_alert_to,
+//             to: anterius_config.sms_alert_to,
 //             subject: "Kea-Anterius " + "(" + host_name + ") " + alert_title,
 //             html: (alert_message.substring(0, 130) + "..."),
 //         };

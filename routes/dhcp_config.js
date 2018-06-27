@@ -7,16 +7,17 @@ var authorize = require('../lib/authorize.js');
 router.get('/', authorize.auth, function (req, res, next) {
 
 	// var json_file = require('jsonfile');
-	// var anterius_config = json_file.readFileSync('config/anterius_config.json');
 	content = template_render.get_template("dhcp_config");
+
 	// Display current config file from API config-get
 	content = template_render.set_template_variable(content, "dhcp_config_content", JSON.stringify(kea_config, null, 4));
-	// content = template_render.set_template_variable(content, "title", "Kea DHCP4 Configuration");
 
 	// Uncomment to display/modify Local configuration file
+	// content = template_render.set_template_variable(content, "title", "Kea DHCP4 Configuration");
 	// content = template_render.set_template_variable(content, "c_content", "");
 	// content = template_render.set_template_variable(content, "dhcp_config_location", anterius_config.config_file);
 	// var dhcp_config = fs.readFileSync(anterius_config.config_file, 'utf8');
+
 	var nw_type = req.query.network;
 	var nw_id = req.query.id;
 
