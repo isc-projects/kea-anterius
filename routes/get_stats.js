@@ -157,9 +157,9 @@ router.get('/', function (req, res, next) {
 	}
 
 	/* Process server run status output for display */
-	svrun = run_status.replace('server:', ':').replace('server:', ':').replace("\n", "<br> \n")
-		.replace('active', '<span style="color: #00a90b">Active</span>')
-		.replace('inactive', '<span style="color: #D50000">Inactive</span>')
+	svrun = run_status.replace(/server:/g, ':').replace("\n", "<br> \n")
+		.replace(/\bactive\b/g, '<span style="color: #00a90b">Active</span>')
+		.replace(/\binactive\b/g, '<span style="color: #D50000">Inactive</span>')
 		.split("\n").slice(0, 2);
 
 	response_data = {

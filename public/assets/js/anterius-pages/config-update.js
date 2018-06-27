@@ -117,7 +117,7 @@ function gen_dhcp_config(nw_id, nw_type, subnet_list) {
 	highlightEditedLineNumbers(dhcp_config, config_copy);
 
 	notification('Test config_file generated.', 'bg-green', 100);
-	notification('Switch to config file editor (second tab) to review highlighted changes');
+	notification('Switch to config file editor (second tab) to review changes');
 
 	document.getElementById('test_btn').disabled = false;
 	// $.post("/dhcp_config_update", dhcp_config_form_data, function (data) {

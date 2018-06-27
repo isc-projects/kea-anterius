@@ -237,6 +237,11 @@ var lpm_counter = 0;
 /* Recurrent Loop for lease stats */
 lease_stats_monitor = setInterval(function () {
 
+    /* Fetch running status */
+    // TODO: Mechanism to retrieve below sections from remote machine
+    run_status = execSync("keactrl status").toString();
+
+
     /* Fetch and set server stats*/
     var response_data = api_agent.fire_kea_api(stats_req_data).then(function (api_data) {
         return api_data;

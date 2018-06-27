@@ -29,7 +29,7 @@ router.post('/', authorize.auth, function (req, res, next) {
 			return api_data;
 		});
 		response_data.then(function (data) {
-			if (data.result == 0)
+			if (data.result != 0)
 				console.log("CA Error: " + data.text);
 			res.send({ "message": data.text, "status": data.result });
 		});
