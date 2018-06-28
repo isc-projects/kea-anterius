@@ -17,10 +17,10 @@ router.post('/', authorize.auth, function (req, res, next) {
 	// var exec = require('child_process').exec;
 
 	if (request.mode == 'test') {
-		config_update_req_data = JSON.stringify({ "command": "config-test", "service": ["dhcp4"], "arguments": JSON.parse(request.dhcp_config_file) });
+		config_update_req_data = JSON.stringify({ "command": "config-test", "service": [anterius_config.current_server], "arguments": JSON.parse(request.dhcp_config_file) });
 	}
 	else {
-		config_update_req_data = JSON.stringify({ "command": "config-set", "service": ["dhcp4"], "arguments": JSON.parse(request.dhcp_config_file) });
+		config_update_req_data = JSON.stringify({ "command": "config-set", "service": [anterius_config.current_server], "arguments": JSON.parse(request.dhcp_config_file) });
 	}
 	if (request.affirm) {
 		/* Fetch and set server config*/

@@ -17,29 +17,41 @@ router.get('/', function (req, res, next) {
 	// output = execSync('./bin/dhcpd-pools -c ' + ante_config.config_file + ' -l ' + ante_config.leases_file + ' -f j -A -s e');
 	// var kea_stats = JSON.parse(output);
 
-	// console.log(kea_config['Dhcp4']['shared-networks'].length);
+	// console.log(server_config['shared-networks'].length);
 
 	/* Lists to store server network data */
 	subnet_list = [], subnet_util = [], subnet_assgn_addr_list = [], subnet_total_addr_list = [], subnet_free_addr_list = [],
 		shared_nw_util = [], shared_nw_assgn_addr_list = [], shared_nw_total_addr_list = [], shared_nw_free_addr_list = [],
 		shared_nw_snet_id_list = [], subnet_pool_map = [];
 
+    /* Set identifiers based on current server */
+    if (anterius_config.current_server == 'dhcp4') {
+        server_config = kea_config['Dhcp4']
+        sn_tag = 'subnet4';
+        addr_tag = 'addresses';
+    }
+    else {
+        server_config = kea_config['Dhcp6']
+        sn_tag = 'subnet6';
+        addr_tag = 'pds';
+    }
+
 	/* Calculate Shared network utilization */
-	shared_nw_count = kea_config['Dhcp4']['shared-networks'].length;
+	shared_nw_count = server_config['shared-networks'].length;
 	for (var i = 0; i < shared_nw_count; i++) {
 
 		shared_nw_snet_list = [];
-		kea_config['Dhcp4']['shared-networks'][i]['subnet4'].forEach(x => {
+		server_config['shared-networks'][i][sn_tag].forEach(x => {
 			/* Retrieve and store subnets defined within shared nw */
-			x['shared_nw_name'] = kea_config['Dhcp4']['shared-networks'][i].name;
+			x['shared_nw_name'] = server_config['shared-networks'][i].name;
 			subnet_list.push(x);
 			shared_nw_snet_id_list.push(x['id']);
 		});
 
 		shared_nw_total_addr = 0, shared_nw_assgn_addr = 0;
 		shared_nw_snet_id_list.forEach(k => {
-			shared_nw_assgn_addr += kea_stats['subnet[' + k + '].assigned-addresses'][0][0];
-			shared_nw_total_addr += kea_stats['subnet[' + k + '].total-addresses'][0][0];
+			shared_nw_assgn_addr += kea_stats['subnet[' + k + '].assigned-'+addr_tag][0][0];
+			shared_nw_total_addr += kea_stats['subnet[' + k + '].total-'+addr_tag][0][0];
 		});
 
 		// console.log(shared_nw_assgn_addr, shared_nw_total_addr);		
@@ -67,7 +79,7 @@ router.get('/', function (req, res, next) {
 
 		/* Define shared network row for table */
 		table_row = '';
-		table_row = table_row + '<td><b><a href="/nw_detail_info?type=shared-networks&id=' + kea_config['Dhcp4']['shared-networks'][i].name + '" pjax="1">' + kea_config['Dhcp4']['shared-networks'][i].name + '</a></b></td>';
+		table_row = table_row + '<td><b><a href="/nw_detail_info?type=shared-networks&id=' + server_config['shared-networks'][i].name + '" pjax="1">' + server_config['shared-networks'][i].name + '</a></b></td>';
 		table_row = table_row + '<td>' + shared_nw_assgn_addr_list[i].toLocaleString('en') + ' </td>';
 		table_row = table_row + '<td>' + shared_nw_total_addr_list[i].toLocaleString('en') + '</td>';
 		table_row = table_row + '<td>' + shared_nw_free_addr_list[i].toLocaleString('en') + '</td>';
@@ -86,7 +98,7 @@ router.get('/', function (req, res, next) {
 		shared_network_table = shared_network_table + '<tr>' + table_row + '</tr>';
 	}
 
-	kea_config['Dhcp4']['subnet4'].forEach(sn => {
+	server_config[sn_tag].forEach(sn => {
 		subnet_list.push(sn);
 	});
 
@@ -100,7 +112,7 @@ router.get('/', function (req, res, next) {
 	/* Calculate Subnet utilization */
 	subnet_count = subnet_list.length;
 	for (var i = 1; i <= subnet_count; i++) {
-		utilization = round(parseFloat(kea_stats['subnet[' + i + '].assigned-addresses'][0][0] / kea_stats['subnet[' + i + '].total-addresses'][0][0]) * 100, 2);
+		utilization = round(parseFloat(kea_stats['subnet[' + i + '].assigned-'+addr_tag][0][0] / kea_stats['subnet[' + i + '].total-'+addr_tag][0][0]) * 100, 2);
 
 		/* Subnet pools parser */
 		pools = subnet_list[i - 1]['pools'];
@@ -118,8 +130,8 @@ router.get('/', function (req, res, next) {
 		if (isNaN(utilization))
 			utilization = 0;
 
-		subnet_assgn_addr_list.push(kea_stats['subnet[' + i + '].assigned-addresses'][0][0]);
-		subnet_total_addr_list.push(kea_stats['subnet[' + i + '].total-addresses'][0][0]);
+		subnet_assgn_addr_list.push(kea_stats['subnet[' + i + '].assigned-'+addr_tag][0][0]);
+		subnet_total_addr_list.push(kea_stats['subnet[' + i + '].total-'+addr_tag][0][0]);
 		subnet_free_addr_list.push(subnet_total_addr_list[i - 1] - subnet_assgn_addr_list[i - 1]);
 		subnet_util.push(utilization);
 		// console.log(subnet_util);
@@ -128,7 +140,7 @@ router.get('/', function (req, res, next) {
 	/* Generate Subnet Table */
 	subnet_table = '';
 	for (var i = 0; i < subnet_count; i++) {
-		// console.log(subnet_list[i].pools, kea_stats['subnet[' + i+1 + '].assigned-addresses'][0][0], subnet_util[i].utilization )
+		// console.log(subnet_list[i].pools, kea_stats['subnet[' + i+1 + '].assigned-'+addr_tag][0][0], subnet_util[i].utilization )
 		utilization = subnet_util[i];
 
 		// TODO: Determine subnet pools (disjoint/aggregate)

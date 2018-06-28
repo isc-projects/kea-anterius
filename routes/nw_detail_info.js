@@ -170,7 +170,10 @@ router.get('/', function (req, res, next) {
     // console.log(id);
 
     /* Construct lease-get command for specified subnets */
-    lease_get_req_data = JSON.stringify({ "command": "lease4-get-all", "service": ["dhcp4"], "arguments": { "subnets": id } });
+    if (anterius_config.current_server == 'dhcp4')
+        lease_get_req_data = JSON.stringify({ "command": "lease4-get-all", "service": [anterius_config.current_server], "arguments": { "subnets": id } });
+    else
+        lease_get_req_data = JSON.stringify({ "command": "lease6-get-all", "service": [anterius_config.current_server], "arguments": { "subnets": id } });
 
     /* Fetch lease data for network*/
     var response_data = api_agent.fire_kea_api(lease_get_req_data).then(function (api_data) {
