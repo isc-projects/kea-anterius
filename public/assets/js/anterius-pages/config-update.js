@@ -23,9 +23,9 @@ function gen_dhcp_config(nw_id, nw_type, subnet_list) {
 
 	/* Instantiate a temp test file and Copy to identify file changes*/
 	config_copy = dhcp_config.session.doc.getAllLines();
-	test_config_file = JSON.parse(dhcp_config.getValue());
+	test_config_file = JSON.parse(dhcp_config.getValue())[sn_tag];
 
-	// console.log(test_config_file['Dhcp4']['subnet4'][0]);
+	// console.log(test_config_file[sn_tag][0]);
 	// console.log(subnet_list);
 
 	if (nw_type == 'reservations') {
@@ -37,12 +37,12 @@ function gen_dhcp_config(nw_id, nw_type, subnet_list) {
 
 		/* Check if subnet lies under shared nw */
 		if (subnet_list[subnet_id - 1].shared_nw_name)
-			test_config_file['Dhcp4']['shared-networks'].forEach(shnw => {
+			test_config_file['shared-networks'].forEach(shnw => {
 				if (shnw.name == subnet_list[subnet_id - 1].shared_nw_name)
-					target_sn_list = shnw.subnet4;
+					target_sn_list = shnw[sn_tag];
 			});
 		else
-			target_sn_list = test_config_file['Dhcp4']['subnet4'];
+			target_sn_list = test_config_file[sn_tag];
 
 		target_sn_list.forEach(s => {
 			if (s.id == subnet_id) {
@@ -72,15 +72,15 @@ function gen_dhcp_config(nw_id, nw_type, subnet_list) {
 		});
 	} else {
 
-		target_sn_list = test_config_file['Dhcp4'][nw_type];
+		target_sn_list = test_config_file[nw_type];
 
 		if (nw_type == 'shared-networks')
 			x = 'name';
 		else {
 			if (subnet_list[nw_id - 1].shared_nw_name)
-				test_config_file['Dhcp4']['shared-networks'].forEach(shnw => {
+				test_config_file['shared-networks'].forEach(shnw => {
 					if (shnw.name == subnet_list[nw_id - 1].shared_nw_name)
-						target_sn_list = shnw.subnet4;
+						target_sn_list = shnw[sn_tag];
 				});
 			x = 'id';
 		}
@@ -116,8 +116,8 @@ function gen_dhcp_config(nw_id, nw_type, subnet_list) {
 	dhcp_config.setValue(JSON.stringify(test_config_file, null, 4), -1);
 	highlightEditedLineNumbers(dhcp_config, config_copy);
 
-	notification('Test config_file generated.', 'bg-green', 100);
-	notification('Switch to config file editor (second tab) to review changes');
+	notification('Test config_file generated.', 'bg-green');
+	notification('Switch to config file editor to review changes (Click Here)', 'bg-black');
 
 	document.getElementById('test_btn').disabled = false;
 	// $.post("/dhcp_config_update", dhcp_config_form_data, function (data) {

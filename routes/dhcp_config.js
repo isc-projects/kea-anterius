@@ -11,13 +11,8 @@ router.get('/', authorize.auth, function (req, res, next) {
 
 	// Display current config file from API config-get
 	content = template_render.set_template_variable(content, "dhcp_config_content", JSON.stringify(kea_config, null, 4));
-
-	// Uncomment to display/modify Local configuration file
-	// content = template_render.set_template_variable(content, "title", "Kea DHCP4 Configuration");
-	// content = template_render.set_template_variable(content, "c_content", "");
-	// content = template_render.set_template_variable(content, "dhcp_config_location", anterius_config.config_file);
-	// var dhcp_config = fs.readFileSync(anterius_config.config_file, 'utf8');
-
+	content = template_render.set_template_variable(content, "title", anterius_config.current_server.toUpperCase().replace('P', 'Pv'));
+	
 	var nw_type = req.query.network;
 	var nw_id = req.query.id;
 
@@ -52,7 +47,7 @@ router.get('/', authorize.auth, function (req, res, next) {
 		else {
 
 			var nw_entity;
-			if (nw_type == 'subnet4') {
+			if (nw_type == sn_tag) {
 
 				subnet_list.forEach(s => {
 					if (s.id == req.query.id) {
@@ -63,14 +58,14 @@ router.get('/', authorize.auth, function (req, res, next) {
 					}
 				});
 
-				content = template_render.set_template_variable(content, "edit_title", "Subnet ID : " + nw_entity.id + " [ <a href='/nw_detail_info?type=subnet4&id=" + nw_entity.id + "'>" + nw_entity.subnet + "</a> ] Configuration options");
+				content = template_render.set_template_variable(content, "edit_title", "Subnet ID : " + nw_entity.id + " [ <a href='/nw_detail_info?type=" + sn_tag + "&id=" + nw_entity.id + "'>" + nw_entity.subnet + "</a> ] Configuration options");
 				input = template_render.form_input('Subnet', '<input type="text" class="form-control" name="subnet" id="subnet" placeholder="Enter address/netmask" value="' + nw_entity.subnet + '">');
 			}
 			else {
 
-				kea_config['Dhcp4']['shared-networks'].forEach(s => {
+				server_config['shared-networks'].forEach(s => {
 					if (s.name == req.query.id) {
-						// s['subnet4'].forEach(x => {
+						// s[sn_tag].forEach(x => {
 						// 	id.push(x['id']);
 						// });
 						nw_entity = s;
