@@ -234,100 +234,106 @@ var lps_list = [0];
 var lpm_counter = 0;
 
 /* Recurrent Loop for lease stats */
-lease_stats_monitor = setInterval(function () {
-
+var lease_stats_monitor = function () {
+    
     /* Fetch running status */
     // TODO: Mechanism to retrieve below sections from remote machine
     run_status = execSync("keactrl status").toString();
 
+    /* Kea CA REST API call - config-get and statistics-get */
+    stats_req_data = JSON.stringify({ "command": "statistic-get-all", "service": [anterius_config.current_server] });
+    config_get_req_data = JSON.stringify({ "command": "config-get", "service": [anterius_config.current_server] });
 
-    /* Fetch and set server stats*/
-    var response_data = api_agent.fire_kea_api(stats_req_data).then(function (api_data) {
-        return api_data;
-    });
-    response_data.then(function (data) {
-        if (data.result == 0)
-            kea_stats = data.arguments;
-        else
-            console.log("CA Error:" + api_data.text);
-    });
 
     /* Fetch and set server config*/
     var response_data = api_agent.fire_kea_api(config_get_req_data).then(function (api_data) {
         return api_data;
     });
     response_data.then(function (data) {
-        if (data.result == 0 && data.arguments != undefined)
+        if (data.result == 0 && data.arguments != undefined) {
             kea_config = data.arguments;
+            subnet_list = [];
+
+            /* Set identifiers based on current server */
+            if (anterius_config.current_server == 'dhcp4') {
+                server_config = kea_config['Dhcp4'];
+                sn_tag = 'subnet4';
+                addr_tag = 'addresses';
+            }
+            else {
+                server_config = kea_config['Dhcp6'];
+                sn_tag = 'subnet6';
+                addr_tag = 'pds';
+            }
+
+            // console.log(server_config, sn_tag, addr_tag);
+
+            /* Retrieve and store subnets defined within shared nw */
+            server_config['shared-networks'].forEach(shnw => {
+                shnw[sn_tag].forEach(x => {
+                    x['shared_nw_name'] = shnw.name;
+                    subnet_list.push(x);
+                });
+            });
+
+            /* Retrieve and store subnets defined*/
+            server_config[sn_tag].forEach(x => {
+                subnet_list.push(x);
+            });
+
+            /* Subnet sorting by ID */
+            subnet_list.sort(function (a, b) {
+                return parseInt(a.id) - parseInt(b.id);
+            });
+
+            total_leases = 0;
+            subnet_count = subnet_list.length;
+            shared_nw_count = server_config['shared-networks'].length;
+
+            /* Fetch and set server stats*/
+            var response_data = api_agent.fire_kea_api(stats_req_data).then(function (sapi_data) {
+                return sapi_data;
+            });
+            response_data.then(function (sdata) {
+                if (sdata.result == 0) {
+                    kea_stats = sdata.arguments;
+                    for (var i = 1; i <= subnet_count; i++) {
+                        total_leases += kea_stats['subnet[' + i + '].assigned-' + addr_tag][0][0];
+                    }
+
+                    /* Update metric - leases / sec  */
+                    if (lpm_counter > 0)
+                        leases_per_sec = total_leases - tl0;
+
+                    lps_list[lpm_counter] = leases_per_sec;
+                    lpm_counter++;
+
+                    leases_per_minute = 0;
+                    for (i = 0; i < 59; i++) {
+                        if (lps_list[i] > 0) {
+                            leases_per_minute += lps_list[i];
+                            // console.log("iteration " + i + " val: " + lps_list[i] + " lpm: " + leases_per_minute);
+                        }
+                        else {
+                            // console.log("no data " + i);
+                        }
+                    }
+
+                    if (lpm_counter == 60)
+                        lpm_counter = 0;
+
+                    tl0 = total_leases
+
+                }
+                else
+                    console.log("CA Error:" + sdata.text);
+            });
+            // console.log(kea_stats, kea_config);
+        }
         else
             console.log("CA Error:" + data.text);
     });
 
-    console.log(kea_stats, kea_config);
-
-    subnet_list = [];
-
-    /* Set identifiers based on current server */
-    if (anterius_config.current_server == 'dhcp4') {
-        server_config = kea_config['Dhcp4'];
-        sn_tag = 'subnet4';
-        addr_tag = 'addresses';
-    }
-    else {
-        server_config = kea_config['Dhcp6'];
-        sn_tag = 'subnet6';
-        addr_tag = 'pds';
-    }
-
-    /* Retrieve and store subnets defined within shared nw */
-    server_config['shared-networks'].forEach(shnw => {
-        shnw[sn_tag].forEach(x => {
-            x['shared_nw_name'] = shnw.name;
-            subnet_list.push(x);
-        });
-    });
-
-    /* Retrieve and store subnets defined*/
-    server_config[sn_tag].forEach(x => {
-        subnet_list.push(x);
-    });
-
-    /* Subnet sorting by ID */
-    subnet_list.sort(function (a, b) {
-        return parseInt(a.id) - parseInt(b.id);
-    });
-
-    total_leases = 0;
-    subnet_count = subnet_list.length;
-    shared_nw_count = server_config['shared-networks'].length;
-
-    for (var i = 1; i <= subnet_count; i++) {
-        console.log('subnet[' + i + '].assigned-' + addr_tag);
-        total_leases += kea_stats['subnet[' + i + '].assigned-' + addr_tag][0][0];
-    }
-
-    /* Update metric - leases / sec  */
-    if (lpm_counter > 0)
-        leases_per_sec = total_leases - tl0;
-
-    lps_list[lpm_counter] = leases_per_sec;
-    lpm_counter++;
-
-    leases_per_minute = 0;
-    for (i = 0; i < 59; i++) {
-        if (lps_list[i] > 0) {
-            leases_per_minute += lps_list[i];
-            // console.log("iteration " + i + " val: " + lps_list[i] + " lpm: " + leases_per_minute);
-        }
-        else {
-            // console.log("no data " + i);
-        }
-    }
-
-    if (lpm_counter == 60)
-        lpm_counter = 0;
-
-    tl0 = total_leases
     // console.log(leases_per_minute, leases_per_sec, total_leases);
 
     /* Websockets statistics subscription broadcast */
@@ -340,8 +346,9 @@ lease_stats_monitor = setInterval(function () {
     //     wss.broadcast_event(JSON.stringify(return_data), 'dhcp_statistics');
     // }
 
-}, anterius_config.stat_refresh_interval * 1000);
+};
 
+exports.reload = lease_stats_monitor;
 /**
  * Clean Expired Leases
  */
