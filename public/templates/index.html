@@ -312,12 +312,6 @@
             get_stats();
         }, 5000);
 
-        function parse_statistics_stream(data) {
-            data = JSON.parse(data);
-            $('#cpu-utilization').html(data.cpu_utilization + "%");
-            $('#leases-sec').html(data.leases_per_second.toLocaleString('en') + ' / ' + data.leases_per_minute.toLocaleString('en'));
-        }
-
         /* Refresh stats on window focus */
         var window_focus = true;
         $(window).focus(function () {
@@ -351,6 +345,8 @@
         /* Call anterius config setter for selected server */
         $(document).on('change', 'input[type=radio][name=svrselect]', function () {
             select_server();
+            get_stats();
+            refresh_info('Switched to ' + $("input[name=svrselect]:checked").val());
         });
 
     </script>

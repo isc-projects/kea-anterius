@@ -1,6 +1,7 @@
 /*
 © Anthrino > Home page statistics processor
 */
+var app = require('../app');
 var express = require('express');
 var router = express.Router();
 var fs = require('fs');
@@ -18,6 +19,8 @@ router.get('/', function (req, res, next) {
 	// var kea_stats = JSON.parse(output);
 
 	// console.log(server_config['shared-networks'].length);
+
+    app.reload();
 
 	/* Lists to store server network data */
 	subnet_list = [], subnet_util = [], subnet_assgn_addr_list = [], subnet_total_addr_list = [], subnet_free_addr_list = [],
