@@ -157,8 +157,8 @@ router.get('/', function (req, res, next) {
 
 	/* Process server run status output for display */
 	svrun = run_status.replace(/server:/g, ':').replace("\n", "<br> \n")
-		.replace(/\bDHCPv4\b/g, '<input name="svr-select" id="dhcp4" type="radio" class="with-gap" /><label for="dhcp4"><span>DHCPv4')
-		.replace(/\bDHCPv6\b/g, '<input name="svr-select" id="dhcp6" type="radio" class="with-gap" /><label for="dhcp6"><span>DHCPv6')
+		.replace(/\bDHCPv4\b/g, '<input name="svrselect" id="dhcp4" value="dhcp4" type="radio" class="with-gap" /><label for="dhcp4"><span>DHCPv4')
+		.replace(/\bDHCPv6\b/g, '<input name="svrselect" id="dhcp6" value="dhcp6" type="radio" class="with-gap" /><label for="dhcp6"><span>DHCPv6')
 		.replace(/\bactive\b/g, '<span style="color: #00a90b">Active</span></span></label>')
 		.replace(/\binactive\b/g, '<span style="color: #D50000">Inactive</span></span></label>')
 		.split("\n").slice(0, 2);

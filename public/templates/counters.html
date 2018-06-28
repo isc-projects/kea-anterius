@@ -17,7 +17,7 @@
             </div>
             <div class="content">
                 <div class="text">Kea Server Status</div>
-                <form id="run-status" action="/anterius_settings_save">
+                <form id="run-status" action="/anterius_settings_save" method="POST">
                     Loading..
                 </form>
             </div>
@@ -58,10 +58,4 @@
         </div>
     </div>
 </div>
-<script>
-
-    $('input[type=radio]').click(function () {
-        $("#run-status").submit();
-    });
-
-</script>
+<div id="anterius_settings_result"></div>

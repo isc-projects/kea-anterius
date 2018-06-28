@@ -1,5 +1,5 @@
 /*
-© Anthrino > Cross Appn Core JS functions
+© Anthrino > Cross Application Core JS functions
 */
 
 var loader_html = '<div class="preloader"> \
@@ -134,6 +134,7 @@ function modal(title, content, buttons) {
     $('#mdModal').modal('show');
 }
 
+/* Method to generate  query string from html form fields */
 function get_form_query_string(form_id) {
     query_string = "";
     $('#' + form_id).find('input, select, textarea').each(function (key) {
@@ -154,7 +155,7 @@ function get_form_query_string(form_id) {
     return query_string;
 }
 
-//Toggle show/hide feature for side nav menu
+/* Toggle show/hide feature for side nav menu */
 function navtoggle() {
     side_nav = document.getElementById("leftsidebar");
     logo = document.getElementById("logo");
@@ -198,6 +199,7 @@ function navtoggle() {
     }
 }
 
+/* Reload page on refresh_stats user request  */
 function refresh_info() {
     source = window.location.href;
     get_stats();
@@ -207,9 +209,10 @@ function refresh_info() {
     // TODO: disable refresh button for unnecessary pages
     // if('nw_detail_info' in source){
 
-    // }
+    // } 
 }
 
+/* Identify entity and forward edit mode for config request */
 function edit_params(mode) {
     source = window.location.href;
     info = source.split('?')[1].split('&');
@@ -220,6 +223,7 @@ function edit_params(mode) {
         window.location.replace('/dhcp_config?network=reservations&id=' + mode);
 }
 
+/* Forward and notify settings update request */
 function save_config() {
     anterius_settings = get_form_query_string("anterius-settings-form");
 
@@ -228,6 +232,15 @@ function save_config() {
     });
 }
 
+/* Forward and notify current server change request */
+function select_server() {
+    svrselect = get_form_query_string("run-status");
+    $.post("/anterius_settings_save", svrselect, function (data) {
+        $("#anterius_settings_result").html(data);
+    });
+}
+
+/* Custom notification generator */
 function notification(text, colorName = 'bg-black', timer = 1000) {
 
     animateEnter = 'animated fadeInDown';

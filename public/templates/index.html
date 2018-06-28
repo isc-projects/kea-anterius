@@ -255,6 +255,7 @@
     <script type="text/javascript">
 
         var prevScrollpos = window.pageYOffset;
+        var refresh_interval;
         window.onscroll = function () {
             var currentScrollPos = window.pageYOffset;
             if (prevScrollpos > currentScrollPos) {
@@ -269,6 +270,7 @@
             $(this).scrollTop(0);
         });
 
+        /* Stats parsing and rendering fn */
         function get_stats() {
             $.get("/get_stats", function (data) {
                 $('#cpu-utilization').html(data.cpu_utilization + "%");
@@ -305,6 +307,7 @@
             });
         }
 
+        /* Refresh stats @ interval */
         var get_stats_timer = setInterval(function () {
             get_stats();
         }, 5000);
@@ -315,8 +318,8 @@
             $('#leases-sec').html(data.leases_per_second.toLocaleString('en') + ' / ' + data.leases_per_minute.toLocaleString('en'));
         }
 
+        /* Refresh stats on window focus */
         var window_focus = true;
-
         $(window).focus(function () {
             window_focus = true;
             get_stats();
@@ -344,6 +347,11 @@
                 if (activeItemOffsetTop > 150) $el.slimscroll({ scrollTo: activeItemOffsetTop + 'px' });
             }
         }
+
+        /* Call anterius config setter for selected server */
+        $(document).on('change', 'input[type=radio][name=svrselect]', function () {
+            select_server();
+        });
 
     </script>
 
