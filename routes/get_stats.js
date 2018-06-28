@@ -163,6 +163,11 @@ router.get('/', function (req, res, next) {
 		.replace(/\binactive\b/g, '<span style="color: #D50000">Inactive</span></span></label>')
 		.split("\n").slice(0, 2);
 
+	svrun.forEach(function (svr, index, svr_list) {
+		if (svr.includes('Inactive'))
+			svr_list[index] = svr.replace('type="radio"', 'type="radio" disabled');
+	})
+
 	response_data = {
 		"cpu_utilization": cpu_utilization,
 		"run_status": svrun,

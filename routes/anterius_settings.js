@@ -26,11 +26,17 @@ router.get('/', authorize.auth, function (req, res, next) {
 	/* Stats Refresh interval */
 	input = input + template_render.form_input('Statistics Refresh Interval (s)', '<input type="input" class="form-control" name="stat_refr_int" id="stat_refr_int" placeholder="Enter refresh interval in secs" value="' + anterius_config.stat_refresh_interval + '">');
 
+	/*  Default server */
+	input = input + '<label> Default server </label><div class="form-group"><div class="form-line">'
+		+ '<input name="svrselect" id="dhcp4" value="dhcp4" type="radio" class="with-gap" /><label for="dhcp4"><span>DHCPv4</span></label>'
+		+ '<input name="svrselect" id="dhcp6" value="dhcp6" type="radio" class="with-gap" /><label for="dhcp6"><span>DHCPv6</span></label></div></div>';
+	input = input.replace('value="' + anterius_config.current_server + '"', 'value="' + anterius_config.current_server + '" checked');
+	
 	/* Admin User */
 	input = input + template_render.form_input('Admin User', '<input type="input" class="form-control" name="admin_user" id="admin_user" placeholder="Username" value="' + anterius_config.admin_user + '">');
 	input = input + template_render.form_input('Admin Password', '<input type="input" class="form-control" name="admin_password" id="admin_password" placeholder="Password" value="' + anterius_config.admin_password + '">');
 
-	// /* Log File */
+	/* Log File */
 	// input = input + template_render.form_input('Log File', '<input type="input" class="form-control" name="log_file" id="log_file" placeholder="/var/log/dhcp.log" value="' + anterius_config.log_file + '">');
 
 	input = input + '<br><div class="row" align="center"><button type="button" class="btn btn-info waves-effect ant-btn" onclick="save_config()"><i class="material-icons">settings</i> <span>Save Anteris Settings</span></button></div>';

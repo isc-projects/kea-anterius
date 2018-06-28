@@ -226,7 +226,6 @@ function edit_params(mode) {
 /* Forward and notify settings update request */
 function save_config() {
     anterius_settings = get_form_query_string("anterius-settings-form");
-
     $.post("/anterius_settings_save", anterius_settings, function (data) {
         $("#anterius_settings_result").html(data);
     });
@@ -234,7 +233,11 @@ function save_config() {
 
 /* Forward and notify current server change request */
 function select_server() {
-    svrselect = get_form_query_string("run-status");
+    if (document.getElementById("run-status"))
+        svrselect = get_form_query_string("run-status");
+    else
+        svrselect = 'svrselect='+$("input[name=svrselect]:checked").val();
+
     $.post("/anterius_settings_save", svrselect, function (data) {
         $("#anterius_settings_result").html(data);
     });
