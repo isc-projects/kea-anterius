@@ -146,7 +146,10 @@ function get_form_query_string(form_id) {
                 val = 0;
             }
         }
-        query_string = query_string + "&" + $(this).attr('id') + "=" + encodeURIComponent(val);
+        if ($(this).attr('type') == "radio" && !$(this).is(':checked'))
+            return;
+
+        query_string = query_string + "&" + $(this).attr('name') + "=" + encodeURIComponent(val);
     });
     return query_string;
 }
