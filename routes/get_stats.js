@@ -18,7 +18,7 @@ router.get('/', function (req, res, next) {
 	// output = execSync('./bin/dhcpd-pools -c ' + ante_config.config_file + ' -l ' + ante_config.leases_file + ' -f j -A -s e');
 	// var kea_stats = JSON.parse(output);
 
-	// console.log(server.server_config['shared-networks'].length);
+	// console.log(server.server_config[server.svr_tag]['shared-networks'].length);
 
 	app.reload();
 
@@ -28,13 +28,13 @@ router.get('/', function (req, res, next) {
 		shared_nw_snet_id_list = [], subnet_pool_map = [];
 
 	/* Calculate Shared network utilization */
-	shared_nw_count = server.server_config['shared-networks'].length;
+	shared_nw_count = server.server_config[server.svr_tag]['shared-networks'].length;
 	for (var i = 0; i < shared_nw_count; i++) {
 
 		shared_nw_snet_list = [];
-		server.server_config['shared-networks'][i][server.sn_tag].forEach(x => {
+		server.server_config[server.svr_tag]['shared-networks'][i][server.sn_tag].forEach(x => {
 			/* Retrieve and store subnets defined within shared nw */
-			x['shared_nw_name'] = server.server_config['shared-networks'][i].name;
+			x['shared_nw_name'] = server.server_config[server.svr_tag]['shared-networks'][i].name;
 			subnet_list.push(x);
 			shared_nw_snet_id_list.push(x['id']);
 		});
@@ -70,7 +70,7 @@ router.get('/', function (req, res, next) {
 
 		/* Define shared network row for table */
 		table_row = '';
-		table_row = table_row + '<td><b><a href="/nw_detail_info?type=shared-networks&id=' + server.server_config['shared-networks'][i].name + '" pjax="1">' + server.server_config['shared-networks'][i].name + '</a></b></td>';
+		table_row = table_row + '<td><b><a href="/nw_detail_info?type=shared-networks&id=' + server.server_config[server.svr_tag]['shared-networks'][i].name + '" pjax="1">' + server.server_config[server.svr_tag]['shared-networks'][i].name + '</a></b></td>';
 		table_row = table_row + '<td>' + shared_nw_assgn_addr_list[i].toLocaleString('en') + ' </td>';
 		table_row = table_row + '<td>' + shared_nw_total_addr_list[i].toLocaleString('en') + '</td>';
 		table_row = table_row + '<td>' + shared_nw_free_addr_list[i].toLocaleString('en') + '</td>';
@@ -89,7 +89,7 @@ router.get('/', function (req, res, next) {
 		shared_network_table = shared_network_table + '<tr>' + table_row + '</tr>';
 	}
 
-	server.server_config[server.sn_tag].forEach(sn => {
+	server.server_config[server.svr_tag][server.sn_tag].forEach(sn => {
 		subnet_list.push(sn);
 	});
 

@@ -12,7 +12,7 @@ router.get('/', authorize.auth, function (req, res, next) {
 	// Display current config file from API config-get
 	content = template_render.set_template_variable(content, "dhcp_config_content", JSON.stringify(kea_config, null, 4));
 	content = template_render.set_template_variable(content, "title", anterius_config.current_server.toUpperCase().replace('P', 'Pv'));
-	
+
 	var nw_type = req.query.network;
 	var nw_id = req.query.id;
 
@@ -63,7 +63,7 @@ router.get('/', authorize.auth, function (req, res, next) {
 			}
 			else {
 
-				server.server_config['shared-networks'].forEach(s => {
+				server.server_config[server.svr_tag]['shared-networks'].forEach(s => {
 					if (s.name == req.query.id) {
 						// s[server.sn_tag].forEach(x => {
 						// 	id.push(x['id']);
@@ -85,8 +85,8 @@ router.get('/', authorize.auth, function (req, res, next) {
 			input += template_render.form_input('Relay IP Address', '<input type="text" class="form-control" name="relay_ip-addresses" id="relay_ipaddr" placeholder="Enter relay address" value="' + nw_entity.relay['ip-address'] + '">');
 		}
 
-		input += '<div class="row" align="center"><button type="button" id="gen_btn" class="btn btn-info waves-effect ant-btn" disabled style="margin-bottom: 2%; width: 25%;" onclick=\'gen_dhcp_config("'
-			+ nw_id + '","' + nw_type + '",' + JSON.stringify(subnet_list) + ')\'><i class="material-icons">settings</i> <span>Write Changes to Test file</span></button></div>';
+		input += '<div class="row" align="center"><button type="button" id="gen_btn" class="btn btn-info waves-effect ant-btn" disabled style="margin-bottom: 2%; width: 25%;" onclick=\'gen_dhcp_config('
+			+ JSON.stringify(server) + ',"' + nw_id + '","' + nw_type + '",' + JSON.stringify(subnet_list) + ')\'><i class="material-icons">settings</i> <span>Write Changes to Test file</span></button></div>';
 
 		form_data = template_render.form_body("config-form", input);
 

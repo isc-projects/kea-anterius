@@ -84,7 +84,7 @@ kea_config = {};
 anterius_config = json_file.readFileSync('config/anterius_config.json');
 
 /* Identifiers forcurrent server */
-server = { 'server_config': {}, 'sn_tag': '', 'server.addr_tag': '' };
+server = { 'server_config[server.svr_tag]': {}, 'svr_tag': '', 'sn_tag': '', 'server.addr_tag': '' };
 
 leases_per_minute = 0;
 cpu_utilization = -1;
@@ -256,23 +256,24 @@ var lease_stats_monitor = function () {
         if (data.result == 0 && data.arguments != undefined) {
             kea_config = data.arguments;
             subnet_list = [];
+            server.server_config = kea_config;
 
             /* Set identifiers based on current server */
             if (anterius_config.current_server == 'dhcp4') {
-                server.server_config = kea_config['Dhcp4'];
+                server.svr_tag = 'Dhcp4';
                 server.sn_tag = 'subnet4';
                 server.addr_tag = 'addresses';
             }
             else {
-                server.server_config = kea_config['Dhcp6'];
+                server.svr_tag = 'Dhcp6';
                 server.sn_tag = 'subnet6';
                 server.addr_tag = 'pds';
             }
 
-            // console.log(server.server_config, server.sn_tag, server.addr_tag);
+            // console.log(server.server_config[server.svr_tag], server.sn_tag, server.addr_tag);
 
             /* Retrieve and store subnets defined within shared nw */
-            server.server_config['shared-networks'].forEach(shnw => {
+            server.server_config[server.svr_tag]['shared-networks'].forEach(shnw => {
                 shnw[server.sn_tag].forEach(x => {
                     x['shared_nw_name'] = shnw.name;
                     subnet_list.push(x);
@@ -280,7 +281,7 @@ var lease_stats_monitor = function () {
             });
 
             /* Retrieve and store subnets defined*/
-            server.server_config[server.sn_tag].forEach(x => {
+            server.server_config[server.svr_tag][server.sn_tag].forEach(x => {
                 subnet_list.push(x);
             });
 
@@ -291,7 +292,7 @@ var lease_stats_monitor = function () {
 
             total_leases = 0;
             subnet_count = subnet_list.length;
-            shared_nw_count = server.server_config['shared-networks'].length;
+            shared_nw_count = server.server_config[server.svr_tag]['shared-networks'].length;
 
             /* Fetch and set server stats*/
             var response_data = api_agent.fire_kea_api(stats_req_data).then(function (sapi_data) {

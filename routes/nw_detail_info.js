@@ -43,7 +43,7 @@ router.get('/', function (req, res, next) {
     /* Filter info specific to requested shared network */
     else {
         shared_nw = req.query.id.replace('?v_ajax', '');
-        server.server_config['shared-networks'].forEach(s => {
+        server.server_config[server.svr_tag]['shared-networks'].forEach(s => {
 
             if (s.name == shared_nw) {
                 s[server.sn_tag].forEach(x => {
