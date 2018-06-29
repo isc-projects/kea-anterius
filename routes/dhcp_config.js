@@ -47,7 +47,7 @@ router.get('/', authorize.auth, function (req, res, next) {
 		else {
 
 			var nw_entity;
-			if (nw_type == sn_tag) {
+			if (nw_type == server.sn_tag) {
 
 				subnet_list.forEach(s => {
 					if (s.id == req.query.id) {
@@ -58,14 +58,14 @@ router.get('/', authorize.auth, function (req, res, next) {
 					}
 				});
 
-				content = template_render.set_template_variable(content, "edit_title", "Subnet ID : " + nw_entity.id + " [ <a href='/nw_detail_info?type=" + sn_tag + "&id=" + nw_entity.id + "'>" + nw_entity.subnet + "</a> ] Configuration options");
+				content = template_render.set_template_variable(content, "edit_title", "Subnet ID : " + nw_entity.id + " [ <a href='/nw_detail_info?type=" + server.sn_tag + "&id=" + nw_entity.id + "'>" + nw_entity.subnet + "</a> ] Configuration options");
 				input = template_render.form_input('Subnet', '<input type="text" class="form-control" name="subnet" id="subnet" placeholder="Enter address/netmask" value="' + nw_entity.subnet + '">');
 			}
 			else {
 
-				server_config['shared-networks'].forEach(s => {
+				server.server_config['shared-networks'].forEach(s => {
 					if (s.name == req.query.id) {
-						// s[sn_tag].forEach(x => {
+						// s[server.sn_tag].forEach(x => {
 						// 	id.push(x['id']);
 						// });
 						nw_entity = s;

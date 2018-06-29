@@ -23,9 +23,9 @@ function gen_dhcp_config(nw_id, nw_type, subnet_list) {
 
 	/* Instantiate a temp test file and Copy to identify file changes*/
 	config_copy = dhcp_config.session.doc.getAllLines();
-	test_config_file = JSON.parse(dhcp_config.getValue())[sn_tag];
+	test_config_file = JSON.parse(dhcp_config.getValue())[server.sn_tag];
 
-	// console.log(test_config_file[sn_tag][0]);
+	// console.log(test_config_file[server.sn_tag][0]);
 	// console.log(subnet_list);
 
 	if (nw_type == 'reservations') {
@@ -39,10 +39,10 @@ function gen_dhcp_config(nw_id, nw_type, subnet_list) {
 		if (subnet_list[subnet_id - 1].shared_nw_name)
 			test_config_file['shared-networks'].forEach(shnw => {
 				if (shnw.name == subnet_list[subnet_id - 1].shared_nw_name)
-					target_sn_list = shnw[sn_tag];
+					target_sn_list = shnw[server.sn_tag];
 			});
 		else
-			target_sn_list = test_config_file[sn_tag];
+			target_sn_list = test_config_file[server.sn_tag];
 
 		target_sn_list.forEach(s => {
 			if (s.id == subnet_id) {
@@ -80,7 +80,7 @@ function gen_dhcp_config(nw_id, nw_type, subnet_list) {
 			if (subnet_list[nw_id - 1].shared_nw_name)
 				test_config_file['shared-networks'].forEach(shnw => {
 					if (shnw.name == subnet_list[nw_id - 1].shared_nw_name)
-						target_sn_list = shnw[sn_tag];
+						target_sn_list = shnw[server.sn_tag];
 				});
 			x = 'id';
 		}

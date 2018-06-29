@@ -21,7 +21,7 @@ router.get('/', function (req, res, next) {
     // console.log(subnet_list);
 
     /* Filter info specific to requested subnet */
-    if (req.query.type == sn_tag) {
+    if (req.query.type == server.sn_tag) {
         id = req.query.id.replace('?v_ajax', '');
         subnet_list.forEach(s => {
             if (s.id == id) {
@@ -35,18 +35,18 @@ router.get('/', function (req, res, next) {
                 // break;
             }
         });
-        nw_assgn_addr += kea_stats['subnet[' + id + '].assigned-' + addr_tag][0][0];
-        nw_total_addr += kea_stats['subnet[' + id + '].total-' + addr_tag][0][0];
+        nw_assgn_addr += kea_stats['subnet[' + id + '].assigned-' + server.addr_tag][0][0];
+        nw_total_addr += kea_stats['subnet[' + id + '].total-' + server.addr_tag][0][0];
         content = template_render.set_template_variable(content, "title", "Subnet [" + subnets[0].subnet + "] Information");
 
     }
     /* Filter info specific to requested shared network */
     else {
         shared_nw = req.query.id.replace('?v_ajax', '');
-        server_config['shared-networks'].forEach(s => {
+        server.server_config['shared-networks'].forEach(s => {
 
             if (s.name == shared_nw) {
-                s[sn_tag].forEach(x => {
+                s[server.sn_tag].forEach(x => {
                     id.push(x['id']);
                 });
 
@@ -59,8 +59,8 @@ router.get('/', function (req, res, next) {
                             resv['subnet-id'] = sn.id;
                             host_res.push(resv);
                         });
-                        sn_assgn = kea_stats['subnet[' + sn.id + '].assigned-' + addr_tag][0][0];
-                        sn_total = kea_stats['subnet[' + sn.id + '].total-' + addr_tag][0][0];
+                        sn_assgn = kea_stats['subnet[' + sn.id + '].assigned-' + server.addr_tag][0][0];
+                        sn_total = kea_stats['subnet[' + sn.id + '].total-' + server.addr_tag][0][0];
                         nw_assgn_addr += sn_assgn;
                         nw_total_addr += sn_total;
 
@@ -88,7 +88,7 @@ router.get('/', function (req, res, next) {
 
                     table_row = '';
                     table_row = table_row + '<td>' + subnets[i].id + '</td>'; //Subnet ID
-                    table_row = table_row + '<td><b><a href="/nw_detail_info?type=' + sn_tag + '&id=' + subnets[i].id + '" pjax="1">' + subnets[i].subnet + '</a></b></td>'; //Subnet details link
+                    table_row = table_row + '<td><b><a href="/nw_detail_info?type=' + server.sn_tag + '&id=' + subnets[i].id + '" pjax="1">' + subnets[i].subnet + '</a></b></td>'; //Subnet details link
                     table_row = table_row + '<td>' + pool_range + '</td>'; //Subnet Pool range
                     table_row = table_row + '<td>' + subnet_util[i][0].toLocaleString('en') + ' (' + sn_utilzn + '%)</td>';
                     table_row = table_row + '<td>' + subnet_util[i][1].toLocaleString('en') + '</td>';
@@ -142,7 +142,7 @@ router.get('/', function (req, res, next) {
 
     /* Host reservation parser - generate table*/
     for (var i = 0; i < host_res.length; i++) {
-        // console.log(subnets[i].pools[0].pool, kea_stats['subnet[' + i+1 + '].assigned-'+addr_tag][0][0], subnet_util[i].utilization, )
+        // console.log(subnets[i].pools[0].pool, kea_stats['subnet[' + i+1 + '].assigned-'+server.addr_tag][0][0], subnet_util[i].utilization, )
 
         /* Define reservation row for table */
         table_row = '';

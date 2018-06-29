@@ -84,7 +84,7 @@ kea_config = {};
 anterius_config = json_file.readFileSync('config/anterius_config.json');
 
 /* Identifiers forcurrent server */
-server_config = {}, sn_tag = '', addr_tag = '';
+server = { 'server_config': {}, 'sn_tag': '', 'server.addr_tag': '' };
 
 leases_per_minute = 0;
 cpu_utilization = -1;
@@ -238,7 +238,7 @@ var lpm_counter = 0;
 
 /* Recurrent Loop for lease stats */
 var lease_stats_monitor = function () {
-    
+
     /* Fetch running status */
     // TODO: Mechanism to retrieve below sections from remote machine
     run_status = execSync("keactrl status").toString();
@@ -259,28 +259,28 @@ var lease_stats_monitor = function () {
 
             /* Set identifiers based on current server */
             if (anterius_config.current_server == 'dhcp4') {
-                server_config = kea_config['Dhcp4'];
-                sn_tag = 'subnet4';
-                addr_tag = 'addresses';
+                server.server_config = kea_config['Dhcp4'];
+                server.sn_tag = 'subnet4';
+                server.addr_tag = 'addresses';
             }
             else {
-                server_config = kea_config['Dhcp6'];
-                sn_tag = 'subnet6';
-                addr_tag = 'pds';
+                server.server_config = kea_config['Dhcp6'];
+                server.sn_tag = 'subnet6';
+                server.addr_tag = 'pds';
             }
 
-            // console.log(server_config, sn_tag, addr_tag);
+            // console.log(server.server_config, server.sn_tag, server.addr_tag);
 
             /* Retrieve and store subnets defined within shared nw */
-            server_config['shared-networks'].forEach(shnw => {
-                shnw[sn_tag].forEach(x => {
+            server.server_config['shared-networks'].forEach(shnw => {
+                shnw[server.sn_tag].forEach(x => {
                     x['shared_nw_name'] = shnw.name;
                     subnet_list.push(x);
                 });
             });
 
             /* Retrieve and store subnets defined*/
-            server_config[sn_tag].forEach(x => {
+            server.server_config[server.sn_tag].forEach(x => {
                 subnet_list.push(x);
             });
 
@@ -291,7 +291,7 @@ var lease_stats_monitor = function () {
 
             total_leases = 0;
             subnet_count = subnet_list.length;
-            shared_nw_count = server_config['shared-networks'].length;
+            shared_nw_count = server.server_config['shared-networks'].length;
 
             /* Fetch and set server stats*/
             var response_data = api_agent.fire_kea_api(stats_req_data).then(function (sapi_data) {
@@ -301,7 +301,7 @@ var lease_stats_monitor = function () {
                 if (sdata.result == 0) {
                     kea_stats = sdata.arguments;
                     for (var i = 1; i <= subnet_count; i++) {
-                        total_leases += kea_stats['subnet[' + i + '].assigned-' + addr_tag][0][0];
+                        total_leases += kea_stats['subnet[' + i + '].assigned-' + server.addr_tag][0][0];
                     }
 
                     /* Update metric - leases / sec  */

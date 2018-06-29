@@ -11,7 +11,7 @@ var api_agent = require('../lib/api_service.js');
 router.post('/', authorize.auth, function (req, res, next) {
 
 	var request = req.body;
-	// console.log(JSON.parse(request.dhcp_config_file)[sn_tag]);
+	// console.log(JSON.parse(request.dhcp_config_file)[server.sn_tag]);
 	// ISC DHCP Local config verification - replaced by CA API
 	// fs.writeFileSync("./syntax_verify_config", request.dhcp_config_file, 'utf8');
 	// var exec = require('child_process').exec;
