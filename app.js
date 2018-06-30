@@ -83,8 +83,11 @@ kea_stats = {};
 kea_config = {};
 anterius_config = json_file.readFileSync('config/anterius_config.json');
 
-/* Identifiers forcurrent server */
+/* Identifiers for current server */
 server = { 'server_config[server.svr_tag]': {}, 'svr_tag': '', 'sn_tag': '', 'server.addr_tag': '' };
+
+/* Dir for config file snapshots */
+bkp_dir = "config_backups/" + anterius_config.current_server;
 
 leases_per_minute = 0;
 cpu_utilization = -1;

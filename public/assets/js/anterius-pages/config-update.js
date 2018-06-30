@@ -139,7 +139,7 @@ function test_dhcp_config() {
 	});
 }
 
-function save_dhcp_config() {
+function upload_dhcp_config() {
 	// Push updated config file data as query string to server 
 	var affirm = confirm("Confirm: Apply changed config to server?");
 	params = "mode=update&affirm=" + affirm + "&dhcp_config_file=" + encodeURIComponent(dhcp_config.getValue());

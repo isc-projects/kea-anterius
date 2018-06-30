@@ -4,8 +4,6 @@ var fs = require('fs');
 var template_render = require('../lib/render_template.js');
 var authorize = require('../lib/authorize.js');
 
-var bkp_dir = "config_backups";
-
 function human_time(time) {
     var time = new Date(time);
     var year = time.getFullYear();
@@ -35,6 +33,7 @@ router.post('/', authorize.auth, function (req, res, next) {
     /* Create snapshot bckp folder if missing */
     try {
 
+        bkp_dir = 'config_backups/' + anterius_config.current_server;
         if (!fs.existsSync(bkp_dir)) {
             fs.mkdirSync(bkp_dir);
         }
@@ -52,14 +51,13 @@ router.post('/', authorize.auth, function (req, res, next) {
         console.error(err);
     }
 
-    res.send({ "message": 'Config snapshot created @ <br>< ' + human_time(timestamp) + ' >' });
+    res.send({ "message": anterius_config.current_server.toUpperCase() + 'Config snapshot created @ <br>< ' + human_time(timestamp) + ' >' });
 
 });
 
 router.get('/', authorize.auth, function (req, res, next) {
 
     var content = "";
-
     content = template_render.get_template("dhcp_config_snapshots");
 
     /* Read Config */
@@ -68,10 +66,12 @@ router.get('/', authorize.auth, function (req, res, next) {
     content = template_render.set_template_variable(content, "title", "DHCP Config Snaphots");
 
     /* Create snapshot bckp folder if missing */
-    var backups = '';
+    bkp_dir += 'config_backups/' + anterius_config.current_server;
     if (!fs.existsSync(bkp_dir)) {
         fs.mkdirSync(bkp_dir);
     }
+
+    var backups = '';
 
     /* Parse bckp dir for existing config snapshots */
     fs.readdirSync(bkp_dir).forEach(function (file) {
