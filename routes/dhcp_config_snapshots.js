@@ -28,6 +28,7 @@ function human_time(time) {
     return year + "-" + month + "-" + date1 + " " + hour + ":" + minute + ' ' + amPM;
 }
 
+/* Method to Save current config file to timestamped snapshot */
 router.post('/', authorize.auth, function (req, res, next) {
 
     /* Create snapshot bckp folder if missing */
@@ -51,33 +52,30 @@ router.post('/', authorize.auth, function (req, res, next) {
         console.error(err);
     }
 
-    res.send({ "message": anterius_config.current_server.toUpperCase() + 'Config snapshot created @ <br>< ' + human_time(timestamp) + ' >' });
+    res.send({ "message": anterius_config.current_server.toUpperCase() + ' Config snapshot created @ <br>< ' + human_time(timestamp) + ' >' });
 
 });
 
+/* Method to Fetch and display list of available snapshots with timestamp for current server */
 router.get('/', authorize.auth, function (req, res, next) {
 
     var content = "";
     content = template_render.get_template("dhcp_config_snapshots");
-
-    /* Read Config */
-    var json_file = require('jsonfile');
-
     content = template_render.set_template_variable(content, "title", "DHCP Config Snaphots");
 
     /* Create snapshot bckp folder if missing */
-    bkp_dir += 'config_backups/' + anterius_config.current_server;
+    bkp_dir = 'config_backups/' + anterius_config.current_server;
     if (!fs.existsSync(bkp_dir)) {
         fs.mkdirSync(bkp_dir);
-    }
 
+    }
     var backups = '';
 
     /* Parse bckp dir for existing config snapshots */
     fs.readdirSync(bkp_dir).forEach(function (file) {
         var stats = fs.statSync(bkp_dir + '/' + file);
         var mtime = human_time(stats.mtime);
-
+        /* Add snapshot and timestamp to files list */
         backups = backups + "<tr><td><a style='cursor:pointer;' onclick='view_snapshot(" + JSON.stringify(file) + ")'>" + file + '</a></td><td>' + mtime + '</td></tr>';
     });
 
