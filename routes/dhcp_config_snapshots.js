@@ -39,20 +39,28 @@ router.post('/', authorize.auth, function (req, res, next) {
             fs.mkdirSync(bkp_dir);
         }
         var request = req.body;
-        var json_file = require('jsonfile');
-        var timestamp = new Date().getTime();
-        var ss_filename = anterius_config.current_server + "_conf_snap_" + timestamp;
 
-        dhcp_config_file = JSON.parse(request.dhcp_config_file);
-        // console.log(ss_filename, human_time(timestamp), dhcp_config_file);
+        if (request.mode == 'save') {
 
-        json_file.writeFile(bkp_dir + '/' + ss_filename, dhcp_config_file, { spaces: 2 });
+            var json_file = require('jsonfile');
+            var timestamp = new Date().getTime();
+            var ss_filename = anterius_config.current_server + "_conf_snap_" + timestamp;
+
+            dhcp_config_file = JSON.parse(request.dhcp_config_file);
+            // console.log(ss_filename, human_time(timestamp), dhcp_config_file);
+
+            json_file.writeFile(bkp_dir + '/' + ss_filename, dhcp_config_file, { spaces: 2 });
+            res.send({ "message": anterius_config.current_server.toUpperCase() + ' Config snapshot created @ <br>< ' + human_time(timestamp) + ' >' });
+        }
+        else if (request.affirm) {
+            fs.unlinkSync(bkp_dir + '/' + request.snapshot);
+            res.send({ "message": 'Config snapshot deleted!' });
+        }
 
     } catch (err) {
         console.error(err);
     }
 
-    res.send({ "message": anterius_config.current_server.toUpperCase() + ' Config snapshot created @ <br>< ' + human_time(timestamp) + ' >' });
 
 });
 
@@ -76,7 +84,8 @@ router.get('/', authorize.auth, function (req, res, next) {
         var stats = fs.statSync(bkp_dir + '/' + file);
         var mtime = human_time(stats.mtime);
         /* Add snapshot and timestamp to files list */
-        backups = backups + "<tr><td><a style='cursor:pointer;' onclick='view_snapshot(" + JSON.stringify(file) + ")'>" + file + '</a></td><td>' + mtime + '</td></tr>';
+        backups = backups + "<tr><td><a style='cursor:pointer;' onclick='view_snapshot(" + JSON.stringify(file) + ")'>" + file + "</a></td><td>" + mtime + "</td>" +
+            "<td> <button id='del_btn' type='button' class='btn btn-info waves-effect ant-btn' onclick='delete_config_snapshot(" + JSON.stringify(file) + ")'><i class='material-icons'>delete</i></button></td</tr>";
     });
 
     if (backups == '') {

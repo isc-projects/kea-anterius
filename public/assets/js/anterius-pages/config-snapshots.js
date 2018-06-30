@@ -26,9 +26,21 @@ function view_snapshot(snapshot) {
 function save_config_snapshot(snapshot) {
 
 	var dhcp_config = ace.edit("dhcp-config");
-	params = "dhcp_config_file=" + encodeURIComponent(dhcp_config.getValue());
+	params = "mode=save&dhcp_config_file=" + encodeURIComponent(dhcp_config.getValue());
 
 	$.post("/dhcp_config_snapshots", params, function (data) {
 		notification(data.message, 'bg-black', 3000);
+	});
+}
+
+/* Method to delete saved snapshots */
+function delete_config_snapshot(snapshot) {
+
+	var affirm = confirm("Confirm: Delete Config Snapshot: " + snapshot + "?");
+	params = "mode=delete&affirm=" + affirm + "&snapshot=" + encodeURIComponent(snapshot);
+
+	$.post("/dhcp_config_snapshots", params, function (data) {
+		notification(data.message, 'bg-black', 3000);
+		refresh_info(delay = 5000);
 	});
 }
