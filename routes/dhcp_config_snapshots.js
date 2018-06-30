@@ -3,7 +3,6 @@ var router = express.Router();
 var fs = require('fs');
 var template_render = require('../lib/render_template.js');
 var authorize = require('../lib/authorize.js');
-var mkdirp = require('mkdirp');
 
 var bkp_dir = "config_backups";
 
@@ -55,6 +54,40 @@ router.post('/', authorize.auth, function (req, res, next) {
 
     res.send({ "message": 'Config snapshot created @ <br>< ' + human_time(timestamp) + ' >' });
 
+});
+
+router.get('/', authorize.auth, function (req, res, next) {
+
+    var content = "";
+
+    content = template_render.get_template("dhcp_config_snapshots");
+
+    /* Read Config */
+    var json_file = require('jsonfile');
+
+    content = template_render.set_template_variable(content, "title", "DHCP Config Snaphots");
+
+    /* Create snapshot bckp folder if missing */
+    var backups = '';
+    if (!fs.existsSync(bkp_dir)) {
+        fs.mkdirSync(bkp_dir);
+    }
+
+    /* Parse bckp dir for existing config snapshots */
+    fs.readdirSync(bkp_dir).forEach(function (file) {
+        var stats = fs.statSync(bkp_dir + '/' + file);
+        var mtime = human_time(stats.mtime);
+
+        backups = backups + "<tr><td><a style='cursor:pointer;' onclick='view_snapshot(" + JSON.stringify(file) + ")'>" + file + '</a></td><td>' + mtime + '</td></tr>';
+    });
+
+    if (backups == '') {
+        backups = 'There are no snapshots present at this time...';
+    }
+
+    content = template_render.set_template_variable(content, "c_content", backups);
+
+    res.send(template_render.get_index_template(content, req.url));
 });
 
 module.exports = router;

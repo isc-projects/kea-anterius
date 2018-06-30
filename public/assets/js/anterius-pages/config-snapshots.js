@@ -14,3 +14,12 @@ function view_snapshot(snapshot) {
 		config_snapshot.$blockScrolling = Infinity;
 	});
 }
+function save_config_snapshot(snapshot) {
+
+	var dhcp_config = ace.edit("dhcp-config");
+	params = "dhcp_config_file=" + encodeURIComponent(dhcp_config.getValue());
+
+	$.post("/dhcp_config_snapshots", params, function (data) {
+		notification(data.message, 'bg-green', 3000);
+	});
+}
