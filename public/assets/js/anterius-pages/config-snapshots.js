@@ -3,7 +3,6 @@ function view_snapshot(snapshot) {
 
 		$('#snapshot_grid').fadeOut(100).fadeIn(100);
 		$('#snapshot_name').html("Snapshot '" + snapshot + "'");
-		$('#snapshot_body').html('<div id="snapshot" style="width:100%; height:800px; color: #95cd24">' + data + '</div>');
 
 		$('html, body').animate({
 			scrollTop: $("#snapshot_grid").offset().top
@@ -11,7 +10,10 @@ function view_snapshot(snapshot) {
 
 		config_snapshot = ace.edit("snapshot");
 		config_snapshot.setTheme("ace/theme/terminal");
+		config_snapshot.session.setValue(JSON.stringify(data, null, '\t'));
 		config_snapshot.$blockScrolling = Infinity;
+
+
 	});
 }
 function save_config_snapshot(snapshot) {

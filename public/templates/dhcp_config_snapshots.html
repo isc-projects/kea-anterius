@@ -10,13 +10,13 @@
 
                 <table id="dhcp_config_snapshot_result" class="table table-bordered table-striped table-hover js-basic-example dataTable dashboard-task-infos">
                     <thead>
-                    <tr>
-                        <th style="width:300px">File</th>
-                        <th>Time</th>
-                    </tr>
+                        <tr>
+                            <th style="width:300px">File</th>
+                            <th>Time</th>
+                        </tr>
                     </thead>
                     <tbody>
-                    [c_content]
+                        [c_content]
                     </tbody>
                 </table>
             </div>
@@ -26,11 +26,14 @@
         <div class="card">
             <div class="header">
                 <h2>
-                    Snapshot <span id="snapshot_name"></span>
+                    Snapshot
+                    <span id="snapshot_name"></span>
                 </h2>
             </div>
             <div class="body">
-                <div id="snapshot_body"></div>
+                <div id="snapshot_body">
+                    <div id="snapshot" style="width:100%; height:800px; color: #95cd24"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -46,6 +49,6 @@
         responsive: true,
         "pageLength": 10,
         "aaSorting": [],
-        "order": [[ 1, "desc" ]]
+        "order": [[1, "desc"]]
     });
 </script>
