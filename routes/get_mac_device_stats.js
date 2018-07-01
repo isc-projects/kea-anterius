@@ -26,7 +26,7 @@ router.get('/', function (req, res, next) {
         else {
             leases_data = data.arguments.leases;
             // console.log(leases_data);
-            var vendor_stat_data = {};
+            var vendor_stats = {}, device_stats = {};
             var count = 0;
 
             /* Leases Data parser - retrieve mac oui data */
@@ -35,6 +35,7 @@ router.get('/', function (req, res, next) {
                 /* Mac OUI Lookup */
                 var mac_oui = leases_data[i]['hw-address'].split(":").join("").toUpperCase().slice(0, 6);
 
+                /* Vendor List and Device Count block*/
                 leases_data[i].mac_oui_vendor = '';
                 if (typeof oui_data[mac_oui] !== "undefined") {
                     leases_data[i].mac_oui_vendor = oui_data[mac_oui];
@@ -43,14 +44,37 @@ router.get('/', function (req, res, next) {
                 if ((typeof leases_data[i].mac_oui_vendor !== "undefined" ? leases_data[i].mac_oui_vendor : 'Misc') == "")
                     continue;
 
-                if (typeof vendor_stat_data[(typeof leases_data[i].mac_oui_vendor !== "undefined" ? leases_data[i].mac_oui_vendor : 'Misc')] === "undefined")
-                    vendor_stat_data[(typeof leases_data[i].mac_oui_vendor !== "undefined" ? leases_data[i].mac_oui_vendor : 'Misc')] = 0;
+                if (typeof vendor_stats[(typeof leases_data[i].mac_oui_vendor !== "undefined" ? leases_data[i].mac_oui_vendor : 'Misc')] === "undefined")
+                    vendor_stats[(typeof leases_data[i].mac_oui_vendor !== "undefined" ? leases_data[i].mac_oui_vendor : 'Misc')] = 0;
 
-                vendor_stat_data[(typeof leases_data[i].mac_oui_vendor !== "undefined" && leases_data[i].mac_oui_vendor != "" ? leases_data[i].mac_oui_vendor : 'Misc')]++;
+                vendor_stats[(typeof leases_data[i].mac_oui_vendor !== "undefined" && leases_data[i].mac_oui_vendor != "" ? leases_data[i].mac_oui_vendor : 'Misc')]++;
+
+
+                /* MAC OUI Count by vendor code block */
+                if (mac_oui == "")
+                    continue;
+
+                if (typeof device_stats[mac_oui] === "undefined")
+                    device_stats[mac_oui] = {};
+
+                if (typeof device_stats[mac_oui].count === "undefined")
+                    device_stats[mac_oui].count = 0;
+
+                device_stats[mac_oui].count++;
+
+                if (device_stats[mac_oui].mac_prefix !== "undefined") {
+                    device_stats[mac_oui].mac_prefix = mac_oui;
+                }
+
+                if (device_stats[mac_oui].vendor !== "undefined") {
+                    if (typeof oui_data[mac_oui] !== "undefined") {
+                        device_stats[mac_oui].vendor = oui_data[mac_oui];
+                    }
+                }
             }
 
             res.setHeader('Content-Type', 'application/json');
-            res.send(JSON.stringify(vendor_stat_data));
+            res.send(JSON.stringify({ 'vendor_stats': vendor_stats, 'device_stats': device_stats }));
         }
     });
 });

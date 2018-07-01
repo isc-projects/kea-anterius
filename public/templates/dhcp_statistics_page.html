@@ -7,12 +7,12 @@
                 </ul>
             </div>
             <div class="body">
-                <table id="device_list_table"  class="table table-bordered table-striped table-hover js-basic-example dataTable dashboard-task-infos">
+                <table id="device_list_table" class="table table-bordered table-striped table-hover js-basic-example dataTable dashboard-task-infos">
                     <thead>
-                    <tr>
-                        <th>Vendor</th>
-                        <th>Count</th>
-                    </tr>
+                        <tr>
+                            <th>Vendor</th>
+                            <th>Count</th>
+                        </tr>
                     </thead>
                     <tbody>
                     </tbody>
@@ -25,8 +25,10 @@
                 <h2>Excessive DHCP Requests (10 Minute Interval)</h2>
             </div>
             <div class="body">
-                <small>Usually indicative of a physical error on the network with one-way communication</small><br><br>
-                <table id="excessive_requests"  class="table table-bordered table-striped table-hover js-basic-example dataTable dashboard-task-infos">
+                <small>Usually indicative of a physical error on the network with one-way communication</small>
+                <br>
+                <br>
+                <table id="excessive_requests" class="table table-bordered table-striped table-hover js-basic-example dataTable dashboard-task-infos">
                     <thead>
                         <tr>
                             <th>MAC</th>
@@ -61,13 +63,13 @@
                 <h2>MAC Address OUI Count by Vendor</h2>
             </div>
             <div class="body">
-                <table id="device_list_mac"  class="table table-bordered table-striped table-hover js-basic-example dataTable dashboard-task-infos">
+                <table id="device_list_mac" class="table table-bordered table-striped table-hover js-basic-example dataTable dashboard-task-infos">
                     <thead>
-                    <tr>
-                        <th>MAC Address OUI</th>
-                        <th>Vendor</th>
-                        <th>Count</th>
-                    </tr>
+                        <tr>
+                            <th>MAC Address OUI</th>
+                            <th>Vendor</th>
+                            <th>Count</th>
+                        </tr>
                     </thead>
                     <tbody>
                     </tbody>
@@ -82,10 +84,12 @@
     $('.hide_me').hide();
 
     var chart_data = [];
-    $.getJSON( "/get_mac_device_stats", function( data ) {
-        $.each(data, function(k, v) {
-            if(v >= 3)
-                chart_data.push({"label": k, "value": v});
+    $.getJSON("/get_mac_device_stats", function (data) {
+
+        /* Vendor List and Device Count block*/
+        $.each(data.vendor_stats, function (k, v) {
+            if (v >= 3)
+                chart_data.push({ "label": k, "value": v });
 
             $('#device_list_table  > tbody:last-child').append('<tr><td>' + k + '</td><td>' + v.toLocaleString('en') + '</td></tr>');
         });
@@ -104,9 +108,34 @@
             responsive: true,
             "pageLength": 20,
             "aaSorting": [],
-            "order": [[ 1, "desc" ]],
+            "order": [[1, "desc"]],
             "searching": true
         });
+
+        /* MAC OUI Count by vendor code block */
+        data = data.device_stats;
+        $.each(data, function (k, v) {
+            // console.log(k);
+
+            $('#device_list_mac  > tbody:last-child').append('<tr>' +
+                '<td>' + data[k].mac_prefix + '</td>' +
+                '<td>' + data[k].vendor + '</td>' +
+                '<td>' + data[k].count.toLocaleString('en') + '</td>' +
+                '</tr>'
+            );
+
+        });
+
+        device_list = $('#device_list_mac').DataTable({
+            dom: 'rftip',
+            responsive: true,
+            "pageLength": 20,
+            "aaSorting": [],
+            "order": [[2, "desc"]]
+        });
+
+        // $('table').fadeIn(100);
+        $('.hide_me').show();
     });
 
 </script>
