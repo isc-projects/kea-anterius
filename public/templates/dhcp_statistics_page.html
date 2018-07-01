@@ -82,7 +82,7 @@
     $('.hide_me').hide();
 
     var chart_data = [];
-    $.getJSON( "/api/get_vendor_count", function( data ) {
+    $.getJSON( "/get_mac_device_stats", function( data ) {
         $.each(data, function(k, v) {
             if(v >= 3)
                 chart_data.push({"label": k, "value": v});
@@ -108,56 +108,5 @@
             "searching": true
         });
     });
-
-    $.getJSON( "/api/get_mac_oui_count_by_vendor", function( data ) {
-        $.each(data, function(k, v) {
-            // console.log(k);
-
-            $('#device_list_mac  > tbody:last-child').append('<tr>' +
-                '<td>' + data[k].mac_prefix + '</td>' +
-                '<td>' + data[k].vendor + '</td>' +
-                '<td>' + data[k].count.toLocaleString('en') + '</td>' +
-                '</tr>'
-            );
-
-        });
-
-        device_list = $('#device_list_mac').DataTable({
-            dom: 'rftip',
-            responsive: true,
-            "pageLength": 20,
-            "aaSorting": [],
-            "order": [[ 2, "desc" ]]
-        });
-
-        // $('table').fadeIn(100);
-        $('.hide_me').show();
-    });
-
-    $.getJSON( "/api/get_dhcp_requests", function( data ) {
-        $.each(data, function(k, v) {
-            $('#excessive_requests  > tbody:last-child').append('<tr>' +
-                '<td>' + k + '</td>' +
-                '<td>' + data[k].request_vendor + '</td>' +
-                '<td>' + data[k].request_for + '</td>' +
-                '<td>' + data[k].request_via + '</td>' +
-                '<td>' + data[k].request_count.toLocaleString('en') + '</td>' +
-                '</tr>'
-            );
-
-        });
-
-        excessive_requests = $('#excessive_requests').DataTable({
-            dom: 'rftip',
-            responsive: true,
-            "pageLength": 20,
-            "aaSorting": [],
-            "order": [[ 4, "desc" ]]
-        });
-
-        // $('table').fadeIn(100);
-        $('.hide_me').show();
-    });
-
 
 </script>

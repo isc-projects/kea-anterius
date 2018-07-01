@@ -33,6 +33,7 @@ app.use('/users', require('./routes/users'));
 app.use('/get_stats', require('./routes/get_stats'));
 app.use('/nw_detail_info', require('./routes/nw_detail_info'));
 app.use('/dhcp_statistics', require('./routes/dhcp_statistics_page'));
+app.use('/get_mac_device_stats', require('./routes/get_mac_device_stats'));
 app.use('/dhcp_leases', require('./routes/dhcp_leases'));
 app.use('/dhcp_lease_search', require('./routes/dhcp_lease_search'));
 app.use('/dhcp_log', require('./routes/dhcp_log'));
@@ -40,15 +41,13 @@ app.use('/dhcp_config', require('./routes/dhcp_config'));
 app.use('/dhcp_config_snapshots', require('./routes/dhcp_config_snapshots'));
 app.use('/dhcp_config_snapshot_view', require('./routes/dhcp_config_snapshot_view'));
 app.use('/dhcp_config_update', require('./routes/dhcp_config_update'));
-app.use('/dhcp_start_stop_restart', require('./routes/dhcp_start_stop_restart'));
-app.use('/api_examples', require('./routes/api_examples'));
+app.use('/dhcp_boot_ops', require('./routes/dhcp_boot_ops'));
 app.use('/anterius_settings', require('./routes/anterius_settings'));
 app.use('/anterius_alerts', require('./routes/alerts_config'));
 app.use('/anterius_alert_settings_save', require('./routes/anterius_alert_settings_save'));
 app.use('/anterius_settings_save', require('./routes/anterius_settings_save'));
 
 /* Glass API Routes - disabled */
-// app.use('/api/get_active_leases/', require('./api/get_active_leases'));
 // app.use('/api/get_subnet_details/', require('./api/get_subnet_details'));
 // app.use('/api/get_vendor_count/', require('./api/get_vendor_count'));
 // app.use('/api/get_mac_oui_count_by_vendor/', require('./api/get_mac_oui_count_by_vendor'));
