@@ -8,6 +8,41 @@
             </div>
             <div class="body">
                 [body_content]
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="card">
+                            <div class="header">
+                                <h2>
+                                    Kea Server Host Machine Configurations
+                                </h2>
+                            </div>
+                            <div class="body">
+                                <div class="table-responsive">
+                                    <table id="leases-table" class="table table-bordered table-striped table-hover js-basic-example dataTable dashboard-task-infos">
+                                        <thead>
+                                            <tr>
+                                                <th>Hostname</th>
+                                                <th>Server CA Address</th>
+                                                <th>Server CA Port</th>
+                                                <th width="1%">Edit</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            [server_hostname_list]
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" align="center">
+                    <button type="button" class="btn btn-info waves-effect ant-btn" onclick="save_config()">
+                        <i class="material-icons">settings</i>
+                        <span>Save Anteris Settings</span>
+                    </button>
+                </div>
+                <br>
             </div>
         </div>
     </div>

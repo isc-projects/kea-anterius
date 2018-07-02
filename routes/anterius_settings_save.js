@@ -17,7 +17,7 @@ router.post('/', function (req, res, next) {
 		json_file.writeFile('./config/anterius_config.json', anterius_config, { spaces: 2 }, function (err) {
 			console.error(err)
 		});
-		res.send('<script type="text/javascript">notification(\' Switched to ' + request.svrselect + '\', \'bg-green\', 1000)</script>');
+		res.send('<script type="text/javascript">notification(\' Switched to ' + request.svrselect + '\')</script>');
 	}
 	/* Anterius settings update */
 	else {
@@ -27,7 +27,7 @@ router.post('/', function (req, res, next) {
 		anterius_config.server_addr = request.ca_remote_addr.split(':')[0];
 		anterius_config.server_port = request.ca_remote_addr.split(':')[1];
 		anterius_config.current_server = request.svrselect;
-		
+
 		// anterius_config.leases_file = request.leases_file;
 		// anterius_config.log_file = request.log_file;
 		// anterius_config.config_file = request.config_file;
