@@ -13,7 +13,6 @@ var loader_html = '<div class="preloader"> \
     </div> \
     </div>';
 
-
 /*
  * On initial document load events
  */
@@ -200,10 +199,13 @@ function navtoggle() {
 }
 
 /* Reload page on refresh_stats user request  */
-function refresh_info() {
-    source = window.location.href;
-    get_stats();
-    window.location = source;
+function refresh_info(delay = 0, message = 'Stats Reloaded!') {
+    setTimeout(function () {
+        source = window.location.href;
+        get_stats();
+        window.location = source;
+    }, delay);
+
     // window.location = source+'?v_ajax';
 
     // TODO: disable refresh button for unnecessary pages
@@ -216,7 +218,7 @@ function refresh_info() {
 function edit_params(mode) {
     source = window.location.href;
     info = source.split('?')[1].split('&');
-    console.log(info);
+    // console.log(info);
     if (mode == 0)
         window.location.replace('/dhcp_config?network=' + info[0].split('type=')[1] + '&id=' + info[1].split('id=')[1]);
     else
@@ -231,12 +233,47 @@ function save_config() {
     });
 }
 
+/* Common remote host variables */
+var $hostname, $addr, $port;
+
+/* Method to Replace remote host values with input fields */
+function edit_remote_host(index) {
+
+    $hostname = $('<input type="input" class="form-control"/>').val($('#h' + index).text());
+    $addr = $('<input type="input" class="form-control"/>').val($('#a' + index).text());
+    $port = $('<input type="input" class="form-control"/>').val($('#p' + index).text());
+
+    $('#h' + index).replaceWith($hostname);
+    $('#a' + index).replaceWith($addr);
+    $('#p' + index).replaceWith($port);
+
+    // console.log($('#b' + index).children())
+    $('#b' + index).attr('onclick', 'save_remote_host(' + index + ')');
+    $('#b' + index).children().remove(".waves-ripple").text('save');
+}
+
+/* Method to save remote input fields */
+function save_remote_host(index) {
+
+    var $h = $('<p data-editable id="h' + index + '"/>').text($hostname.val());
+    var $a = $('<p data-editable id="a' + index + '"/>').text($addr.val());
+    var $p = $('<p data-editable id="p' + index + '"/>').text($port.val());
+
+    $hostname.replaceWith($h);
+    $addr.replaceWith($a);
+    $port.replaceWith($p);
+
+    $('#b' + index).children().remove(".waves-ripple").text('edit');
+    $('#b' + index).attr('onclick', 'edit_remote_host(' + index + ')');
+}
+
+
 /* Forward and notify current server change request */
 function select_server() {
     if (document.getElementById("run-status"))
         svrselect = get_form_query_string("run-status");
     else
-        svrselect = 'svrselect='+$("input[name=svrselect]:checked").val();
+        svrselect = 'svrselect=' + $("input[name=svrselect]:checked").val();
 
     $.post("/anterius_settings_save", svrselect, function (data) {
         $("#anterius_settings_result").html(data);
@@ -244,20 +281,24 @@ function select_server() {
 }
 
 /* Custom notification generator */
-function notification(text, colorName = 'bg-black', timer = 1000) {
+function notification(text, colorName = 'bg-black', delay = 2000, url = '#') {
 
     animateEnter = 'animated fadeInDown';
     animateExit = 'animated fadeOutUp';
     var allowDismiss = true;
 
     $.notify({
-        message: text
+        message: text,
+        url: url,
     },
         {
             type: colorName,
             allow_dismiss: allowDismiss,
             newest_on_top: false,
-            timer: timer,
+            offset: 10,
+            spacing: 10,
+            z_index: 1031,
+            delay: delay,
             animate: {
                 enter: animateEnter,
                 exit: animateExit
