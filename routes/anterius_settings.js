@@ -45,25 +45,24 @@ router.get('/', authorize.auth, function (req, res, next) {
 
 	anterius_settings_template = template_render.set_template_variable(anterius_settings_template, "body_content", form_data);
 
-	remote_host_list = anterius_config.remote_host_list;
+	server_host_list = anterius_config.server_host_list;
 	hostname_data_table = '';
 
-	for (var i = 0; i < remote_host_list.length; i++) {
+	for (var i = 0; i < server_host_list.length; i++) {
 
 		/* Define hostname row for remote servers table */
 		table_row = '';
-		table_row = table_row + '<td><p id="h' + i + '">' + remote_host_list[i].hostname + '</p></td>';
-		table_row = table_row + '<td><p id="a' + i + '">' + remote_host_list[i].svr_addr + '</p></td>';
-		table_row = table_row + '<td><p id="p' + i + '">' + remote_host_list[i].svr_port + '</p></td>';
+		table_row = table_row + '<td><p id="h' + i + '">' + server_host_list[i].hostname + '</p></td>';
+		table_row = table_row + '<td><p id="a' + i + '">' + server_host_list[i].svr_addr + '</p></td>';
+		table_row = table_row + '<td><p id="p' + i + '">' + server_host_list[i].svr_port + '</p></td>';
 		table_row = table_row + '<td><button type="button" class="btn waves-effect" id="b' + i + '" onclick="edit_remote_host(\'' + i + '\')">' +
 			'<i class="material-icons">edit</i></button></td >';
 
 		table_row = table_row.replace(/<td><\/td>/g, '<td> -- </td>');
-		// console.log(table_row);
-		hostname_data_table = hostname_data_table + '<tr>' + table_row + '</tr>';
+		hostname_data_table = hostname_data_table + '<tr><form id="server-host'+i+'" action="/anterius_settings_save" method="POST">' + table_row + '</form></tr>';
 	}
 
-	anterius_settings_template = template_render.set_template_variable(anterius_settings_template, "remote_host_list", hostname_data_table);
+	anterius_settings_template = template_render.set_template_variable(anterius_settings_template, "server_host_list", hostname_data_table);
 
 	res.send(template_render.get_index_template(anterius_settings_template, req.url));
 });

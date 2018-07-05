@@ -239,9 +239,9 @@ var $hostname, $addr, $port;
 /* Method to Replace remote host values with input fields */
 function edit_remote_host(index) {
 
-    $hostname = $('<input type="input" class="form-control"/>').val($('#h' + index).text());
-    $addr = $('<input type="input" class="form-control"/>').val($('#a' + index).text());
-    $port = $('<input type="input" class="form-control"/>').val($('#p' + index).text());
+    $hostname = $('<input type="input" name="hostname" class="form-control"/>').val($('#h' + index).text());
+    $addr = $('<input type="input" name="svr_addr" class="form-control"/>').val($('#a' + index).text());
+    $port = $('<input type="input" name="svr_port" class="form-control"/>').val($('#p' + index).text());
 
     $('#h' + index).replaceWith($hostname);
     $('#a' + index).replaceWith($addr);
@@ -255,6 +255,12 @@ function edit_remote_host(index) {
 /* Method to save remote input fields */
 function save_remote_host(index) {
 
+    svr_host = "index=" + index + "&hostname=" + $hostname.val() + "&addr=" + $addr.val() + "&port=" + $port.val();
+
+    $.post("/anterius_settings_save", svr_host, function (data) {
+        $("#anterius_settings_result").html(data);
+    });
+
     var $h = $('<p data-editable id="h' + index + '"/>').text($hostname.val());
     var $a = $('<p data-editable id="a' + index + '"/>').text($addr.val());
     var $p = $('<p data-editable id="p' + index + '"/>').text($port.val());
@@ -265,6 +271,7 @@ function save_remote_host(index) {
 
     $('#b' + index).children().remove(".waves-ripple").text('edit');
     $('#b' + index).attr('onclick', 'edit_remote_host(' + index + ')');
+
 }
 
 

@@ -10,8 +10,20 @@ router.post('/', function (req, res, next) {
 	var request = req.body;
 	var json_file = require('jsonfile');
 
+	/* Check if remote server host update request */
+	if (request.hostname) {
+		anterius_config.server_host_list[request.index].hostname = request.hostname;
+		anterius_config.server_host_list[request.index].svr_addr = request.addr;
+		anterius_config.server_host_list[request.index].svr_port = request.port;
+
+		json_file.writeFile('./config/anterius_config.json', anterius_config, { spaces: 2 }, function (err) {
+			console.error(err)
+		});
+		res.send('<script type="text/javascript">notification("Remote Server details updated!");</script>');
+	}
+
 	/* Check if current server update request */
-	if (!request.admin_user) {
+	else if (request.svrselect && !request.admin_user) {
 		anterius_config.current_server = request.svrselect;
 
 		json_file.writeFile('./config/anterius_config.json', anterius_config, { spaces: 2 }, function (err) {
@@ -19,6 +31,7 @@ router.post('/', function (req, res, next) {
 		});
 		res.send('<script type="text/javascript">notification(\' Switched to ' + request.svrselect + '\')</script>');
 	}
+
 	/* Anterius settings update */
 	else {
 		anterius_config.admin_user = request.admin_user;
