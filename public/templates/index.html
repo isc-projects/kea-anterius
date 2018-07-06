@@ -290,13 +290,14 @@
             $.get("/get_stats", function (data) {
                 $('#cpu-utilization').html(data.cpu_utilization + "%");
                 $('#run-status').html(data.run_status);
+                $('#svr-host-select').html(data.server_host_list);
                 $(data.current_server).prop('checked', true);
                 $('#leases-sec').html(data.leases_per_second.toLocaleString('en') + ' / ' + data.leases_per_minute.toLocaleString('en'));
                 $('#total-active').html(data.leases_used.toLocaleString('en'));
                 $('#server-name').html(data.host_name);
                 $('#shared-networks > tbody').html(data.shared_network_table);
                 $('#subnets > tbody').html(data.subnet_table);
-
+                
                 if (typeof shared_networks !== "undefined")
                     shared_networks.destroy();
 
@@ -319,6 +320,9 @@
 
                 $('#shared-networks').fadeOut(100).fadeIn(100);
                 $('#subnets').fadeOut(100).fadeIn(100);
+
+                $('select').selectpicker('refresh');
+                
             });
         }
 

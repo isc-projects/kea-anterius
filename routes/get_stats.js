@@ -158,6 +158,20 @@ router.get('/', function (req, res, next) {
 		subnet_table = subnet_table + '<tr>' + table_row + '</tr>';
 	}
 
+	if (anterius_config.server_host_list) {
+		svr_host_list = '<option value="" disabled>Choose Kea machine</option>'
+		anterius_config.server_host_list.forEach(function (host, index) {
+			svr_host_list += '<option value="' + index + '" id="server-host' + index + '" >' + host.hostname + '</option>';
+		});
+
+		if (anterius_config.current_host_index == '-1')
+			svr_host_list = svr_host_list.replace('<option value=""', '<option value="" selected');
+		else
+			svr_host_list = svr_host_list.replace('<option value="' + anterius_config.current_host_index + '"', '<option value="' + anterius_config.current_host_index + '" selected');
+
+	} else
+		svr_host_list = '<option value="" disabled selected>No server hosts configured</option>'
+
 	/* Process server run status output for display */
 	svrun = run_status.replace(/server:/g, ':').replace("\n", "<br> \n")
 		.replace(/\bDHCPv4\b/g, '<input name="svrselect" id="dhcp4" value="dhcp4" type="radio" class="with-gap" /><label for="dhcp4"><span>DHCPv4')
@@ -175,6 +189,7 @@ router.get('/', function (req, res, next) {
 		"cpu_utilization": cpu_utilization,
 		"run_status": svrun,
 		"current_server": '#' + anterius_config.current_server,
+		"server_host_list": svr_host_list,
 		"leases_used": total_leases,
 		"leases_per_second": leases_per_sec,
 		"leases_per_minute": leases_per_minute,
