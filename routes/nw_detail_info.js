@@ -176,7 +176,7 @@ router.get('/', function (req, res, next) {
         lease_get_req_data = JSON.stringify({ "command": "lease6-get-all", "service": [anterius_config.current_server], "arguments": { "subnets": id } });
 
     /* Fetch lease data for network*/
-    var response_data = api_agent.fire_kea_api(lease_get_req_data).then(function (api_data) {
+    var response_data = api_agent.fire_kea_api(lease_get_req_data, anterius_config.server_addr, anterius_config.server_port).then(function (api_data) {
         // console.log(api_data);
         return api_data;
     });

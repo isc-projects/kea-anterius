@@ -126,7 +126,7 @@ stats_req_data = JSON.stringify({ "command": "statistic-get-all", "service": [an
 config_get_req_data = JSON.stringify({ "command": "config-get", "service": [anterius_config.current_server] });
 
 /* Fetch and set server stats*/
-api_agent.fire_kea_api(stats_req_data).then(function (api_data) {
+api_agent.fire_kea_api(stats_req_data, anterius_config.server_addr, anterius_config.server_port).then(function (api_data) {
     // console.log(api_data);
     if (api_data.result == 0)
         kea_stats = api_data.arguments;
@@ -135,7 +135,7 @@ api_agent.fire_kea_api(stats_req_data).then(function (api_data) {
 });
 
 /* Fetch and set server config*/
-api_agent.fire_kea_api(config_get_req_data).then(function (api_data) {
+api_agent.fire_kea_api(config_get_req_data, anterius_config.server_addr, anterius_config.server_port).then(function (api_data) {
     // console.log(api_data);
     if (api_data.result == 0)
         kea_config = api_data.arguments;
@@ -251,7 +251,7 @@ var lease_stats_monitor = function () {
 
 
     /* Fetch and set server config*/
-    var response_data = api_agent.fire_kea_api(config_get_req_data).then(function (api_data) {
+    var response_data = api_agent.fire_kea_api(config_get_req_data, anterius_config.server_addr, anterius_config.server_port).then(function (api_data) {
         return api_data;
     });
     response_data.then(function (data) {
@@ -297,7 +297,7 @@ var lease_stats_monitor = function () {
             shared_nw_count = server.server_config[server.svr_tag]['shared-networks'].length;
 
             /* Fetch and set server stats*/
-            var response_data = api_agent.fire_kea_api(stats_req_data).then(function (sapi_data) {
+            var response_data = api_agent.fire_kea_api(stats_req_data, anterius_config.server_addr, anterius_config.server_port).then(function (sapi_data) {
                 return sapi_data;
             });
             response_data.then(function (sdata) {

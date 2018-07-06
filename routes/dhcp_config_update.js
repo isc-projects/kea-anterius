@@ -24,7 +24,7 @@ router.post('/', authorize.auth, function (req, res, next) {
 	}
 	if (request.affirm) {
 		/* Fetch and set server config*/
-		var response_data = api_agent.fire_kea_api(config_update_req_data).then(function (api_data) {
+		var response_data = api_agent.fire_kea_api(config_update_req_data, anterius_config.server_addr, anterius_config.server_port).then(function (api_data) {
 			console.log(api_data);
 			return api_data;
 		});
