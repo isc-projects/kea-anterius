@@ -31,6 +31,9 @@
     <!-- Custom Css -->
     <link href="assets/css/style.css" rel="stylesheet">
 
+    <!-- Materialize Css -->
+    <!-- <link href="assets/css/materialize.css" rel="stylesheet"> -->
+
     <link href="assets/css/glass.css" rel="stylesheet">
 
     <link href="assets/plugins/jquery-datatable/skin/bootstrap/css/dataTables.bootstrap.css" rel="stylesheet">
@@ -232,6 +235,9 @@
     <!-- Bootstrap Core Js -->
     <script src="assets/plugins/bootstrap/js/bootstrap.js"></script>
 
+    <!-- Materialize Core Js -->
+    <!-- <script src="assets/plugins/materialize/materialize.min.js"></script> -->
+
     <!-- Select Plugin Js -->
     <script src="assets/plugins/bootstrap-select/js/bootstrap-select.js"></script>
 
@@ -272,8 +278,11 @@
             }
         }
 
+        /* OnReady - Scroll to top, initialize server host selector */
         $(document).ready(function () {
             $(this).scrollTop(0);
+            if ($('select'))
+                $('select').selectpicker();
         });
 
         /* Stats parsing and rendering fn */
@@ -348,16 +357,11 @@
             }
         }
 
-        /* Initialize server host selector */
-        $(document).ready(function () {
-            $('select').formSelect();
-        });
-
         /* Call anterius config setter for selected server */
         $(document).on('change', 'input[type=radio][name=svrselect]', function () {
             select_server();
             get_stats();
-            refresh_info(500, 'Rendering ' + $("input[name=svrselect]:checked").val() + ' Stats..');
+            refresh_info(500, 'Switched to ' + $("input[name=svrselect]:checked").val());
         });
 
     </script>
