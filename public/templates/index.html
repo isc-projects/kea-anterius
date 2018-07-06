@@ -17,6 +17,7 @@
 
     <!-- Bootstrap Core Css -->
     <link href="assets/plugins/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="assets/plugins/bootstrap-select/css/bootstrap-select.css" rel="stylesheet">
 
     <!-- Waves Effect Css -->
     <link href="assets/plugins/node-waves/waves.css" rel="stylesheet" />
@@ -141,9 +142,9 @@
                         </a>
                     </li>
                     <li>
-                        <a href="/dhcp_start_stop_restart" pjax="1" onclick="navtoggle()">
+                        <a href="/dhcp_boot_ops" pjax="1" onclick="navtoggle()">
                             <i class="material-icons menuitems">refresh</i>
-                            <span class="menuitems">Start / Stop / Restart</span>
+                            <span class="menuitems">Server Boot (Start/Stop/Reload)</span>
                         </a>
                     </li>
 
@@ -256,14 +257,19 @@
 
         var prevScrollpos = window.pageYOffset;
         var refresh_interval;
+        var side_nav = document.getElementById("leftsidebar");
+
+        /* Hide top navbar on scroll */
         window.onscroll = function () {
-            var currentScrollPos = window.pageYOffset;
-            if (prevScrollpos > currentScrollPos) {
-                document.getElementById("top-nav").style.top = "0";
-            } else {
-                document.getElementById("top-nav").style.top = "-100px";
+            if (side_nav.style.width == "0px") {
+                var currentScrollPos = window.pageYOffset;
+                if (prevScrollpos > currentScrollPos) {
+                    document.getElementById("top-nav").style.top = "0";
+                } else {
+                    document.getElementById("top-nav").style.top = "-100px";
+                }
+                prevScrollpos = currentScrollPos;
             }
-            prevScrollpos = currentScrollPos;
         }
 
         $(document).ready(function () {
@@ -342,11 +348,16 @@
             }
         }
 
+        /* Initialize server host selector */
+        $(document).ready(function () {
+            $('select').formSelect();
+        });
+
         /* Call anterius config setter for selected server */
         $(document).on('change', 'input[type=radio][name=svrselect]', function () {
             select_server();
             get_stats();
-            refresh_info('Switched to ' + $("input[name=svrselect]:checked").val());
+            refresh_info(500, 'Rendering ' + $("input[name=svrselect]:checked").val() + ' Stats..');
         });
 
     </script>
