@@ -237,29 +237,33 @@ function save_config() {
 /* Common remote host variables */
 var $hostname, $addr, $port;
 
-/* Method to Replace remote host values with input fields */
-function edit_remote_host(index) {
+/* Method to Replace server host values with input fields */
+function edit_server_host(index) {
 
-    $hostname = $('<input type="input" name="hostname" class="form-control"/>').val($('#h' + index).text());
-    $addr = $('<input type="input" name="svr_addr" class="form-control"/>').val($('#a' + index).text());
-    $port = $('<input type="input" name="svr_port" class="form-control"/>').val($('#p' + index).text());
+    $hostname = $('<input type="input" name="hostname" id="hostname" class="form-control"/>').val($('#h' + index).text());
+    $addr = $('<input type="input" name="svr_addr" id="svr_addr" class="form-control"/>').val($('#a' + index).text());
+    $port = $('<input type="input" name="svr_port" id="svr_port" class="form-control"/>').val($('#p' + index).text());
 
     $('#h' + index).replaceWith($hostname);
     $('#a' + index).replaceWith($addr);
     $('#p' + index).replaceWith($port);
 
     // console.log($('#b' + index).children())
-    $('#b' + index).attr('onclick', 'save_remote_host(' + index + ')');
+    $('#b' + index).attr('onclick', 'save_server_host(' + index + ')');
     $('#b' + index).children().remove(".waves-ripple").text('save');
 }
 
-/* Method to save remote input fields */
-function save_remote_host(index) {
+/* Method to save server host input field values */
+function save_server_host(index) {
+
+    $hostname = $('#hostname');
+    $addr = $('#svr_addr');
+    $port = $('#svr_port');
 
     svr_host = "index=" + index + "&hostname=" + $hostname.val() + "&addr=" + $addr.val() + "&port=" + $port.val();
 
     $.post("/anterius_settings_save", svr_host, function (data) {
-        $("#anterius_settings_result").html(data);
+        refresh_info(750, data);
     });
 
     var $h = $('<p data-editable id="h' + index + '"/>').text($hostname.val());
@@ -271,10 +275,9 @@ function save_remote_host(index) {
     $port.replaceWith($p);
 
     $('#b' + index).children().remove(".waves-ripple").text('edit');
-    $('#b' + index).attr('onclick', 'edit_remote_host(' + index + ')');
+    $('#b' + index).attr('onclick', 'edit_server_host(' + index + ')');
 
 }
-
 
 /* Forward and notify current server host and server type change requests */
 function select_server(mode, index = 0) {

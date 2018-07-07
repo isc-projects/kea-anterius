@@ -55,13 +55,14 @@ router.get('/', authorize.auth, function (req, res, next) {
 		table_row = table_row + '<td><p id="h' + i + '">' + server_host_list[i].hostname + '</p></td>';
 		table_row = table_row + '<td><p id="a' + i + '">' + server_host_list[i].svr_addr + '</p></td>';
 		table_row = table_row + '<td><p id="p' + i + '">' + server_host_list[i].svr_port + '</p></td>';
-		table_row = table_row + '<td><button type="button" class="btn waves-effect" id="b' + i + '" onclick="edit_remote_host(\'' + i + '\')">' +
+		table_row = table_row + '<td><button type="button" class="btn waves-effect" id="b' + i + '" onclick="edit_server_host(\'' + i + '\')">' +
 			'<i class="material-icons">edit</i></button></td >';
 
 		table_row = table_row.replace(/<td><\/td>/g, '<td> -- </td>');
-		hostname_data_table = hostname_data_table + '<tr><form id="server-host'+i+'" action="/anterius_settings_save" method="POST">' + table_row + '</form></tr>';
+		hostname_data_table = hostname_data_table + '<tr><form id="server-host' + i + '" action="/anterius_settings_save" method="POST">' + table_row + '</form></tr>';
 	}
 
+	anterius_settings_template = template_render.set_template_variable(anterius_settings_template, "svr_hosts_len", anterius_config.server_host_list.length);
 	anterius_settings_template = template_render.set_template_variable(anterius_settings_template, "server_host_list", hostname_data_table);
 
 	res.send(template_render.get_index_template(anterius_settings_template, req.url));

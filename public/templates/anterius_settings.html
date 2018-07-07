@@ -14,21 +14,24 @@
                             <div class="header">
                                 <h2>
                                     Kea Server Host Machine Configurations
+                                    <button style="float: right; margin-top:-1%; margin-right:1%;" type="button" class="btn btn-info waves-effect ant-btn" onclick="add_server_host([svr_hosts_len])">
+                                        <i class="material-icons">add</i>
+                                    </button>
                                 </h2>
                             </div>
                             <div class="body">
                                 <div class="table-responsive">
-                                    <table id="leases-table" class="table table-bordered table-striped table-hover js-basic-example dataTable dashboard-task-infos">
+                                    <table id="server-hosts-table" class="table table-bordered table-striped table-hover js-basic-example dataTable dashboard-task-infos">
                                         <thead>
                                             <tr>
                                                 <th>Hostname</th>
                                                 <th>Server CA Address</th>
                                                 <th>Server CA Port</th>
-                                                <th width="1%">Edit</th>
+                                                <th width="1%">Edit/Save</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            [server_hostname_list]
+                                            [server_host_list]
                                         </tbody>
                                     </table>
                                 </div>
@@ -47,3 +50,36 @@
         </div>
     </div>
 </div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(this).scrollTop(0);
+    });
+
+    var server_hosts_table;
+    $(document).ready(function () {
+
+        server_hosts_table = $('#server-hosts-table').DataTable({
+            dom: 'tip',
+            responsive: true,
+            "pageLength": 100,
+            "aaSorting": []
+        });
+
+        $('#server-hosts-table').fadeOut(100).fadeIn(100);
+    });
+
+    /* Method to add a server host */
+    function add_server_host(index) {
+
+        table_row = '<tr><td><input type="input" name="hostname" id="hostname" placeholder="Enter server hostname" class="form-control"/></td>' +
+            '<td><input type="input" name="svr_addr" id="svr_addr" placeholder="Enter Host IP address" class="form-control"/></td>' +
+            '<td><input type="input" name="svr_port" id="svr_port" placeholder="Enter Host machine port" class="form-control"/></td>' +
+            '<td><button type="button" class="btn waves-effect" id="b' + index + '" onclick="save_server_host(\'' + index + '\')">' +
+            '<i class="material-icons">save</i></button></td></tr>';
+
+        server_hosts_table.rows.add($(table_row)).draw(); // Add new data
+    }
+
+
+
+</script>
