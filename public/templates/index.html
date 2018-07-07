@@ -297,7 +297,7 @@
                 $('#server-name').html(data.host_name);
                 $('#shared-networks > tbody').html(data.shared_network_table);
                 $('#subnets > tbody').html(data.subnet_table);
-                
+
                 if (typeof shared_networks !== "undefined")
                     shared_networks.destroy();
 
@@ -322,7 +322,7 @@
                 $('#subnets').fadeOut(100).fadeIn(100);
 
                 $('select').selectpicker('refresh');
-                
+
             });
         }
 
@@ -361,9 +361,17 @@
             }
         }
 
-        /* Call anterius config setter for selected server */
+        /* Call anterius config setter for selected server host */
+        $('select').on('change', function (e) {
+            // console.log(this.value);
+            select_server('host', this.value);
+            get_stats();
+            refresh_info(500, 'Switched to ' + this.text);
+        });
+
+        /* Call anterius config setter for selected server type */
         $(document).on('change', 'input[type=radio][name=svrselect]', function () {
-            select_server();
+            select_server('type');
             get_stats();
             refresh_info(500, 'Switched to ' + $("input[name=svrselect]:checked").val());
         });

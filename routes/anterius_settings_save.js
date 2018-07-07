@@ -23,13 +23,19 @@ router.post('/', function (req, res, next) {
 	}
 
 	/* Check if current server update request */
-	else if (request.svrselect && !request.admin_user) {
-		anterius_config.current_server = request.svrselect;
+	else if (request.svrselect && request.mode && !request.admin_user) {
+		anterius_config[request.mode] = request.svrselect;
+
+		if(request.mode == 'current_host_index')
+		{
+			anterius_config.server_addr = anterius_config.server_host_list[request.svrselect].svr_addr;
+			anterius_config.server_port = anterius_config.server_host_list[request.svrselect].svr_port;
+		}
 
 		json_file.writeFile('./config/anterius_config.json', anterius_config, { spaces: 2 }, function (err) {
 			console.error(err)
 		});
-		res.send('<script type="text/javascript">notification(\' Switched to ' + request.svrselect + '\')</script>');
+		res.send('<script type="text/javascript">notification(\'Reloading Stats..\')</script>');
 	}
 
 	/* Anterius settings update */

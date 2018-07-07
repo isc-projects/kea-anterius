@@ -206,6 +206,7 @@ function refresh_info(delay = 0, message = 'Stats Reloaded!') {
         window.location = source;
     }, delay);
 
+    notification(message);
     // window.location = source+'?v_ajax';
 
     // TODO: disable refresh button for unnecessary pages
@@ -275,13 +276,17 @@ function save_remote_host(index) {
 }
 
 
-/* Forward and notify current server change request */
-function select_server() {
-    if (document.getElementById("run-status"))
-        svrselect = get_form_query_string("run-status");
-    else
-        svrselect = 'svrselect=' + $("input[name=svrselect]:checked").val();
+/* Forward and notify current server host and server type change requests */
+function select_server(mode, index = 0) {
 
+    if (mode == 'host') {
+        svrselect = 'mode=current_host_index&svrselect=' + index;
+    } else {
+        if (document.getElementById("run-status"))
+            svrselect = get_form_query_string("run-status");
+        else
+            svrselect = 'mode=current_server&svrselect=' + $("input[name=svrselect]:checked").val();
+    }
     $.post("/anterius_settings_save", svrselect, function (data) {
         $("#anterius_settings_result").html(data);
     });
