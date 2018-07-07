@@ -27,7 +27,7 @@
                                                 <th>Hostname</th>
                                                 <th>Server CA Address</th>
                                                 <th>Server CA Port</th>
-                                                <th width="1%">Edit/Save</th>
+                                                <th width="1%">Edit/Delete</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -75,7 +75,9 @@
             '<td><input type="input" name="svr_addr" id="svr_addr" placeholder="Enter Host IP address" class="form-control"/></td>' +
             '<td><input type="input" name="svr_port" id="svr_port" placeholder="Enter Host machine port" class="form-control"/></td>' +
             '<td><button type="button" class="btn waves-effect" id="b' + index + '" onclick="save_server_host(\'' + index + '\')">' +
-            '<i class="material-icons">save</i></button></td></tr>';
+            '<i class="material-icons">save</i></button>' +
+            '<button type="button" style="margin-left: 1%" class="btn waves-effect" id="b' + index + '" onclick="delete_server_host(\'' + index + '\')">' +
+            '<i class="material-icons">delete</i></button></td></tr>';
 
         server_hosts_table.rows.add($(table_row)).draw(); // Add new data
     }

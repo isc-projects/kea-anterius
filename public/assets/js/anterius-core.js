@@ -278,6 +278,14 @@ function save_server_host(index) {
     $('#b' + index).attr('onclick', 'edit_server_host(' + index + ')');
 
 }
+/* Method to delete server host entry */
+function delete_server_host(index) {
+    svr_host = "index=" + index + "&delete=true";
+
+    $.post("/anterius_settings_save", svr_host, function (data) {
+        refresh_info(750, data);
+    });
+}
 
 /* Forward and notify current server host and server type change requests */
 function select_server(mode, index = 0) {

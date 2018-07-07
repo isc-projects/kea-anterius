@@ -56,7 +56,9 @@ router.get('/', authorize.auth, function (req, res, next) {
 		table_row = table_row + '<td><p id="a' + i + '">' + server_host_list[i].svr_addr + '</p></td>';
 		table_row = table_row + '<td><p id="p' + i + '">' + server_host_list[i].svr_port + '</p></td>';
 		table_row = table_row + '<td><button type="button" class="btn waves-effect" id="b' + i + '" onclick="edit_server_host(\'' + i + '\')">' +
-			'<i class="material-icons">edit</i></button></td >';
+			'<i class="material-icons">edit</i></button>' +
+			'<button type="button" style="margin-left: 5%" class="btn waves-effect" id="b' + i + '" onclick="delete_server_host(\'' + i + '\')">' +
+			'<i class="material-icons">delete</i></button></td>';
 
 		table_row = table_row.replace(/<td><\/td>/g, '<td> -- </td>');
 		hostname_data_table = hostname_data_table + '<tr><form id="server-host' + i + '" action="/anterius_settings_save" method="POST">' + table_row + '</form></tr>';

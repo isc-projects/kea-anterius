@@ -25,6 +25,17 @@ router.post('/', function (req, res, next) {
 		res.send("Server Host details updated!");
 	}
 
+	/* Check if delete server host entry request */
+	if (request.delete) {
+
+		anterius_config.server_host_list.splice(request.index, 1);
+
+		json_file.writeFile('./config/anterius_config.json', anterius_config, { spaces: 2 }, function (err) {
+			console.error(err)
+		});
+		res.send("Server Host Entry deleted!");
+	}
+
 	/* Check if current server update request */
 	else if (request.svrselect && request.mode && !request.admin_user) {
 		anterius_config[request.mode] = request.svrselect;
