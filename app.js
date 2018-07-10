@@ -354,7 +354,10 @@ var lease_stats_monitor = function () {
 
 };
 
+/* Call and export stats function */
+lease_stats_monitor();
 exports.reload = lease_stats_monitor;
+
 /**
  * Clean Expired Leases
  */
