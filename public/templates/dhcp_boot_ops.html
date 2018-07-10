@@ -8,50 +8,54 @@
             </div>
             <div class="body">
                 [c_content]
-                <div id="dhcp_start_stop_restart_result"></div>
+                <div id="dhcp_boot_op_result"></div>
             </div>
         </div>
     </div>
 </div>
 
 <script type="text/javascript">
-    function process_action(action) {
+    function server_boot_ops(action, svr) {
+
+        svr_name = svr.split(':')[0];
         switch (action) {
             case "stop":
                 modal(
-                    "Are you sure you want to stop server?",
-                    "Stopping the server can be service affecting! Are you sure?",
+                    "Confirm: Stop" + svr_name + "?",
+                    "(Suspending the server will affect your services)",
                     '<button type="button" class="btn btn-link waves-effect" onclick="process_action(\'confirm_stop\')">STOP SERVER</button>'
                 );
                 break;
+
             case "confirm_stop":
                 $('#body-content .btn').attr('disabled', true);
-                $.post("/dhcp_start_stop_restart", "action=stop", function (data) {
-                    $("#dhcp_start_stop_restart_result").html(data);
+                $.post("/dhcp_boot_ops", "action=stop&server=" + svr_name, function (data) {
+                    $("#dhcp_boot_op_result").html(data);
                 });
-
                 break;
+
             case "restart":
                 modal(
-                    "Are you sure you want to restart the server?",
-                    "Restarting the server can cause very brief interruption. Are you sure?",
+                    "Confirm: Restart" + svr_name + "?",
+                    "(Suspending the server will interupt your services)",
                     '<button type="button" class="btn btn-link waves-effect" onclick="process_action(\'confirm_restart\')">RESTART SERVER</button>'
                 );
                 break;
+
             case "confirm_restart":
                 $('#body-content .btn').attr('disabled', true);
-                $.post("/dhcp_start_stop_restart", "action=restart", function (data) {
-                    $("#dhcp_start_stop_restart_result").html(data);
+                $.post("/dhcp_boot_ops", "action=restart&server=" + svr_name, function (data) {
+                    $("#dhcp_boot_op_result").html(data);
                 });
-
                 break;
+
             case "start":
                 $('#body-content .btn').attr('disabled', true);
-                $.post("/dhcp_start_stop_restart", "action=start", function (data) {
-                    $("#dhcp_start_stop_restart_result").html(data);
+                $.post("/dhcp_boot_ops", "action=start&server=" + svr_name, function (data) {
+                    $("#dhcp_boot_op_result").html(data);
                 });
-
                 break;
+
             default:
                 break;
         }
