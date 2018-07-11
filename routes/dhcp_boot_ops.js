@@ -26,7 +26,7 @@ router.get('/', authorize.auth, function (req, res, next) {
 		state = '';
 		svr_name = svr.split(':')[0];
 
-		if (svr_name.includes('Inactive')) {
+		if (svr.includes('Inactive')) {
 			ss_btn_template = '<div class="row" align="center">' +
 				'<button id="start_btn" type="button" class="btn btn-info waves-effect ant-btn" style="margin-bottom: 2%; width: 20%;" onclick="server_boot_ops(\'start\', \'' + svr_name + '\')">' +
 				'<i class="material-icons">power_settings_new</i>' +
@@ -39,7 +39,7 @@ router.get('/', authorize.auth, function (req, res, next) {
 				'<i class="material-icons">power_settings_new</i>' +
 				'<span>Stop</span></button>';
 
-		return_content = return_content + '<h4>' + svr_name + ' </h4>' + ss_btn_template +
+		return_content = return_content + '<h4>' + svr + ' </h4>' + ss_btn_template +
 			'<span style="margin-left:5%; margin-right:5%"></span>' +
 			'<button id="restart_btn" type="button" class="btn btn-info waves-effect ant-btn" ' + state + ' style="margin-bottom: 2%; width: 20%;" onclick="server_boot_ops(\'restart\',\'' + svr_name + '\')">' +
 			'<i class="material-icons">restore</i>' +
@@ -70,7 +70,7 @@ router.post('/', authorize.auth, function (req, res, next) {
 					console.log('stdout: ' + stdout);
 				}
 			)
-			res.send("<script type='text/javascript'>notification('" + request.server + " Stopped');ignore_cache = 1;do_pjax_request('/dhcp_start_stop_restart');$('#mdModal').modal('hide');</script>");
+			res.send("<script type='text/javascript'>get_stats(); refresh_info(750, '" + request.server + " Stopped');ignore_cache = 1;$('#mdModal').modal('hide');</script>");
 			break;
 
 		case "start":
@@ -80,7 +80,7 @@ router.post('/', authorize.auth, function (req, res, next) {
 					console.log('stdout: ' + stdout);
 				}
 			)
-			res.send("<script type='text/javascript'>notification('" + request.server + " Started');ignore_cache = 1;do_pjax_request('/dhcp_start_stop_restart');</script>");
+			res.send("<script type='text/javascript'> get_stats(); refresh_info(750, '" + request.server + " Started');ignore_cache = 1;</script>");
 			break;
 
 		case "restart":
@@ -90,7 +90,7 @@ router.post('/', authorize.auth, function (req, res, next) {
 					console.log('stdout: ' + stdout);
 				}
 			)
-			res.send("<script type='text/javascript'>notification('" + request.server + " Restarted '); do_pjax_request('/dhcp_start_stop_restart'); $('#mdModal').modal('hide');</script > ");
+			res.send("<script type='text/javascript'> get_stats(); refresh_info(750, '" + request.server + " Restarted '); $('#mdModal').modal('hide');</script > ");
 			break;
 
 		default:

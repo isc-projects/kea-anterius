@@ -15,15 +15,14 @@
 </div>
 
 <script type="text/javascript">
-    function server_boot_ops(action, svr) {
+    function server_boot_ops(action, svr_name) {
 
-        svr_name = svr.split(':')[0];
         switch (action) {
             case "stop":
                 modal(
-                    "Confirm: Stop" + svr_name + "?",
+                    "Confirm: Stop " + svr_name + "?",
                     "(Suspending the server will affect your services)",
-                    '<button type="button" class="btn btn-link waves-effect" onclick="process_action(\'confirm_stop\')">STOP SERVER</button>'
+                    '<button type="button" class="btn btn-link waves-effect" onclick="server_boot_ops(\'confirm_stop\', \'' + svr_name + '\')">STOP SERVER</button>'
                 );
                 break;
 
@@ -38,7 +37,7 @@
                 modal(
                     "Confirm: Restart" + svr_name + "?",
                     "(Suspending the server will interupt your services)",
-                    '<button type="button" class="btn btn-link waves-effect" onclick="process_action(\'confirm_restart\')">RESTART SERVER</button>'
+                    '<button type="button" class="btn btn-link waves-effect" onclick="server_boot_ops(\'confirm_restart\', \'' + svr_name + '\')">RESTART SERVER</button>'
                 );
                 break;
 
