@@ -24,6 +24,7 @@
     "nodemailer": "^4.1.0",
     "serve-favicon": "~2.5.0",
     "slack-node": "^0.1.8",
+    "sudo-prompt": "^8.2.0",
     "ws": "^5.2.0"
   },
   "devDependencies": {
