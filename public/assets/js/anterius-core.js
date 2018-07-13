@@ -215,15 +215,18 @@ function refresh_info(delay = 0, message = 'Stats Reloaded!') {
     // } 
 }
 
-/* Identify entity and forward edit mode for config request */
+/* Identify and forward add / edit requests for dhcp nw entities */
 function edit_params(mode) {
     source = window.location.href;
-    info = source.split('?')[1].split('&');
-    // console.log(info);
-    if (mode == 0)
-        window.location.replace('/dhcp_config?network=' + info[0].split('type=')[1] + '&id=' + info[1].split('id=')[1]);
+    console.log(mode);
+
+    if (mode == 0) {
+        info = source.split('?')[1].split('&');
+        window.location.replace('/dhcp_config?mode=edit&network=' + info[0].split('type=')[1] + '&id=' + info[1].split('id=')[1]);
+    } else if (mode.includes('add'))
+        window.location.replace('/dhcp_config?mode=add&network=' + mode.split('_')[1]);
     else
-        window.location.replace('/dhcp_config?network=reservations&id=' + mode);
+        window.location.replace('/dhcp_config?mode=edit&network=reservations&id=' + mode);
 }
 
 /* Forward and notify settings update request */
@@ -294,10 +297,12 @@ function select_server(mode, index = 0) {
         svrselect = 'mode=current_host_index&svrselect=' + index;
     } else {
         if (document.getElementById("run-status"))
-            svrselect = get_form_query_string("run-status");
+            svrselect = 'mode=current_server' + get_form_query_string("run-status");
         else
             svrselect = 'mode=current_server&svrselect=' + $("input[name=svrselect]:checked").val();
     }
+    console.log(svrselect);
+
     $.post("/anterius_settings_save", svrselect, function (data) {
         $("#anterius_settings_result").html(data);
     });
