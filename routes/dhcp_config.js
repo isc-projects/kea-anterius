@@ -97,19 +97,26 @@ router.get('/', authorize.auth, function (req, res, next) {
 				nw_template = json_file.readFileSync('public/config_templates/sharednw' + server.svr_tag.replace('Dhcp', '') + '.json');
 
 			// console.log(nw_template);
-			content = template_render.set_template_variable(content, "edit_title", nw_type.toUpperCase() + " Creation options");
-			input = '';
-			
+			content = template_render.set_template_variable(content, "edit_title", nw_type.toUpperCase() + " Creation options: " + server.svr_tag + " Server");
+			input = '', buffer = '';
+
 			for (param in nw_template) {
 				// console.log(nw_template[param]);
-				input += template_render.form_input(param, '<input type="text" class="form-control"  name="' + param + ' id="' + param + ' placeholder="Enter ' + nw_type + ' ' + param + '">');
-
+				if (typeof (nw_template[param]) === 'boolean')
+					buffer += '<div class="form-group"><input type="checkbox" class="form-check-input checkbox pull-right" name="' + param + '" id="' + param + '"><label for="' + param + '">' + param + '</label></div>';
+				else if (Array.isArray(nw_template[param]) || typeof (nw_template[param]) === 'object')
+					buffer += template_render.form_input(param, '<input type="text" class="form-control" name="' + param + '" id="' + param + '" disabled placeholder="Edit ' + nw_type + ' ' + param + ' values on file editor tab after generating test config...">');
+				else if (nw_template[param] == '')
+					input += template_render.form_input(param, '<input type="text" class="form-control" name="' + param + '" id="' + param + '" placeholder="Enter ' + nw_type + ' ' + param + '">');
+				else if (nw_template[param] == -1)
+					input += template_render.form_input(param, '<input type="number" class="form-control" name="' + param + '" id="' + param + '" placeholder="Enter ' + nw_type + ' ' + param + '">');
 			}
+			input += buffer;
 		}
 
 		/* Config gen button */
 		input += '<div class="row" align="center"><button id="gen_btn" type="button" class="btn btn-info waves-effect ant-btn" style="margin-bottom: 2%; width: 25%;" onclick=\'gen_dhcp_config("'
-			+ req.query.mode + '","' + server.svr_tag + '","' + server.sn_tag + '","' + nw_id + '","' + nw_type + '",' + JSON.stringify(subnet_list) + ')\'><i class="material-icons">settings</i> <span>Write ' + req.query.mode + ' changes to Test file</span></button></div>';
+			+ req.query.mode + '","' + server.svr_tag + '","' + server.sn_tag + '","' + nw_id + '","' + nw_type + '",' + JSON.stringify(nw_template) + ',' + JSON.stringify(subnet_list) + ')\'><i class="material-icons">settings</i> <span>Write ' + req.query.mode + ' changes to Test file</span></button></div>';
 
 		form_data = template_render.form_body("config-form", input);
 
