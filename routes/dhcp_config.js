@@ -3,6 +3,7 @@ var router = express.Router();
 var fs = require('fs');
 var template_render = require('../lib/render_template.js');
 var authorize = require('../lib/authorize.js');
+var json_file = require('jsonfile');
 
 router.get('/', authorize.auth, function (req, res, next) {
 
@@ -89,14 +90,21 @@ router.get('/', authorize.auth, function (req, res, next) {
 				input += template_render.form_input('Relay IP Address', '<input type="text" class="form-control" name="relay_ip-addresses" id="relay_ipaddr" placeholder="Enter relay address" value="' + nw_entity.relay['ip-address'] + '">');
 			}
 		} else {
-			content = template_render.set_template_variable(content, "edit_title", "Shared Network Creation options");
-			input = template_render.form_input('Shared NW name', '<input type="text" class="form-control"  name="name" id="name" placeholder="Enter shared network name">');
 
-			// Subnet, Shared nw common parameters
-			input += template_render.form_input('Valid Lifetime', '<input type="number" class="form-control" name="valid-lifetime" id="valid-lifetime" placeholder="Enter valid lifetime" >');
-			input += template_render.form_input('Renew Timer', '<input type="number" class="form-control" name="renew-timer" id="renew-timer" placeholder="Enter renew time interval" >');
-			input += template_render.form_input('Rebind Timer', '<input type="number" class="form-control" name="rebind-timer"  id="rebind-timer" placeholder="Enter rebindtime interval" >');
-			input += template_render.form_input('Relay IP Address', '<input type="text" class="form-control" name="relay_ip-addresses" id="relay_ipaddr" placeholder="Enter relay address" >');
+			if (nw_type == 'subnet')
+				nw_template = json_file.readFileSync('public/config_templates/subnet' + server.svr_tag.replace('Dhcp', '') + '.json');
+			else
+				nw_template = json_file.readFileSync('public/config_templates/sharednw' + server.svr_tag.replace('Dhcp', '') + '.json');
+
+			// console.log(nw_template);
+			content = template_render.set_template_variable(content, "edit_title", nw_type.toUpperCase() + " Creation options");
+			input = '';
+			
+			for (param in nw_template) {
+				// console.log(nw_template[param]);
+				input += template_render.form_input(param, '<input type="text" class="form-control"  name="' + param + ' id="' + param + ' placeholder="Enter ' + nw_type + ' ' + param + '">');
+
+			}
 		}
 
 		/* Config gen button */
