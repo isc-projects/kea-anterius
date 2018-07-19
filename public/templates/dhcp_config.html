@@ -29,8 +29,7 @@
 
                     <br>
                     <div class="row" align="center">
-                        <button type="button" id="gen_btn" class="btn btn-info waves-effect ant-btn" style="margin-bottom: 2%; width: 25%;"
-                            onclick="save_config_snapshot()">
+                        <button type="button" id="save_snap_btn" class="btn btn-info waves-effect ant-btn" style="margin-bottom: 2%; width: 25%;" onclick="save_config_snapshot()">
                             <i class="material-icons">save</i>
                             <span>Save Config</span>
                         </button>
@@ -49,13 +48,13 @@
         </div>
         <hr>
         <div class="row" align="center">
-            <button id="test_btn" type="button" class="btn btn-info waves-effect ant-btn" disabled style="margin-bottom: 2%; width: 20%;"
+            <button id="test_btn" type="button" class="btn btn-info waves-effect ant-btn" style="margin-bottom: 2%; width: 20%;"
                 onclick="test_dhcp_config()">
                 <i class="material-icons">system_update_alt</i>
                 <span>Test Config</span>
             </button>
             <span style="margin-left:5%; margin-right:5%"></span>
-            <button id="update_btn" type="button" class="btn btn-info waves-effect ant-btn" disabled style="margin-bottom: 2%;  width: 20%;"
+            <button id="update_btn" type="button" class="btn btn-info waves-effect ant-btn" style="margin-bottom: 2%;  width: 20%;"
                 onclick="upload_dhcp_config()">
                 <i class="material-icons">system_update_alt</i>
                 <span>Update Config</span>
@@ -66,6 +65,14 @@
 </div>
 <script>
 
+    /* OnReady - Scroll to top, initialize buttons */
+    $(window).load(function () {
+        $(this).scrollTop(0);
+        $("#gen_btn").attr("disabled", "disabled");
+        $("#update_btn").attr("disabled", "disabled");
+        $("#test_btn").attr("disabled", "disabled");
+    });
+
     $('#config-tab a').on('click', function (e) {
         e.preventDefault();
         if ($(this).parent('li').hasClass('disabled')) {
@@ -74,9 +81,9 @@
     });
 
     $('input').change(function () {
-        document.getElementById("gen_btn").disabled = false;
-        document.getElementById('update_btn').disabled = true;
-        document.getElementById('test_btn').disabled = true;
+        $("#gen_btn").removeAttr("disabled");
+        $("#update_btn").attr("disabled", "disabled");
+        $("#test_btn").attr("disabled", "disabled");
     });
 
     $('#dhcp-config').on('keypress keydown keyup', function () {
