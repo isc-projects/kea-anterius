@@ -12,7 +12,7 @@ var Range = ace.require('ace/range').Range;
 var config_copy = dhcp_config.session.doc.getAllLines();
 var markedList = [];
 
-function gen_dhcp_config(mode, svr_tag, sn_tag, nw_id, nw_type, subnet_list) {
+function gen_dhcp_config(mode, svr_tag, sn_tag, nw_id, nw_type, nw_template, subnet_list) {
 
 	/* Fetch config form options as query string */
 	// dhcp_config_form_data = get_form_query_string("dhcp_config_form");
@@ -29,10 +29,18 @@ function gen_dhcp_config(mode, svr_tag, sn_tag, nw_id, nw_type, subnet_list) {
 	// console.log(test_config_file[svr_tag][sn_tag][0]);
 	// console.log(subnet_list);
 
-	if (req.query.mode == 'add' && nw_id == -1) {
+	if (mode == 'add' && nw_id == -1) {
+		configformData.forEach(fd => {
+			nw_template[fd.name] = fd.value;
+		});
+		for (param in nw_template) {
+			if (nw_template[param] == "" || nw_template[param] == -1)
+				delete nw_template[param];
+		}
+		test_config_file[svr_tag][sn_tag].push(nw_template);
+		console.log(test_config_file[svr_tag][sn_tag], nw_template);
 
 	}
-
 	else {
 		if (nw_type == 'reservations') {
 
@@ -123,7 +131,7 @@ function gen_dhcp_config(mode, svr_tag, sn_tag, nw_id, nw_type, subnet_list) {
 	highlightEditedLineNumbers(dhcp_config, config_copy);
 
 	notification('Test config_file generated.', 'bg-green');
-	notification('Switch to config file editor to review changes (Click Here)', 'bg-black');
+	notification('Switch to config file editor to review changes', 'bg-black');
 
 	document.getElementById('test_btn').disabled = false;
 	// $.post("/dhcp_config_update", dhcp_config_form_data, function (data) {
