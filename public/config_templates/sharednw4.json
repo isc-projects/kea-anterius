@@ -1,0 +1,14 @@
+{
+    "valid-lifetime": -1,
+    "name": "",
+    "subnet4": [],
+    "reservation-mode": "",
+    "interface": "",
+    "match-client-id": false,
+    "relay": {
+        "ip-address": ""
+    },
+    "rebind-timer": 0,
+    "option-data": [],
+    "renew-timer": 0
+}

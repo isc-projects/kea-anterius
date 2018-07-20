@@ -1,0 +1,21 @@
+{
+    "server-hostname": "",
+    "boot-file-name": "",
+    "valid-lifetime": -1,
+    "4o6-subnet": "",
+    "next-server": "",
+    "reservation-mode": "",
+    "subnet": "",
+    "match-client-id": true,
+    "4o6-interface-id": "",
+    "4o6-interface": "",
+    "pools": [],
+    "option-data": [],
+    "id": -1,
+    "renew-timer": -1,
+    "rebind-timer": -1,
+    "relay": {
+        "ip-address": ""
+    },
+    "interface": ""
+}

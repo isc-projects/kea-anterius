@@ -1,0 +1,56 @@
+{
+    "reservations": [
+        {
+            "option-data": [
+                {
+                    "data": "",
+                    "always-send": false,
+                    "space": "dhcp6",
+                    "name": "",
+                    "code": 23,
+                    "csv-format": true
+                }
+            ],
+            "prefixes": [],
+            "hw-address": "",
+            "ip-addresses": [],
+            "client-classes": [],
+            "hostname": ""
+        }
+    ],
+    "rapid-commit": false,
+    "option-data": [
+        {
+            "csv-format": true,
+            "code": 23,
+            "name": "dns-servers",
+            "space": "dhcp6",
+            "data": "",
+            "always-send": false
+        }
+    ],
+    "subnet": "",
+    "reservation-mode": "",
+    "id": -1,
+    "preferred-lifetime": -1,
+    "valid-lifetime": -1,
+    "pools": [
+        {
+            "pool": "",
+            "option-data": []
+        }
+    ],
+    "rebind-timer": -1,
+    "pd-pools": [
+        {
+            "prefix-len": -1,
+            "option-data": [],
+            "delegated-len": -1,
+            "prefix": ""
+        }
+    ],
+    "relay": {
+        "ip-addresses": []
+    },
+    "renew-timer": -1
+}
