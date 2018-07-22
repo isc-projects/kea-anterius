@@ -83,7 +83,7 @@ kea_config = {};
 anterius_config = json_file.readFileSync('config/anterius_config.json');
 
 /* Identifiers for current server */
-server = { 'server_config[server.svr_tag]': {}, 'svr_tag': '', 'sn_tag': '', 'server.addr_tag': '' };
+server = { 'server_config': {}, 'svr_tag': '', 'sn_tag': '', 'server.addr_tag': '' };
 
 /* Dir for config file snapshots */
 bkp_dir = "config_backups/" + anterius_config.current_server;
@@ -95,8 +95,10 @@ current_time = 0;
 lps = -1;
 leases_per_sec = 0;
 leases_last_update_time = -1;
+run_status = '';
 
 listening_to_log_file = 0;
+server_active = 1;
 
 subnet_list = [];
 
@@ -111,15 +113,16 @@ if (anterius_config.ip_ranges_to_allow != "") {
     app.use(ip_filter(ips, { mode: 'allow' }));
 }
 
-// TODO: Mechanism to retrieve below sections from remote machine
-host_name = execSync("cat /etc/hostname").toString().replace("\n", "");
-run_status = execSync("keactrl status").toString();
+// TODO: Mechanism to retrieve following attibutes from remote machine
+if (anterius_config.server_addr == 'localhost') {
+    host_name = execSync("cat /etc/hostname").toString().replace("\n", "");
+    run_status = execSync("keactrl status").toString();
 
-/* Poll: CPU Utilization */
-cpu_utilization_poll = setInterval(function () {
-    cpu_utilization = parseFloat(execSync("top -bn 1 | awk 'NR>7{s+=$9} END {print s/4}'").toString())
-}, (15 * 1000));
-
+    /* Poll: CPU Utilization */
+    cpu_utilization_poll = setInterval(function () {
+        cpu_utilization = parseFloat(execSync("top -bn 1 | awk 'NR>7{s+=$9} END {print s/4}'").toString())
+    }, (15 * 1000));
+}
 
 /* Kea CA REST API call - config-get and statistics-get */
 stats_req_data = JSON.stringify({ "command": "statistic-get-all", "service": [anterius_config.current_server] });
@@ -131,7 +134,9 @@ api_agent.fire_kea_api(stats_req_data, anterius_config.server_addr, anterius_con
     if (api_data.result == 0)
         kea_stats = api_data.arguments;
     else
-        console.log("CA Error:" + api_data.text);
+        console.log("CA Error: " + api_data.text);
+}).catch(function () {
+    server_active = 0;
 });
 
 /* Fetch and set server config*/
@@ -140,8 +145,10 @@ api_agent.fire_kea_api(config_get_req_data, anterius_config.server_addr, anteriu
     if (api_data.result == 0)
         kea_config = api_data.arguments;
     else
-        console.log("CA Error:" + api_data.text);
-});
+        console.log("CA Error: " + api_data.text);
+}).catch(function () {
+    server_active = 0;
+});;
 
 /* Ingest OUI Database */
 fs = require('fs');
@@ -170,67 +177,13 @@ if (fs.existsSync(oui_database_file)) {
     });
 }
 
-/**
- * Ingest Current Lease File (On System File)
- */
-// var lease_parser = require('./lib/lease_parser.js');
-// dhcp_lease_data = {};
-// lease_read_buffer = "";
-
-// fs = require('fs');
-// fs.readFile(anterius_config.leases_file, 'utf8', function (err, data) {
-//     if (err) {
-//         return console.log(err);
-//     }
-//     else {
-//         lease_parser.parse(data);
-//         console.log("Anterius Server> Leases file loaded");
-//     }
-// });
-
-/**
- * Leases File Listener <memfile> - calculate leases/sec
- */
-// tail = new tail_module(
-//     anterius_config.leases_file,
-//     "\n",
-//     options
-// );
-
-// tail.on("line", function (data) {
-//     unix_time = Math.floor(new Date() / 1000);
-
-//     /* Buffering lines until we get full lease data */
-//     lease_read_buffer = lease_read_buffer + data + "\n";
-
-//     /* End of lease - cut off and parse the buffer */
-//     if (/}/i.test(data)) {
-//         lease_parser.parse(lease_read_buffer);
-//         lease_read_buffer = "";
-//     }
-
-//     /* Count leases per second */
-//     if (/lease/.test(data)) {
-//         lps++;
-//     }
-//     if (current_time != unix_time) {
-//         current_time = unix_time;
-//         leases_per_sec = lps;
-//         leases_last_update_time = unix_time;
-//         lps = 0;
-//     }
-// });
-
-
 var dashboard_timer = setInterval(function () {
     // console.log("Checking timers...");
     unix_time = Math.floor(new Date() / 1000);
     if ((unix_time - 5) > leases_last_update_time) {
         leases_per_sec = 0;
     }
-
     // console.log(JSON.stringify(dhcp_lease_data, null, 2));
-
 }, 5000);
 
 
@@ -238,12 +191,21 @@ var dashboard_timer = setInterval(function () {
 var lps_list = [0];
 var lpm_counter = 0;
 
-/* Recurrent Loop for lease stats */
+/* * Recurrent Loop for lease stats * */
 var lease_stats_monitor = function () {
 
     /* Fetch running status */
-    // TODO: Mechanism to retrieve below sections from remote machine
-    run_status = execSync("keactrl status").toString();
+
+    // TODO: Mechanism to retrieve following attibutes from remote machine
+    if (anterius_config.server_addr == 'localhost' || anterius_config.server_addr == '127.0.0.1') {
+        host_name = execSync("cat /etc/hostname").toString().replace("\n", "");
+        run_status = execSync("keactrl status").toString();
+
+        /* Poll: CPU Utilization */
+        cpu_utilization_poll = setInterval(function () {
+            cpu_utilization = parseFloat(execSync("top -bn 1 | awk 'NR>7{s+=$9} END {print s/4}'").toString())
+        }, (15 * 1000));
+    }
 
     /* Kea CA REST API call - config-get and statistics-get */
     stats_req_data = JSON.stringify({ "command": "statistic-get-all", "service": [anterius_config.current_server] });
@@ -272,7 +234,7 @@ var lease_stats_monitor = function () {
                 server.addr_tag = 'pds';
             }
 
-            // console.log(server.server_config[server.svr_tag], server.sn_tag, server.addr_tag);
+            // console.log(server,server.server_config[server.svr_tag], server.sn_tag, server.addr_tag);
 
             /* Retrieve and store subnets defined within shared nw */
             server.server_config[server.svr_tag]['shared-networks'].forEach(shnw => {
@@ -332,13 +294,18 @@ var lease_stats_monitor = function () {
 
                 }
                 else
-                    console.log("CA Error:" + sdata.text);
+                    console.log("CA Error: " + sdata.text);
+            }).catch(function () {
+                server_active = 0;
             });
             // console.log(kea_stats, kea_config);
         }
         else
-            console.log("CA Error:" + data.text);
-    });
+            console.log("CA Error: " + data.text);
+
+    }).catch(function () {
+        server_active = 0;
+    });;
 
     // console.log(leases_per_minute, leases_per_sec, total_leases);
 
