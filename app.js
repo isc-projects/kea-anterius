@@ -211,7 +211,6 @@ var lease_stats_monitor = function () {
     stats_req_data = JSON.stringify({ "command": "statistic-get-all", "service": [anterius_config.current_server] });
     config_get_req_data = JSON.stringify({ "command": "config-get", "service": [anterius_config.current_server] });
 
-
     /* Fetch and set server config*/
     var response_data = api_agent.fire_kea_api(config_get_req_data, anterius_config.server_addr, anterius_config.server_port).then(function (api_data) {
         return api_data;
@@ -346,6 +345,7 @@ fs.watch('config/anterius_config.json', function (event, filename) {
     if (filename) {
         setTimeout(function () {
             anterius_config = json_file.readFileSync('config/anterius_config.json');
+            server_active = 1;
             console.log("Anterius Server> Config Loaded");
         }, 1000);
     } else {

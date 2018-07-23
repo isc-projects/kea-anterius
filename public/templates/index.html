@@ -264,6 +264,7 @@
         var prevScrollpos = window.pageYOffset;
         var refresh_interval;
         var side_nav = document.getElementById("leftsidebar");
+        var alert_flag = 0;
 
         /* Hide top navbar on scroll */
         window.onscroll = function () {
@@ -288,41 +289,52 @@
         /* Stats parsing and rendering fn */
         function get_stats() {
             $.get("/get_stats", function (data) {
-                $('#cpu-utilization').html(data.cpu_utilization + "%");
-                $('#run-status').html(data.run_status);
-                $('#svr-host-select').html(data.server_host_list);
-                $(data.current_server).prop('checked', true);
-                $('#leases-sec').html(data.leases_per_second.toLocaleString('en') + ' / ' + data.leases_per_minute.toLocaleString('en'));
-                $('#total-active').html(data.leases_used.toLocaleString('en'));
-                $('#server-name').html(data.host_name);
-                $('#shared-networks > tbody').html(data.shared_network_table);
-                $('#subnets > tbody').html(data.subnet_table);
 
-                if (typeof shared_networks !== "undefined")
-                    shared_networks.destroy();
+                if (data.Err && alert_flag == 0) {
+                    do_pjax_request("/anterius_settings");
+                    alert(data.Err);
+                    alert_flag = 1;
+                } else {
+                    $('#run-status').html(data.run_status);
+                    $('#svr-host-select').html(data.server_host_list);
+                    $(data.current_server).prop('checked', true);
+                    $('#leases-sec').html(data.leases_per_second.toLocaleString('en') + ' / ' + data.leases_per_minute.toLocaleString('en'));
+                    $('#total-active').html(data.leases_used.toLocaleString('en'));
+                    $('#shared-networks > tbody').html(data.shared_network_table);
+                    $('#subnets > tbody').html(data.subnet_table);
 
-                if (typeof display_subnets !== "undefined")
-                    display_subnets.destroy();
+                    if (isNaN(data.cpu_utilization)) {
+                        $('#cpu-utilization').html(data.cpu_utilization);
+                        $('#cpu-utilization').css("fontSize", "12px");
+                    } else
+                        $('#cpu-utilization').html(data.cpu_utilization + "%");
 
-                shared_networks = $('#shared-networks').DataTable({
-                    dom: 'tip',
-                    responsive: true,
-                    "pageLength": 100,
-                    "aaSorting": []
-                });
 
-                display_subnets = $('#subnets').DataTable({
-                    dom: 'tip',
-                    responsive: true,
-                    "pageLength": 100,
-                    "aaSorting": []
-                });
+                    if (typeof shared_networks !== "undefined")
+                        shared_networks.destroy();
 
-                $('#shared-networks').fadeOut(100).fadeIn(100);
-                $('#subnets').fadeOut(100).fadeIn(100);
+                    if (typeof display_subnets !== "undefined")
+                        display_subnets.destroy();
 
-                $('select').selectpicker('refresh');
+                    shared_networks = $('#shared-networks').DataTable({
+                        dom: 'tip',
+                        responsive: true,
+                        "pageLength": 100,
+                        "aaSorting": []
+                    });
 
+                    display_subnets = $('#subnets').DataTable({
+                        dom: 'tip',
+                        responsive: true,
+                        "pageLength": 100,
+                        "aaSorting": []
+                    });
+
+                    $('#shared-networks').fadeOut(100).fadeIn(100);
+                    $('#subnets').fadeOut(100).fadeIn(100);
+
+                    $('select').selectpicker('refresh');
+                }
             });
         }
 
@@ -366,7 +378,7 @@
             // console.log(this.value);
             select_server('host', this.value);
             get_stats();
-            refresh_info(500, 'Switched to ' + this.text);
+            refresh_info(500, 'Switched to ' + $("select[id=svr-host-select]").val());
         });
 
         /* Call anterius config setter for selected server type */
