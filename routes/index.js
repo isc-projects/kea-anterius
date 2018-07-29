@@ -182,6 +182,7 @@ router.get('/', function (req, res, next) {
 				.replace(/\binactive\b/g, '<span style="color: #D50000">Inactive</span></span></label>')
 				.split("\n").slice(0, 2);
 
+			run_status_html = '';
 			svrun.forEach(function (svr, index, svr_list) {
 				/* Check if inactive server */
 				if (svr.includes('Inactive'))
@@ -190,17 +191,19 @@ router.get('/', function (req, res, next) {
 				/* Check if current server */
 				if (svr.includes(anterius_config.current_server))
 					svr_list[index] = svr.replace('type="radio"', 'type="radio" checked');
+
+				run_status_html += svr_list[index];
 			});
 		}
 
 		/* Set counter param values */
-		counters.replace(/Loading../g, '');
+		counters = counters.replace(/Loading../g, '');
 		counters = template_render.set_template_variable(counters, "svr_host_list", svr_host_list);
-		counters = template_render.set_template_variable(counters, "run_status", svrun);
+		counters = template_render.set_template_variable(counters, "run_status", run_status_html);
 		counters = template_render.set_template_variable(counters, "leases_ps", leases_per_sec);
 		counters = template_render.set_template_variable(counters, "leases_pm", leases_per_minute);
 		counters = template_render.set_template_variable(counters, "total_active_leases", total_leases);
-		counters = template_render.set_template_variable(counters, "cpu_utilzn", cpu_utilization);
+		counters = template_render.set_template_variable(counters, "cpu_utilzn", cpu_utilization + '%');
 
 		/* Set Shared NW table params*/
 		content_shared_networks = template_render.set_template_variable(content_shared_networks, "title", "Shared Networks");
@@ -222,15 +225,13 @@ router.get('/', function (req, res, next) {
 				content_shared_networks + content_subnets +
 				'</div>',
 				req.url
-			) + '<script type="text/javascript">get_stats(); $("select").selectpicker(); </script>'
-
+			) + '<script type="text/javascript"> $("select").selectpicker(); </script>'
 		);
 	}
 
 	/* If server = inactive */
 	else {
-		res.setHeader('Content-Type', 'application/json');
-		res.send(JSON.stringify({ 'Err': 'Server Error: Verify Server Status and CA address' }));
+		res.send('<script type="text/javascript"> alert(\'Server Error: \\n - Validate CA address in settings \\n - Verify selected server is operational\'); window.location = "/anterius_settings"; </script>');
 	}
 
 });
