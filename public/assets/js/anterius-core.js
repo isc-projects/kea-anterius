@@ -199,7 +199,7 @@ function navtoggle() {
 }
 
 /* Reload page on refresh_stats user request  */
-function refresh_info(delay = 0, message = 'Stats Reloaded!') {
+function refresh_info(delay = 0, message = 'Reloading..') {
     setTimeout(function () {
         source = window.location.href;
         get_stats();

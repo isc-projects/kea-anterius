@@ -21,7 +21,7 @@ router.get('/', authorize.auth, function (req, res, next) {
 	// input = input + template_render.form_input('Config File', '<input type="input" class="form-control" name="config_file" id="config_file" placeholder="/etc/dhcp/dhcpd.conf" value="' + anterius_config.config_file + '">');
 
 	/* Kea Control Agent Hostname Select */
-	host_select = '<div class="input-field form-control"><select id="svr-host-select" name="svr-host-select" style="max-width:75%">';
+	host_select = '<select class="bootstrap-select" id="svr-host-select" name="svr-host-select">';
 	if (anterius_config.server_host_list) {
 		svr_host_list = '<option value="" disabled>Choose Kea machine</option>';
 		anterius_config.server_host_list.forEach(function (host, index) {
@@ -36,7 +36,7 @@ router.get('/', authorize.auth, function (req, res, next) {
 	} else
 		svr_host_list = '<option value="" disabled selected>No server hosts configured</option>';
 
-	input = template_render.form_input('Kea Control Agent Host[host:port]', host_select + svr_host_list + '</select></div>');
+	input = '<label>Kea Control Agent Host [host:port]</label><div class="form-group">' + host_select + svr_host_list + '</select></div>';
 
 	/* Stats Refresh interval */
 	input = input + template_render.form_input('Statistics Refresh Interval (s)', '<input type="input" class="form-control" name="stat_refr_int" id="stat_refr_int" placeholder="Enter refresh interval in secs" value="' + anterius_config.stat_refresh_interval + '">');
@@ -85,7 +85,8 @@ router.get('/', authorize.auth, function (req, res, next) {
 	anterius_settings_template = template_render.set_template_variable(anterius_settings_template, "svr_hosts_len", anterius_config.server_host_list.length);
 	anterius_settings_template = template_render.set_template_variable(anterius_settings_template, "server_host_list", hostname_data_table);
 
-	res.send(template_render.get_index_template(anterius_settings_template, req.url));
+
+	res.send(template_render.get_index_template(anterius_settings_template, req.url) + '<script type="text/javascript"> $("select").selectpicker(); </script>');
 });
 
 module.exports = router;	
