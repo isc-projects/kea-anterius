@@ -221,7 +221,9 @@ router.get('/', function (req, res, next) {
 				content_shared_networks + content_subnets +
 				'</div>',
 				req.url
-			) + '<script type="text/javascript"> $("select").selectpicker(); $("#shared-networks").DataTable(); $("#subnets").DataTable(); </script>'
+			) + '<script type="text/javascript"> $("select").selectpicker();' +
+			'if (!$.fn.dataTable.isDataTable(\'#shared-networks\'))shared_nw_dtable = $(\'#shared-networks\').DataTable({"lengthChange": false, "pageLength": 50});' +
+			'if (!$.fn.dataTable.isDataTable(\'#subnets\'))subnet_dtable = $(\'#subnets\').DataTable({"lengthChange": false, "pageLength": 50});'
 		);
 	}
 

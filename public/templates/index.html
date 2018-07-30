@@ -283,19 +283,14 @@
         $(document).ready(function () {
             alert_flag = 0;
             $(this).scrollTop(0);
-            shared_nw_dtable = $('#shared-networks').DataTable({
-                dom: 'tip',
-                responsive: true,
-                "pageLength": 100,
-                "aaSorting": []
-            });
+            if (!$.fn.dataTable.isDataTable('#shared-networks'))
+                shared_nw_dtable = $('#shared-networks').DataTable({ "lengthChange": false, "pageLength": 50 });
+            if (!$.fn.dataTable.isDataTable('#subnets'))
+                subnet_dtable = $('#subnets').DataTable({ "lengthChange": false, "pageLength": 50 });
 
-            subnet_dtable = $('#subnets').DataTable({
-                dom: 'tip',
-                responsive: true,
-                "pageLength": 100,
-                "aaSorting": []
-            });
+            $('.dataTable input[type="search"]').
+                attr('placeholder', 'Search networks..').
+                css({ 'width': '90%', 'display': 'inline-block' });
 
         });
 
