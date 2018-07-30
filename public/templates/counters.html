@@ -1,14 +1,15 @@
 <div class="row clearfix">
     <div class="col-lg-3 col-md-2 col-sm-6 col-xs-12">
         <div class="info-box hover-zoom-effect" style="overflow: visible">
-            <div class="icon bg-deep-blue">
+            <div class="icon bg-deep-blue col-sm-4">
                 <i class="material-icons">dvr</i>
             </div>
-            <div class="content">
-                <div class="input-field col s12">
+            <div class="content col-sm-8">
+                <div class="input-field">
                     <label class="text">Server Hostname</label>
-                    <select id="svr-host-select" style="font-size:12px; margin-top: 50px;">
-                        Loading...
+                    <select class="bootsrap-select" id="svr-host-select" style="font-size:12px; margin-top: 50px;">
+                        Loading..
+                        [svr_host_list]
                     </select>
                 </div>
             </div>
@@ -23,6 +24,7 @@
                 <div class="text">Kea Server Status</div>
                 <form id="run-status" action="/anterius_settings_save" method="POST">
                     Loading..
+                    [run_status]
                 </form>
             </div>
         </div>
@@ -34,7 +36,7 @@
             </div>
             <div class="content">
                 <div class="text">Leases Per Second / Minute</div>
-                <div class="number" id="leases-sec">0 / 0</div>
+                <div class="number" id="leases-sec">[leases_ps] / [leases_pm]</div>
             </div>
         </div>
 
@@ -46,7 +48,7 @@
             </div>
             <div class="content">
                 <div class="text">Total Active Leases</div>
-                <div class="number" id="total-active">0</div>
+                <div class="number" id="total-active">[total_active_leases]</div>
             </div>
         </div>
     </div>
@@ -57,7 +59,7 @@
             </div>
             <div class="content">
                 <div class="text">CPU</div>
-                <div class="number" id="cpu-utilization">0</div>
+                <div class="number" id="cpu-utilization">[cpu_utilzn]</div>
             </div>
         </div>
     </div>

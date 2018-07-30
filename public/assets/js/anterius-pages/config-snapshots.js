@@ -41,6 +41,6 @@ function delete_config_snapshot(snapshot) {
 
 	$.post("/dhcp_config_snapshots", params, function (data) {
 		notification(data.message, 'bg-black', 3000);
-		refresh_info(delay = 5000);
+		refresh_info(delay = 750);
 	});
 }

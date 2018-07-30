@@ -48,6 +48,8 @@ router.post('/', function (req, res, next) {
 		json_file.writeFile('./config/anterius_config.json', anterius_config, { spaces: 2 }, function (err) {
 			console.error(err)
 		});
+
+		server_active = 1;
 		res.send('<script type="text/javascript">notification(\'Reloading Stats..\')</script>');
 	}
 
@@ -56,8 +58,6 @@ router.post('/', function (req, res, next) {
 		anterius_config.admin_user = request.admin_user;
 		anterius_config.admin_password = request.admin_password;
 		anterius_config.stat_refresh_interval = request.stat_refr_int;
-		anterius_config.server_addr = request.ca_remote_addr.split(':')[0];
-		anterius_config.server_port = request.ca_remote_addr.split(':')[1];
 		anterius_config.current_server = request.svrselect;
 
 		// anterius_config.leases_file = request.leases_file;
@@ -68,6 +68,7 @@ router.post('/', function (req, res, next) {
 			console.error(err)
 		});
 
+		server_active = 1;
 		res.send('<script type="text/javascript">notification(\'Settings saved!\')</script>');
 	}
 });

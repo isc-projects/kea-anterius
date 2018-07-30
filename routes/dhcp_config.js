@@ -14,7 +14,7 @@ router.get('/', authorize.auth, function (req, res, next) {
 	content = template_render.set_template_variable(content, "dhcp_config_content", JSON.stringify(kea_config, null, 4));
 	content = template_render.set_template_variable(content, "title", anterius_config.current_server.toUpperCase().replace('P', 'Pv'));
 
-	var nw_id, nw_type = req.query.network;
+	var nw_id, nw_template = '', nw_type = req.query.network;
 	if (req.query.id)
 		nw_id = req.query.id;
 	else

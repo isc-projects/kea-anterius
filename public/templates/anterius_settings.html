@@ -24,10 +24,11 @@
                                     <table id="server-hosts-table" class="table table-bordered table-striped table-hover js-basic-example dataTable dashboard-task-infos">
                                         <thead>
                                             <tr>
+                                                <!-- <th>Current</th> -->
                                                 <th>Hostname</th>
                                                 <th>Server CA Address</th>
                                                 <th>Server CA Port</th>
-                                                <th width="1%">Edit/Delete</th>
+                                                <th width="10%">Edit / Delete</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -71,7 +72,9 @@
     /* Method to add a server host */
     function add_server_host(index) {
 
-        table_row = '<tr><td><input type="input" name="hostname" id="hostname" placeholder="Enter server hostname" class="form-control"/></td>' +
+        table_row = '<tr>' +
+            // '<td><input type="radio" name="svrhost" id="r' + index + '" value="' + index + '" class="with-gap"/></td>'+
+            '<td><input type="input" name="hostname" id="hostname" placeholder="Enter server hostname" class="form-control"/></td>' +
             '<td><input type="input" name="svr_addr" id="svr_addr" placeholder="Enter Host IP address" class="form-control"/></td>' +
             '<td><input type="input" name="svr_port" id="svr_port" placeholder="Enter Host machine port" class="form-control"/></td>' +
             '<td><button type="button" class="btn waves-effect" id="b' + index + '" onclick="save_server_host(\'' + index + '\')">' +
@@ -79,7 +82,7 @@
             '<button type="button" style="margin-left: 1%" class="btn waves-effect" id="b' + index + '" onclick="delete_server_host(\'' + index + '\')">' +
             '<i class="material-icons">delete</i></button></td></tr>';
 
-        server_hosts_table.rows.add($(table_row)).draw(); // Add new data
+        server_hosts_table.rows.add($(table_row)).draw(); // Add new datax
     }
 
 
