@@ -22,21 +22,52 @@
   * Shared Network Distribution & Utilization
   * Subnet Distribution & Utilization
   
-  ![anterius_settings_ca_address](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_dashboard.png)
+  ![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_dashboard.png)
   
   ### Network Information
 - A detailed information page can be viewed for each individual shared network and subnet defined by the server that provides entity specific data such as **utilization, pools, total, assigned and available no. of leases.**
 
-![anterius_settings_ca_address](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_sharednw_info.png)
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_sharednw_info.png)
 
-![anterius_settings_ca_address](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_subnet_info.png)
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_subnet_info.png)
 
 - Page also presents tables listing the **Host Reservations** defined in n/w configuration and **Lease Information** for currently active leases from the network. Shared network page includes a list of subnets contained in the network.
 
-![anterius_settings_ca_address](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_hostresv_info.png)
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_hostresv_info.png)
 
-![anterius_settings_ca_address](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_lease_info.png)
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_lease_info.png)
 
+  ### DHCP Config Management
+   
+- The DHCP configuration interface can be used to view and make modifications to the current server config file.
+
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_config_view.png)
+
+- Config changes can be validated with the server thru the CA API to test for errors.
+
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_config_test.png)
+
+- Updated and validated config files can be applied to the server if confirmed by the user.
+
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_config update.png)
+
+- Anterius also provides a feature to apply configuration changes for specific networks entities (subnet/shared-network) accessible thru the edit config button available in the network detailed info pages.
+
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_config_shnw.png)
+
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_config_sn.png)
+
+- Config modifications can be reviewed from the File Editor tab where changes are highlighted.
+
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_config_file_editor.png)
+
+- Config page also provides an option to save a snapshot of the current config file which can be accessed as depicted below. 
+
+### DHCP Config Snapshots
+
+- The Snapshot centre provides admins features like viewing previously created config checkpoints and also validate and restore the config files with user confirmation.
+
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_config_snapshots.png)
 
 ## Installation
 (Instructions for Debian/Ubuntu based systems)
@@ -88,7 +119,7 @@ sudo npm start
 
 - Kea Control Agent(CA) runs on port 8000 by default, defined in the CA config file. Please refer to the [Kea Control Agent Documentation](https://kea.isc.org/docs/kea-guide.html#kea-ctrl-agent) for setting CA parameters and addtional info.
 
-![anterius_settings_ca_address](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_settings.png)
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_settings.png)
 
 - To select server host machine, browse to the Anterius Settings option from the menu and select from the list of available hostnames. 
 - Navigate to the Kea Hostname List in the settings page to add/edit/delete server host machine details. 
