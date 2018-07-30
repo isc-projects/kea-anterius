@@ -1,5 +1,5 @@
 [![npm](https://img.shields.io/npm/v/npm.svg)]()
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
 
 # kea-anterius
 - The Anterius project is developed as part of the [Google Summer of Code '18](https://summerofcode.withgoogle.com) program, with the objective to create a GUI dashboard for the Kea DHCP server that provides monitoring and configuration capabilities to users. 
@@ -8,16 +8,19 @@
 
 - Anterius functionality has been modified to support interaction with Kea servers running on remote systems, by incorporating features from the REST API exposed by the Kea Control Agent.
 
-- Anterius currently only supports DHCPv4 server monitoring, and can be interfaced with only a single Kea server instance at a time. DHCPv6 support and multiple servers are features planned to be incorporated in future releases.
+- Anterius supports monitoring and configuration of both DHCPv4 and DHCPv6 servers (provided they are operational at the selected control agent interface).
+
+- Anterius is also designed to interface with multiple server host machines by switching between control agent destination addresses.
 
 ## Features
   ### Dashboard
   The home page provides a monitoring dashboard for the connected server that compiles realtime statistics and critical operating information:
+  * Current Kea Server Hostname
+  * Operational status of Kea servers (DHCP v4/v6) and current selection.
   * DHCP Leases per second / minute
   * Total Active Leases
-  * Kea Server Running status
-  * Shared Network Utilization
-  * Subnet Utilization
+  * Shared Network Distribution & Utilization
+  * Subnet Distribution & Utilization
   
   ![anterius_settings_ca_address](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_dashboard.png)
   
@@ -87,7 +90,8 @@ sudo npm start
 
 ![anterius_settings_ca_address](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_settings.png)
 
-- To select mode of operation, from the Anterius Settings option in the menu, set the CA address(host:port) accordingly.
+- To select server host machine, browse to the Anterius Settings option from the menu and select from the list of available hostnames. 
+- Navigate to the Kea Hostname List in the settings page to add/edit/delete server host machine details. 
 
   - For local server (default mode), set address = localhost:8000
   - For remote server, set address = <public_ip:port>
