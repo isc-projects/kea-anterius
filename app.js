@@ -191,10 +191,9 @@ var lps_list = [0];
 var lpm_counter = 0;
 
 /* * Recurrent Loop for lease stats * */
-var lease_stats_monitor = function () {
+(function lease_stats_monitor() {
 
-    /* Fetch running status */
-
+    /* Fetch running status at set refresh interval*/
     // TODO: Mechanism to retrieve following attibutes from remote machine
     if (anterius_config.server_addr == 'localhost' || anterius_config.server_addr == '127.0.0.1') {
         host_name = execSync("cat /etc/hostname").toString().replace("\n", "");
@@ -300,10 +299,11 @@ var lease_stats_monitor = function () {
         }
         else
             console.log("CA Error: " + data.text);
-
     }).catch(function () {
         server_active = 0;
     });;
+
+    setTimeout(lease_stats_monitor, anterius_config.stat_refresh_interval * 1000);
 
     // console.log(leases_per_minute, leases_per_sec, total_leases);
 
@@ -317,11 +317,10 @@ var lease_stats_monitor = function () {
     //     wss.broadcast_event(JSON.stringify(return_data), 'dhcp_statistics');
     // }
 
-};
+})();
 
 /* Call and export stats function */
-lease_stats_monitor();
-exports.reload = lease_stats_monitor;
+// exports.reload = lease_stats_monitor;
 
 /**
  * Clean Expired Leases

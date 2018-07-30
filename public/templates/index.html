@@ -262,7 +262,7 @@
     <script type="text/javascript">
 
         var prevScrollpos = window.pageYOffset;
-        var refresh_interval;
+        var shared_nw_dtable, subnet_dtable;
         var side_nav = document.getElementById("leftsidebar");
         var alert_flag = 0;
 
@@ -283,42 +283,38 @@
         $(document).ready(function () {
             alert_flag = 0;
             $(this).scrollTop(0);
+            shared_nw_dtable = $('#shared-networks').DataTable({
+                dom: 'tip',
+                responsive: true,
+                "pageLength": 100,
+                "aaSorting": []
+            });
+
+            subnet_dtable = $('#subnets').DataTable({
+                dom: 'tip',
+                responsive: true,
+                "pageLength": 100,
+                "aaSorting": []
+            });
+
         });
 
         /* Stats update rendering fn */
         function get_stats() {
-            $.get("/", function (data) {
-                if (typeof shared_networks !== "undefined")
-                    shared_networks.destroy();
+            do_pjax_request('/');
 
-                if (typeof display_subnets !== "undefined")
-                    display_subnets.destroy();
+            $('#shared-networks').fadeOut(100).fadeIn(100);
+            $('#subnets').fadeOut(100).fadeIn(100);
 
-                shared_networks = $('#shared-networks').DataTable({
-                    dom: 'tip',
-                    responsive: true,
-                    "pageLength": 100,
-                    "aaSorting": []
-                });
-
-                display_subnets = $('#subnets').DataTable({
-                    dom: 'tip',
-                    responsive: true,
-                    "pageLength": 100,
-                    "aaSorting": []
-                });
-
-                $('#shared-networks').fadeOut(100).fadeIn(100);
-                $('#subnets').fadeOut(100).fadeIn(100);
-
-                $('select').selectpicker('refresh');
-            });
+            $('#body-content').css("opacity", "1");
+            $('select').selectpicker('refresh');
         }
 
-        /* Refresh stats @ interval */
-        var get_stats_timer = setInterval(function () {
-            // get_stats();
-        }, 5000);
+        /* Refresh display stats @ interval */
+        get_stats_timer = setInterval(function () {
+            if (window.location.pathname == '/')
+                get_stats();
+        }, 3000);
 
         /* Refresh stats on window focus */
         var window_focus = true;

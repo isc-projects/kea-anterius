@@ -1,4 +1,3 @@
-var app = require('../app');
 var express = require('express');
 var router = express.Router();
 var fs = require('fs');
@@ -14,9 +13,6 @@ router.get('/', function (req, res, next) {
 
 	/* Server online check */
 	if (server_active == 1) {
-
-		/* Update Stats */
-		app.reload();
 
 		/* Lists to store server network data */
 		subnet_list = [], subnet_util = [], subnet_assgn_addr_list = [], subnet_total_addr_list = [], subnet_free_addr_list = [],
@@ -225,7 +221,7 @@ router.get('/', function (req, res, next) {
 				content_shared_networks + content_subnets +
 				'</div>',
 				req.url
-			) + '<script type="text/javascript"> $("select").selectpicker(); </script>'
+			) + '<script type="text/javascript"> $("select").selectpicker(); $("#shared-networks").DataTable(); $("#subnets").DataTable(); </script>'
 		);
 	}
 
