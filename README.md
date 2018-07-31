@@ -13,7 +13,8 @@
 - Anterius is also designed to interface with multiple server host machines by switching between control agent destination addresses.
 
 ## Features
-  ### Dashboard
+
+### Dashboard
   The home page provides a monitoring dashboard for the connected server that compiles realtime statistics and critical operating information:
   * Current Kea Server Hostname
   * Operational status of Kea servers (DHCP v4/v6) and current selection.
@@ -24,7 +25,8 @@
   
   ![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_dashboard.png)
   
-  ### Network Information
+
+### Network Information
 - A detailed information page can be viewed for each individual shared network and subnet defined by the server that provides entity specific data such as **utilization, pools, total, assigned and available no. of leases.**
 
 ![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_sharednw_info.png)
@@ -37,7 +39,8 @@
 
 ![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_lease_info.png)
 
-  ### DHCP Config Management
+
+### DHCP Config Management
    
 - The DHCP configuration interface can be used to view and make modifications to the current server config file.
 
@@ -49,7 +52,7 @@
 
 - Updated and validated config files can be applied to the server if confirmed by the user.
 
-![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_config update.png)
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_config_update.png)
 
 - Anterius also provides a feature to apply configuration changes for specific networks entities (subnet/shared-network) accessible thru the edit config button available in the network detailed info pages.
 
@@ -63,11 +66,41 @@
 
 - Config page also provides an option to save a snapshot of the current config file which can be accessed as depicted below. 
 
+
 ### DHCP Config Snapshots
 
 - The Snapshot centre provides admins features like viewing previously created config checkpoints and also validate and restore the config files with user confirmation.
 
 ![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_config_snapshots.png)
+
+
+### DHCP Server Boot Operations <local-server-feature>
+
+- Anterius provides a server operation management page to execute start / stop / restart commands for DHCP v4/v6 servers. (Please note this feature is only supported for a local machine server until these commands are added to the Control Agent API) 
+
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_boot_ops.png)
+
+
+### Kea Log Streaming <local-server-feature>
+
+- Anterius includes a Log streaming page displays the syslogd output from Kea servers in real-time allowing admins to review and save logs to a text file. (Please note this feature is only supported for a local machine server, remote log streaming feature is planned to be added in a future release)
+
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_log_stream.png)
+
+### Anterius Alerting
+
+- The alerting function allows admins to set custom thresholds for subnet and shared network utilization
+
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_alerts.png)
+
+- Alert Levels:
+  - Default 80 (Warning)
+  - Default 95 (Critical)
+
+- Alert Delivery Methods
+  - E-Mail
+  - SMS
+
 
 ## Installation
 (Instructions for Debian/Ubuntu based systems)
