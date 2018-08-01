@@ -241,7 +241,7 @@ router.get('/', function (req, res, next) {
         content = template_render.set_template_variable(content, "total_addr", nw_total_addr);
         content = template_render.set_template_variable(content, "free_addr", nw_free_addr);
 
-        res.send(template_render.get_index_template(content, req.url) + '<script type="text/javascript">get_stats(); </script>');
+        res.send(template_render.get_index_template(content, req.url));
     });
 
 });

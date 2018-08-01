@@ -264,7 +264,7 @@
         var prevScrollpos = window.pageYOffset;
         var shared_nw_dtable, subnet_dtable;
         var side_nav = document.getElementById("leftsidebar");
-        var alert_flag = 0;
+        var refresh_flag = true;
 
         /* Hide top navbar on scroll */
         window.onscroll = function () {
@@ -281,7 +281,6 @@
 
         /* OnReady - Scroll to top, initialize server host selector */
         $(document).ready(function () {
-            alert_flag = 0;
             $(this).scrollTop(0);
             if (!$.fn.dataTable.isDataTable('#shared-networks'))
                 shared_nw_dtable = $('#shared-networks').DataTable({ "lengthChange": false, "pageLength": 50 });
@@ -307,7 +306,7 @@
 
         /* Refresh display stats @ interval */
         get_stats_timer = setInterval(function () {
-            if (window.location.pathname == '/')
+            if (window.location.pathname == '/' && refresh_flag)
                 get_stats();
         }, 3000);
 
@@ -344,17 +343,22 @@
         /* Call anterius config setter for selected server host */
         $('select').on('change', function (e) {
             // console.log(this.value);
+            refresh_flag = false;
             select_server('host', this.value);
+            refresh_flag = true;
             get_stats();
             refresh_info(500, 'Switched to ' + $("select[id=svr-host-select] :selected").text());
         });
 
         /* Call anterius config setter for selected server type */
         $(document).on('change', 'input[type=radio][name=svrselect]', function () {
+            refresh_flag = false;
             select_server('type');
+            refresh_flag = true;
             get_stats();
             refresh_info(500, 'Switched to ' + $("input[name=svrselect]:checked").val());
         });
+
 
     </script>
 

@@ -188,7 +188,7 @@ var lps_list = [0];
 var lpm_counter = 0;
 
 /* * Recurrent Loop for lease stats * */
-var lease_stats_monitor = function() {
+var lease_stats_monitor = function () {
 
     /* Fetch running status at set refresh interval*/
     // TODO: Mechanism to retrieve following attibutes from remote machine
@@ -287,20 +287,22 @@ var lease_stats_monitor = function() {
                     tl0 = total_leases
 
                 }
-                else
+                else {
                     console.log("CA Error: " + sdata.text);
+                    server_active = 0;
+                }
             }).catch(function () {
                 server_active = 0;
             });
             // console.log(kea_stats, kea_config);
         }
-        else
+        else {
             console.log("CA Error: " + data.text);
+            server_active = 0;
+        }
     }).catch(function () {
         server_active = 0;
     });;
-
-    setTimeout(lease_stats_monitor, anterius_config.stat_refresh_interval * 1000);
 
     // console.log(leases_per_minute, leases_per_sec, total_leases);
 
@@ -317,7 +319,8 @@ var lease_stats_monitor = function() {
 };
 
 /* Call and export stats function */
-lease_stats_monitor();
+setTimeout(lease_stats_monitor, anterius_config.stat_refresh_interval * 1000);
+// clearTimeout(lease_stats_monitor);
 exports.reload = lease_stats_monitor;
 
 /**
