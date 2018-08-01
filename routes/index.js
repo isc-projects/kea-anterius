@@ -1,3 +1,4 @@
+var app = require('../app');
 var express = require('express');
 var router = express.Router();
 var fs = require('fs');
@@ -13,6 +14,9 @@ router.get('/', function (req, res, next) {
 
 	/* Server online check */
 	if (server_active == 1) {
+
+		/* Reload Stats */
+		// app.reload();
 
 		/* Lists to store server network data */
 		subnet_list = [], subnet_util = [], subnet_assgn_addr_list = [], subnet_total_addr_list = [], subnet_free_addr_list = [],
@@ -229,7 +233,12 @@ router.get('/', function (req, res, next) {
 
 	/* If server = inactive */
 	else {
-		res.send('<script type="text/javascript"> alert(\'Server Error: \\n - Validate CA address in settings \\n - Verify selected server is operational\'); window.location = "/anterius_settings"; </script>');
+		res.send('<html><link rel="icon" href="../images/favicon.ico" type="image/x-icon"><script src="assets/plugins/jquery/jquery.min.js"></script><script src="assets/plugins/bootstrap/js/bootstrap.js"></script>' +
+			'<link href="assets/plugins/bootstrap/css/bootstrap.css" rel="stylesheet"><link href="assets/css/style.css" rel="stylesheet"><link href="assets/plugins/node-waves/waves.css" rel="stylesheet" />' +
+			'<div class="modal fade" id="mdModal" tabindex="-1" role="dialog"> <div class="modal-dialog" role="document"> <div class="modal-content"> <div class="modal-header"> <h4 class="modal-title" id="modal-title">Modal title</h4> </div>' +
+			'<div class="modal-body" id="modal-body"> </div> <div class="modal-footer"> <div id="modal-buttons" style="display:inline-block"></div> <button type="button" class="btn btn-link waves-effect" data-dismiss="modal">CLOSE</button> </div> </div> </div> </div>' +
+			'<script type="text/javascript">$(\'#modal-buttons\').html(\'\'); $(\'#modal-title\').html(\'Server Error:\'); $(\'#modal-body\').html(\' - Validate CA address in settings <br> - Verify selected server is operational\');' +
+			'$(\'#modal-buttons\').html(\'<button type="button" class="btn btn-link waves-effect" onclick="window.location = \\\'/anterius_settings\\\'">Verify Settings</button>\'); $(\'#mdModal\').modal(\'show\'); </script></html>');
 	}
 
 });

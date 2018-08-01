@@ -4,7 +4,6 @@
 
 var express = require('express');
 var path = require('path');
-var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
@@ -19,8 +18,6 @@ var api_agent = require('./lib/api_service.js');
 /* Read Config */
 var json_file = require('jsonfile');
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -191,7 +188,7 @@ var lps_list = [0];
 var lpm_counter = 0;
 
 /* * Recurrent Loop for lease stats * */
-(function lease_stats_monitor() {
+var lease_stats_monitor = function() {
 
     /* Fetch running status at set refresh interval*/
     // TODO: Mechanism to retrieve following attibutes from remote machine
@@ -317,10 +314,11 @@ var lpm_counter = 0;
     //     wss.broadcast_event(JSON.stringify(return_data), 'dhcp_statistics');
     // }
 
-})();
+};
 
 /* Call and export stats function */
-// exports.reload = lease_stats_monitor;
+lease_stats_monitor();
+exports.reload = lease_stats_monitor;
 
 /**
  * Clean Expired Leases
