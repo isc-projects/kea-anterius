@@ -1,5 +1,5 @@
 [![npm](https://img.shields.io/npm/v/npm.svg)]()
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
 
 # kea-anterius
 - The Anterius project is developed as part of the [Google Summer of Code '18](https://summerofcode.withgoogle.com) program, with the objective to create a GUI dashboard for the Kea DHCP server that provides monitoring and configuration capabilities to users. 
@@ -8,31 +8,98 @@
 
 - Anterius functionality has been modified to support interaction with Kea servers running on remote systems, by incorporating features from the REST API exposed by the Kea Control Agent.
 
-- Anterius currently only supports DHCPv4 server monitoring, and can be interfaced with only a single Kea server instance at a time. DHCPv6 support and multiple servers are features planned to be incorporated in future releases.
+- Anterius supports monitoring and configuration of both DHCPv4 and DHCPv6 servers (provided they are operational at the selected control agent interface).
+
+- Anterius is also designed to interface with multiple server host machines by switching between control agent destination addresses.
 
 ## Features
-  ### Dashboard
+
+### Dashboard
   The home page provides a monitoring dashboard for the connected server that compiles realtime statistics and critical operating information:
+  * Current Kea Server Hostname
+  * Operational status of Kea servers (DHCP v4/v6) and current selection.
   * DHCP Leases per second / minute
   * Total Active Leases
-  * Kea Server Running status
-  * Shared Network Utilization
-  * Subnet Utilization
+  * Shared Network Distribution & Utilization
+  * Subnet Distribution & Utilization
   
-  ![anterius_settings_ca_address](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_dashboard.png)
+  ![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_dashboard.png)
   
-  ### Network Information
+
+### Network Information
 - A detailed information page can be viewed for each individual shared network and subnet defined by the server that provides entity specific data such as **utilization, pools, total, assigned and available no. of leases.**
 
-![anterius_settings_ca_address](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_sharednw_info.png)
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_sharednw_info.png)
 
-![anterius_settings_ca_address](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_subnet_info.png)
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_subnet_info.png)
 
 - Page also presents tables listing the **Host Reservations** defined in n/w configuration and **Lease Information** for currently active leases from the network. Shared network page includes a list of subnets contained in the network.
 
-![anterius_settings_ca_address](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_hostresv_info.png)
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_hostresv_info.png)
 
-![anterius_settings_ca_address](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_lease_info.png)
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_lease_info.png)
+
+
+### DHCP Config Management
+   
+- The DHCP configuration interface can be used to view and make modifications to the current server config file.
+
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_config_view.png)
+
+- Config changes can be validated with the server thru the CA API to test for errors.
+
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_config_test.png)
+
+- Updated and validated config files can be applied to the server if confirmed by the user.
+
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_config_update.png)
+
+- Anterius also provides a feature to apply configuration changes for specific networks entities (subnet/shared-network) accessible thru the edit config button available in the network detailed info pages.
+
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_config_shnw.png)
+
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_config_sn.png)
+
+- Config modifications can be reviewed from the File Editor tab where changes are highlighted.
+
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_config_file_editor.png)
+
+- Config page also provides an option to save a snapshot of the current config file which can be accessed as depicted below. 
+
+
+### DHCP Config Snapshots
+
+- The Snapshot centre provides admins features like viewing previously created config checkpoints and also validate and restore the config files with user confirmation.
+
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_config_snapshots.png)
+
+
+### DHCP Server Boot Operations <local-server-feature>
+
+- Anterius provides a server operation management page to execute start / stop / restart commands for DHCP v4/v6 servers. (Please note this feature is only supported for a local machine server until these commands are added to the Control Agent API) 
+
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_boot_ops.png)
+
+
+### Kea Log Streaming <local-server-feature>
+
+- Anterius includes a Log streaming page displays the syslogd output from Kea servers in real-time allowing admins to review and save logs to a text file. (Please note this feature is only supported for a local machine server, remote log streaming feature is planned to be added in a future release)
+
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_log_stream.png)
+
+### Anterius Alerting
+
+- The alerting function allows admins to set custom thresholds for subnet and shared network utilization
+
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_alerts.png)
+
+- Alert Levels:
+  - Default 80 (Warning)
+  - Default 95 (Critical)
+
+- Alert Delivery Methods
+  - E-Mail
+  - SMS
 
 
 ## Installation
@@ -85,9 +152,10 @@ sudo npm start
 
 - Kea Control Agent(CA) runs on port 8000 by default, defined in the CA config file. Please refer to the [Kea Control Agent Documentation](https://kea.isc.org/docs/kea-guide.html#kea-ctrl-agent) for setting CA parameters and addtional info.
 
-![anterius_settings_ca_address](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_settings.png)
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_settings.png)
 
-- To select mode of operation, from the Anterius Settings option in the menu, set the CA address(host:port) accordingly.
+- To select server host machine, browse to the Anterius Settings option from the menu and select from the list of available hostnames. 
+- Navigate to the Kea Hostname List in the settings page to add/edit/delete server host machine details. 
 
   - For local server (default mode), set address = localhost:8000
   - For remote server, set address = <public_ip:port>
