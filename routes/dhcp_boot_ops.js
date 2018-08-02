@@ -70,7 +70,7 @@ router.post('/', authorize.auth, function (req, res, next) {
 					console.log('stdout: ' + stdout);
 				}
 			)
-			res.send("<script type='text/javascript'>get_stats(); refresh_info(750, '" + request.server + " Stopped');ignore_cache = 1;$('#mdModal').modal('hide');</script>");
+			res.send("<script type='text/javascript'>get_stats(); refresh_info(delay = 750, message = '" + request.server + " Stopped');ignore_cache = 1;$('#mdModal').modal('hide');</script>");
 			break;
 
 		case "start":
@@ -80,7 +80,7 @@ router.post('/', authorize.auth, function (req, res, next) {
 					console.log('stdout: ' + stdout);
 				}
 			)
-			res.send("<script type='text/javascript'> get_stats(); refresh_info(750, '" + request.server + " Started');ignore_cache = 1;</script>");
+			res.send("<script type='text/javascript'> get_stats(); refresh_info(delay = 750, message = '" + request.server + " Started');ignore_cache = 1;</script>");
 			break;
 
 		case "restart":
@@ -90,7 +90,7 @@ router.post('/', authorize.auth, function (req, res, next) {
 					console.log('stdout: ' + stdout);
 				}
 			)
-			res.send("<script type='text/javascript'> get_stats(); refresh_info(750, '" + request.server + " Restarted '); $('#mdModal').modal('hide');</script > ");
+			res.send("<script type='text/javascript'> get_stats(); refresh_info(delay = 750, message = '" + request.server + " Restarted '); $('#mdModal').modal('hide');</script > ");
 			break;
 
 		default:
