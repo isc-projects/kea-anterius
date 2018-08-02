@@ -122,6 +122,8 @@ function remove_init_form() {
 }
 
 function modal(title, content, buttons) {
+
+    console.log(title, buttons);
     $('#modal-buttons').html('');
     $('#modal-title').html(title);
     $('#modal-body').html(content);
@@ -199,10 +201,9 @@ function navtoggle() {
 }
 
 /* Reload page on refresh_stats user request  */
-function refresh_info(delay = 0, message = 'Reloading..') {
+function refresh_info(delay = 0, message = 'Reloading..', source = window.location.href) {
     setTimeout(function () {
-        source = window.location.href;
-        get_stats();
+        console.log(source);
         window.location = source;
     }, delay);
 
@@ -266,7 +267,7 @@ function save_server_host(index) {
     svr_host = "index=" + index + "&hostname=" + $hostname.val() + "&addr=" + $addr.val() + "&port=" + $port.val();
 
     $.post("/anterius_settings_save", svr_host, function (data) {
-        refresh_info(750, data);
+        refresh_info(delay = 750, message = data);
     });
 
     var $h = $('<p data-editable id="h' + index + '"/>').text($hostname.val());
@@ -286,7 +287,7 @@ function delete_server_host(index) {
     svr_host = "index=" + index + "&delete=true";
 
     $.post("/anterius_settings_save", svr_host, function (data) {
-        refresh_info(750, data);
+        refresh_info(delay = 750, message = data);
     });
 }
 
@@ -301,7 +302,7 @@ function select_server(mode, index = 0) {
         else
             svrselect = 'mode=current_server&svrselect=' + $("input[name=svrselect]:checked").val();
     }
-    console.log(svrselect);
+    // console.log(svrselect);
 
     $.post("/anterius_settings_save", svrselect, function (data) {
         $("#anterius_settings_result").html(data);
@@ -342,20 +343,6 @@ function notification(text, colorName = 'bg-black', delay = 2000, url = '#') {
                 '<a href="{3}" target="{4}" data-notify="url"></a>' +
                 '</div>'
         });
-}
-
-function change_favicon(img) {
-    var favicon = document.querySelector('link[rel="shortcut icon"]');
-
-    if (!favicon) {
-        favicon = document.createElement('link');
-        favicon.setAttribute('rel', 'shortcut icon');
-        var head = document.querySelector('head');
-        head.appendChild(favicon);
-    }
-
-    favicon.setAttribute('type', 'image/png');
-    favicon.setAttribute('href', img);
 }
 
 $(document).on("click", ".option_data", function () {
