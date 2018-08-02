@@ -319,8 +319,9 @@ var lease_stats_monitor = function () {
 };
 
 /* Call and export stats function */
-setTimeout(lease_stats_monitor, anterius_config.stat_refresh_interval * 1000);
-// clearTimeout(lease_stats_monitor);
+lease_stats_monitor();
+setInterval(lease_stats_monitor, anterius_config.stat_refresh_interval * 1000);
+// clearInterval(lease_stats_monitor);
 exports.reload = lease_stats_monitor;
 
 /**
