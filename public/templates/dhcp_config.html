@@ -29,7 +29,8 @@
 
                     <br>
                     <div class="row" align="center">
-                        <button type="button" id="save_snap_btn" class="btn btn-info waves-effect ant-btn" style="margin-bottom: 2%; width: 25%;" onclick="save_config_snapshot()">
+                        <button type="button" id="save_snap_btn" class="btn btn-info waves-effect ant-btn" style="margin-bottom: 2%; width: 25%;"
+                            onclick="save_config_snapshot()">
                             <i class="material-icons">save</i>
                             <span>Save Config</span>
                         </button>
@@ -48,14 +49,12 @@
         </div>
         <hr>
         <div class="row" align="center">
-            <button id="test_btn" type="button" class="btn btn-info waves-effect ant-btn" style="margin-bottom: 2%; width: 20%;"
-                onclick="test_dhcp_config()">
+            <button id="test_btn" type="button" class="btn btn-info waves-effect ant-btn" style="margin-bottom: 2%; width: 20%;" onclick="test_dhcp_config()">
                 <i class="material-icons">system_update_alt</i>
                 <span>Test Config</span>
             </button>
             <span style="margin-left:5%; margin-right:5%"></span>
-            <button id="update_btn" type="button" class="btn btn-info waves-effect ant-btn" style="margin-bottom: 2%;  width: 20%;"
-                onclick="upload_dhcp_config()">
+            <button id="update_btn" type="button" class="btn btn-info waves-effect ant-btn" style="margin-bottom: 2%;  width: 20%;" onclick="upload_dhcp_config()">
                 <i class="material-icons">system_update_alt</i>
                 <span>Update Config</span>
             </button>
@@ -63,8 +62,8 @@
     </div>
 
 </div>
-<script>
-
+<script type="text/javascript">
+    'use strict';
     /* OnReady - Scroll to top, initialize buttons */
     $(window).load(function () {
         $(this).scrollTop(0);
