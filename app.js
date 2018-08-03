@@ -1,6 +1,7 @@
 /*
 © Anthrino > Express APP
 */
+'use strict';
 
 var express = require('express');
 var path = require('path');
