@@ -34,7 +34,7 @@ router.post('/', authorize.auth, function (req, res, next) {
     /* Create snapshot bckp folder if missing */
     try {
 
-        bkp_dir = 'config_backups/' + anterius_config.current_server;
+        bkp_dir = 'config_backups/' + global.anterius_config.current_server;
         if (!fs.existsSync(bkp_dir)) {
             fs.mkdirSync(bkp_dir);
         }
@@ -44,13 +44,13 @@ router.post('/', authorize.auth, function (req, res, next) {
 
             var json_file = require('jsonfile');
             var timestamp = new Date().getTime();
-            var ss_filename = anterius_config.current_server + "_conf_snap_" + timestamp;
+            var ss_filename = global.anterius_config.current_server + "_conf_snap_" + timestamp;
 
             dhcp_config_file = JSON.parse(request.dhcp_config_file);
             // console.log(ss_filename, human_time(timestamp), dhcp_config_file);
 
             json_file.writeFile(bkp_dir + '/' + ss_filename, dhcp_config_file, { spaces: 2 });
-            res.send({ "message": anterius_config.current_server.toUpperCase() + ' Config snapshot created @ <br>< ' + human_time(timestamp) + ' >' });
+            res.send({ "message": global.anterius_config.current_server.toUpperCase() + ' Config snapshot created @ <br>< ' + human_time(timestamp) + ' >' });
         }
         else if (request.affirm) {
             fs.unlinkSync(bkp_dir + '/' + request.snapshot);
@@ -72,7 +72,7 @@ router.get('/', authorize.auth, function (req, res, next) {
     content = template_render.set_template_variable(content, "title", "DHCP Config Snaphots");
 
     /* Create snapshot bckp folder if missing */
-    bkp_dir = 'config_backups/' + anterius_config.current_server;
+    bkp_dir = 'config_backups/' + global.anterius_config.current_server;
     if (!fs.existsSync(bkp_dir)) {
         fs.mkdirSync(bkp_dir);
 

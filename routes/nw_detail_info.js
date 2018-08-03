@@ -18,12 +18,12 @@ router.get('/', function (req, res, next) {
     var nw_total_addr = 0, nw_free_addr = 0, nw_assgn_addr = 0;
     var content_subnets = '', subnet_table = '', host_res_table = '', leases_data_table = '';
 
-    // console.log(subnet_list);
+    // console.log(global.kea_server.subnet_list);
 
     /* Filter info specific to requested subnet */
-    if (req.query.type == server.sn_tag) {
+    if (req.query.type == global.kea_server.sn_tag) {
         id = req.query.id.replace('?v_ajax', '');
-        subnet_list.forEach(s => {
+        global.kea_server.subnet_list.forEach(s => {
             if (s.id == id) {
                 pools.push(s.pools);
                 subnets.push(s);
@@ -35,23 +35,23 @@ router.get('/', function (req, res, next) {
                 // break;
             }
         });
-        nw_assgn_addr += kea_stats['subnet[' + id + '].assigned-' + server.addr_tag][0][0];
-        nw_total_addr += kea_stats['subnet[' + id + '].total-' + server.addr_tag][0][0];
+        nw_assgn_addr += global.kea_stats['subnet[' + id + '].assigned-' + global.kea_server.addr_tag][0][0];
+        nw_total_addr += global.kea_stats['subnet[' + id + '].total-' + global.kea_server.addr_tag][0][0];
         content = template_render.set_template_variable(content, "title", "Subnet [" + subnets[0].subnet + "] Information");
 
     }
     /* Filter info specific to requested shared network */
     else {
         shared_nw = req.query.id.replace('?v_ajax', '');
-        server.server_config[server.svr_tag]['shared-networks'].forEach(s => {
+        global.kea_server.server_config[global.kea_server.svr_tag]['shared-networks'].forEach(s => {
 
             if (s.name == shared_nw) {
-                s[server.sn_tag].forEach(x => {
+                s[global.kea_server.sn_tag].forEach(x => {
                     id.push(x['id']);
                 });
 
                 /* Identify subnets defined within shared nw */
-                subnet_list.forEach(sn => {
+                global.kea_server.subnet_list.forEach(sn => {
                     if (id.includes(sn.id)) {
                         pools.push(sn.pools);
                         subnets.push(sn);
@@ -59,8 +59,8 @@ router.get('/', function (req, res, next) {
                             resv['subnet-id'] = sn.id;
                             host_res.push(resv);
                         });
-                        sn_assgn = kea_stats['subnet[' + sn.id + '].assigned-' + server.addr_tag][0][0];
-                        sn_total = kea_stats['subnet[' + sn.id + '].total-' + server.addr_tag][0][0];
+                        sn_assgn = global.kea_stats['subnet[' + sn.id + '].assigned-' + global.kea_server.addr_tag][0][0];
+                        sn_total = global.kea_stats['subnet[' + sn.id + '].total-' + global.kea_server.addr_tag][0][0];
                         nw_assgn_addr += sn_assgn;
                         nw_total_addr += sn_total;
 
@@ -88,7 +88,7 @@ router.get('/', function (req, res, next) {
 
                     table_row = '';
                     table_row = table_row + '<td>' + subnets[i].id + '</td>'; //Subnet ID
-                    table_row = table_row + '<td><b><a href="/nw_detail_info?type=' + server.sn_tag + '&id=' + subnets[i].id + '" pjax="1">' + subnets[i].subnet + '</a></b></td>'; //Subnet details link
+                    table_row = table_row + '<td><b><a href="/nw_detail_info?type=' + global.kea_server.sn_tag + '&id=' + subnets[i].id + '" pjax="1">' + subnets[i].subnet + '</a></b></td>'; //Subnet details link
                     table_row = table_row + '<td>' + pool_range + '</td>'; //Subnet Pool range
                     table_row = table_row + '<td>' + subnet_util[i][0].toLocaleString('en') + ' (' + sn_utilzn + '%)</td>';
                     table_row = table_row + '<td>' + subnet_util[i][1].toLocaleString('en') + '</td>';
@@ -142,7 +142,7 @@ router.get('/', function (req, res, next) {
 
     /* Host reservation parser - generate table*/
     for (var i = 0; i < host_res.length; i++) {
-        // console.log(subnets[i].pools[0].pool, kea_stats['subnet[' + i+1 + '].assigned-'+server.addr_tag][0][0], subnet_util[i].utilization, )
+        // console.log(subnets[i].pools[0].pool, global.kea_stats['subnet[' + i+1 + '].assigned-'+global.kea_server.addr_tag][0][0], subnet_util[i].utilization, )
 
         /* Define reservation row for table */
         table_row = '';
@@ -170,13 +170,13 @@ router.get('/', function (req, res, next) {
     // console.log(id);
 
     /* Construct lease-get command for specified subnets */
-    if (anterius_config.current_server == 'dhcp4')
-        lease_get_req_data = JSON.stringify({ "command": "lease4-get-all", "service": [anterius_config.current_server], "arguments": { "subnets": id } });
+    if (global.anterius_config.current_server == 'dhcp4')
+        lease_get_req_data = JSON.stringify({ "command": "lease4-get-all", "service": [global.anterius_config.current_server], "arguments": { "subnets": id } });
     else
-        lease_get_req_data = JSON.stringify({ "command": "lease6-get-all", "service": [anterius_config.current_server], "arguments": { "subnets": id } });
+        lease_get_req_data = JSON.stringify({ "command": "lease6-get-all", "service": [global.anterius_config.current_server], "arguments": { "subnets": id } });
 
     /* Fetch lease data for network*/
-    var response_data = api_agent.fire_kea_api(lease_get_req_data, anterius_config.server_addr, anterius_config.server_port).then(function (api_data) {
+    var response_data = api_agent.fire_kea_api(lease_get_req_data, global.anterius_config.server_addr, global.anterius_config.server_port).then(function (api_data) {
         // console.log(api_data);
         return api_data;
     });

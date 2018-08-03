@@ -11,8 +11,8 @@ router.get('/', authorize.auth, function (req, res, next) {
 	content = template_render.get_template("dhcp_config");
 
 	// Display current config file from API config-get
-	content = template_render.set_template_variable(content, "dhcp_config_content", JSON.stringify(kea_config, null, 4));
-	content = template_render.set_template_variable(content, "title", anterius_config.current_server.toUpperCase().replace('P', 'Pv'));
+	content = template_render.set_template_variable(content, "dhcp_config_content", JSON.stringify(global.kea_config, null, 4));
+	content = template_render.set_template_variable(content, "title", global.anterius_config.current_server.toUpperCase().replace('P', 'Pv'));
 
 	var nw_id, nw_template = '', nw_type = req.query.network;
 	if (req.query.id)
@@ -28,7 +28,7 @@ router.get('/', authorize.auth, function (req, res, next) {
 				var nw_entity;
 				hr_addr = req.query.id.split(':')[0];
 				subnet_id = req.query.id.split(':')[1];
-				subnet_list.forEach(s => {
+				global.kea_server.subnet_list.forEach(s => {
 					if (s.id == subnet_id) {
 						// pools = s.pools;
 						s['reservations'].forEach(h => {
@@ -52,9 +52,9 @@ router.get('/', authorize.auth, function (req, res, next) {
 			else {
 
 				var nw_entity;
-				if (nw_type == server.sn_tag) {
+				if (nw_type == global.kea_server.sn_tag) {
 
-					subnet_list.forEach(s => {
+					global.kea_server.subnet_list.forEach(s => {
 						if (s.id == req.query.id) {
 							// pools = s.pools;
 							nw_entity = s;
@@ -63,14 +63,14 @@ router.get('/', authorize.auth, function (req, res, next) {
 						}
 					});
 
-					content = template_render.set_template_variable(content, "edit_title", "Subnet ID : " + nw_entity.id + " [ <a href='/nw_detail_info?type=" + server.sn_tag + "&id=" + nw_entity.id + "'>" + nw_entity.subnet + "</a> ] Configuration options");
+					content = template_render.set_template_variable(content, "edit_title", "Subnet ID : " + nw_entity.id + " [ <a href='/nw_detail_info?type=" + global.kea_server.sn_tag + "&id=" + nw_entity.id + "'>" + nw_entity.subnet + "</a> ] Configuration options");
 					input = template_render.form_input('Subnet', '<input type="text" class="form-control" name="subnet" id="subnet" placeholder="Enter address/netmask" value="' + nw_entity.subnet + '">');
 				}
 				else {
 
-					server.server_config[server.svr_tag]['shared-networks'].forEach(s => {
+					global.kea_server.server_config[global.kea_server.svr_tag]['shared-networks'].forEach(s => {
 						if (s.name == req.query.id) {
-							// s[server.sn_tag].forEach(x => {
+							// s[global.kea_server.sn_tag].forEach(x => {
 							// 	id.push(x['id']);
 							// });
 							nw_entity = s;
@@ -92,12 +92,12 @@ router.get('/', authorize.auth, function (req, res, next) {
 		} else {
 
 			if (nw_type == 'subnet')
-				nw_template = json_file.readFileSync('public/config_templates/subnet' + server.svr_tag.replace('Dhcp', '') + '.json');
+				nw_template = json_file.readFileSync('public/config_templates/subnet' + global.kea_server.svr_tag.replace('Dhcp', '') + '.json');
 			else
-				nw_template = json_file.readFileSync('public/config_templates/sharednw' + server.svr_tag.replace('Dhcp', '') + '.json');
+				nw_template = json_file.readFileSync('public/config_templates/sharednw' + global.kea_server.svr_tag.replace('Dhcp', '') + '.json');
 
 			// console.log(nw_template);
-			content = template_render.set_template_variable(content, "edit_title", nw_type.toUpperCase() + " Creation options: " + server.svr_tag + " Server");
+			content = template_render.set_template_variable(content, "edit_title", nw_type.toUpperCase() + " Creation options: " + global.kea_server.svr_tag + " Server");
 			input = '', buffer = '';
 
 			for (param in nw_template) {
@@ -116,7 +116,7 @@ router.get('/', authorize.auth, function (req, res, next) {
 
 		/* Config gen button */
 		input += '<div class="row" align="center"><button id="gen_btn" type="button" class="btn btn-info waves-effect ant-btn" style="margin-bottom: 2%; width: 25%;" onclick=\'gen_dhcp_config("'
-			+ req.query.mode + '","' + server.svr_tag + '","' + server.sn_tag + '","' + nw_id + '","' + nw_type + '",' + JSON.stringify(nw_template) + ',' + JSON.stringify(subnet_list) + ')\'><i class="material-icons">settings</i> <span>Write ' + req.query.mode + ' changes to Test file</span></button></div>';
+			+ req.query.mode + '","' + global.kea_server.svr_tag + '","' + global.kea_server.sn_tag + '","' + nw_id + '","' + nw_type + '",' + JSON.stringify(nw_template) + ',' + JSON.stringify(global.kea_server.subnet_list) + ')\'><i class="material-icons">settings</i> <span>Write ' + req.query.mode + ' changes to Test file</span></button></div>';
 
 		form_data = template_render.form_body("config-form", input);
 

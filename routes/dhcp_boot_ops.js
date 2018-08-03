@@ -8,11 +8,11 @@ router.get('/', authorize.auth, function (req, res, next) {
 	var content = "";
 
 	content = template_render.get_template("dhcp_boot_ops");
-	content = template_render.set_template_variable(content, "title", anterius_config.current_server.toUpperCase() + " Server Boot Ops : Start / Stop / Restart");
+	content = template_render.set_template_variable(content, "title", global.anterius_config.current_server.toUpperCase() + " Server Boot Ops : Start / Stop / Restart");
 
-	// run_status = execSync("keactrl status").toString();
+	// global.kea_server.run_status = execSync("keactrl status").toString();
 
-	var svrun = run_status.replace("\n", "<br> \n")
+	var svrun = global.kea_server.run_status.replace("\n", "<br> \n")
 		.replace(/\bactive\b/g, '<span style="color: #00a90b">Active</span></span></label>')
 		.replace(/\binactive\b/g, '<span style="color: #D50000">Inactive</span></span></label>')
 		.split("\n").slice(0, 2);

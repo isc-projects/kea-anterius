@@ -6,13 +6,13 @@ var api_agent = require('../lib/api_service.js');
 router.get('/', function (req, res, next) {
 
     /* Construct lease-get command for specified subnets */
-    if (anterius_config.current_server == 'dhcp4')
-        lease_get_req_data = JSON.stringify({ "command": "lease4-get-all", "service": [anterius_config.current_server] });
+    if (global.anterius_config.current_server == 'dhcp4')
+        lease_get_req_data = JSON.stringify({ "command": "lease4-get-all", "service": [global.anterius_config.current_server] });
     else
-        lease_get_req_data = JSON.stringify({ "command": "lease6-get-all", "service": [anterius_config.current_server] });
+        lease_get_req_data = JSON.stringify({ "command": "lease6-get-all", "service": [global.anterius_config.current_server] });
 
     /* Fetch lease data for network*/
-    var response_data = api_agent.fire_kea_api(lease_get_req_data, anterius_config.server_addr, anterius_config.server_port).then(function (api_data) {
+    var response_data = api_agent.fire_kea_api(lease_get_req_data, global.anterius_config.server_addr, global.anterius_config.server_port).then(function (api_data) {
         // console.log(api_data);
         return api_data;
     });
@@ -37,8 +37,8 @@ router.get('/', function (req, res, next) {
 
                 /* Vendor List and Device Count block*/
                 leases_data[i].mac_oui_vendor = '';
-                if (typeof oui_data[mac_oui] !== "undefined") {
-                    leases_data[i].mac_oui_vendor = oui_data[mac_oui];
+                if (typeof global.oui_data[mac_oui] !== "undefined") {
+                    leases_data[i].mac_oui_vendor = global.oui_data[mac_oui];
                 }
 
                 if ((typeof leases_data[i].mac_oui_vendor !== "undefined" ? leases_data[i].mac_oui_vendor : 'Misc') == "")
@@ -67,8 +67,8 @@ router.get('/', function (req, res, next) {
                 }
 
                 if (device_stats[mac_oui].vendor !== "undefined") {
-                    if (typeof oui_data[mac_oui] !== "undefined") {
-                        device_stats[mac_oui].vendor = oui_data[mac_oui];
+                    if (typeof global.oui_data[mac_oui] !== "undefined") {
+                        device_stats[mac_oui].vendor = global.oui_data[mac_oui];
                     }
                 }
             }

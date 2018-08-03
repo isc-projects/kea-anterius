@@ -11,20 +11,20 @@ var api_agent = require('../lib/api_service.js');
 router.post('/', authorize.auth, function (req, res, next) {
 
 	var request = req.body;
-	// console.log(JSON.parse(request.dhcp_config_file)[server.sn_tag]);
+	// console.log(JSON.parse(request.dhcp_config_file)[global.kea_server.sn_tag]);
 	// ISC DHCP Local config verification - replaced by CA API
 	// fs.writeFileSync("./syntax_verify_config", request.dhcp_config_file, 'utf8');
 	// var exec = require('child_process').exec;
 
 	if (request.mode == 'test') {
-		config_update_req_data = JSON.stringify({ "command": "config-test", "service": [anterius_config.current_server], "arguments": JSON.parse(request.dhcp_config_file) });
+		config_update_req_data = JSON.stringify({ "command": "config-test", "service": [global.anterius_config.current_server], "arguments": JSON.parse(request.dhcp_config_file) });
 	}
 	else {
-		config_update_req_data = JSON.stringify({ "command": "config-set", "service": [anterius_config.current_server], "arguments": JSON.parse(request.dhcp_config_file) });
+		config_update_req_data = JSON.stringify({ "command": "config-set", "service": [global.anterius_config.current_server], "arguments": JSON.parse(request.dhcp_config_file) });
 	}
 	if (request.affirm) {
 		/* Fetch and set server config*/
-		var response_data = api_agent.fire_kea_api(config_update_req_data, anterius_config.server_addr, anterius_config.server_port).then(function (api_data) {
+		var response_data = api_agent.fire_kea_api(config_update_req_data, global.anterius_config.server_addr, global.anterius_config.server_port).then(function (api_data) {
 			console.log(api_data);
 			return api_data;
 		});
@@ -66,12 +66,12 @@ router.post('/', authorize.auth, function (req, res, next) {
 	// 		}
 
 	// 		//date +"%Y-%m-%d_%H:%M:%S"
-	// 		exec('/bin/cp ' + anterius_config.config_file + ' ./config_backups/`basename ' + anterius_config.config_file + '`_`date +"%Y-%m-%d_%H:%M:%S"`',
+	// 		exec('/bin/cp ' + global.anterius_config.config_file + ' ./config_backups/`basename ' + global.anterius_config.config_file + '`_`date +"%Y-%m-%d_%H:%M:%S"`',
 	// 			function(err, stdout, stderr) {
 
 	// 		});
 
-	// 		fs.writeFileSync(anterius_config.config_file, request.dhcp_config_file, 'utf8');
+	// 		fs.writeFileSync(global.anterius_config.config_file, request.dhcp_config_file, 'utf8');
 
 	// 		fs.unlinkSync("./verify_output");
 	// 		fs.unlinkSync("./syntax_verify_config");

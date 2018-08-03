@@ -74,85 +74,80 @@ app.use(function (err, req, res, next) {
 
 module.exports = app;
 
-/* Anterius Data Model - Global Statistics Variables */
-kea_stats = {};
-kea_config = {};
-anterius_config = json_file.readFileSync('config/anterius_config.json');
+/* Anterius Data Model - Global Variables */
+var host_name = '';
+global.kea_stats = {};
+global.kea_config = {};
+global.anterius_config = json_file.readFileSync('config/anterius_config.json');
 
-/* Identifiers for current server */
-server = { 'server_config': {}, 'svr_tag': '', 'sn_tag': '', 'server.addr_tag': '' };
+/* Global Identifier structure for current server */
+global.kea_server = {
+    'server_config': {}, 'svr_tag': '', 'sn_tag': '', 'addr_tag': '',
+    'cpu_utilization': -1,
+    'total_leases': -1,
+    'leases_per_sec': 0,
+    'leases_per_minute': 0,
+    'server_active': 1,
+    'run_status': '',
+    'subnet_list': [],
+};
+
+global.oui_data = {};
+
+var listening_to_log_file = 0;
+var options = { 'interval': 1000 };
 
 /* Dir for config file snapshots */
-bkp_dir = "config_backups/" + anterius_config.current_server;
+global.bkp_dir = "config_backups/" + global.anterius_config.current_server;
 
-leases_per_minute = 0;
-cpu_utilization = -1;
-total_leases = -1;
-current_time = 0;
-lps = -1;
-leases_per_sec = 0;
-leases_last_update_time = -1;
-run_status = '';
-
-listening_to_log_file = 0;
-server_active = 1;
-
-subnet_list = [];
-
-options = {};
-options.interval = 1000;
-
-debug_watch_lease_parse_stream = 0;
-
-if (anterius_config.ip_ranges_to_allow != "") {
+if (global.anterius_config.ip_ranges_to_allow != "") {
     var ip_filter = require('express-ipfilter').IpFilter;
-    var ips = anterius_config.ip_ranges_to_allow;
+    var ips = global.anterius_config.ip_ranges_to_allow;
     app.use(ip_filter(ips, { mode: 'allow' }));
 }
 
 // TODO: Mechanism to retrieve following attibutes from remote machine
-if (anterius_config.server_addr == 'localhost') {
+if (global.anterius_config.server_addr == 'localhost') {
     host_name = execSync("cat /etc/hostname").toString().replace("\n", "");
-    run_status = execSync("keactrl status").toString();
+    global.kea_server.run_status = execSync("keactrl status").toString();
 
     /* Poll: CPU Utilization */
-    cpu_utilization_poll = setInterval(function () {
-        cpu_utilization = parseFloat(execSync("top -bn 1 | awk 'NR>7{s+=$9} END {print s/4}'").toString())
+    var cpu_utilization_poll = setInterval(function () {
+        global.kea_server.cpu_utilization = parseFloat(execSync("top -bn 1 | awk 'NR>7{s+=$9} END {print s/4}'").toString())
     }, (15 * 1000));
 }
 
 /* Kea CA REST API call - config-get and statistics-get */
-stats_req_data = JSON.stringify({ "command": "statistic-get-all", "service": [anterius_config.current_server] });
-config_get_req_data = JSON.stringify({ "command": "config-get", "service": [anterius_config.current_server] });
+var stats_req_data = JSON.stringify({ "command": "statistic-get-all", "service": [global.anterius_config.current_server] });
+var config_get_req_data = JSON.stringify({ "command": "config-get", "service": [global.anterius_config.current_server] });
 
 /* Fetch and set server stats*/
-api_agent.fire_kea_api(stats_req_data, anterius_config.server_addr, anterius_config.server_port).then(function (api_data) {
+api_agent.fire_kea_api(stats_req_data, global.anterius_config.server_addr, global.anterius_config.server_port).then(function (api_data) {
     // console.log(api_data);
     if (api_data.result == 0)
-        kea_stats = api_data.arguments;
+        global.kea_stats = api_data.arguments;
     else
         console.log("CA Error: " + api_data.text);
 }).catch(function () {
-    server_active = 0;
+    global.kea_server.server_active = 0;
 });
 
 /* Fetch and set server config*/
-api_agent.fire_kea_api(config_get_req_data, anterius_config.server_addr, anterius_config.server_port).then(function (api_data) {
+api_agent.fire_kea_api(config_get_req_data, global.anterius_config.server_addr, global.anterius_config.server_port).then(function (api_data) {
     // console.log(api_data);
     if (api_data.result == 0)
-        kea_config = api_data.arguments;
+        global.kea_config = api_data.arguments;
     else
         console.log("CA Error: " + api_data.text);
 }).catch(function () {
-    server_active = 0;
+    global.kea_server.server_active = 0;
 });;
 
 /* Ingest OUI Database */
-fs = require('fs');
+var fs = require('fs');
 var oui_database_file = "bin/oui_table.txt";
 
-/* Global oui_data bucket */
-oui_data = {};
+/* Global global.oui_data bucket */
 if (fs.existsSync(oui_database_file)) {
     fs.readFile(oui_database_file, 'utf8', function (err, data) {
         if (err) {
@@ -160,29 +155,19 @@ if (fs.existsSync(oui_database_file)) {
         }
         else {
             /* Iterate through file */
-            lines = data.split("\n");
-            for (l = 0; l < lines.length; l++) {
+            var lines = data.split("\n");
+            for (var l = 0; l < lines.length; l++) {
                 /* Trim whitespaces at each ends of the line */
                 lines[l] = lines[l].trim();
                 var oui_line_data = lines[l].split(":::");
 
                 if (typeof oui_line_data[1] !== "undefined")
-                    oui_data[oui_line_data[0].trim()] = oui_line_data[1].trim();
+                    global.oui_data[oui_line_data[0].trim()] = oui_line_data[1].trim();
             }
             console.log("Anterius Server> OUI Database Loaded");
         }
     });
 }
-
-var dashboard_timer = setInterval(function () {
-    // console.log("Checking timers...");
-    unix_time = Math.floor(new Date() / 1000);
-    if ((unix_time - 5) > leases_last_update_time) {
-        leases_per_sec = 0;
-    }
-    // console.log(JSON.stringify(dhcp_lease_data, null, 2));
-}, 5000);
-
 
 /* Leases per minute calculator */
 var lps_list = [0];
@@ -193,89 +178,89 @@ var lease_stats_monitor = function () {
 
     /* Fetch running status at set refresh interval*/
     // TODO: Mechanism to retrieve following attibutes from remote machine
-    if (anterius_config.server_addr == 'localhost' || anterius_config.server_addr == '127.0.0.1') {
+    if (global.anterius_config.server_addr == 'localhost' || global.anterius_config.server_addr == '127.0.0.1') {
         host_name = execSync("cat /etc/hostname").toString().replace("\n", "");
-        run_status = execSync("keactrl status").toString();
+        global.kea_server.run_status = execSync("keactrl status").toString();
 
         /* Poll: CPU Utilization */
         cpu_utilization_poll = setInterval(function () {
-            cpu_utilization = parseFloat(execSync("top -bn 1 | awk 'NR>7{s+=$9} END {print s/4}'").toString())
+            global.kea_server.cpu_utilization = parseFloat(execSync("top -bn 1 | awk 'NR>7{s+=$9} END {print s/4}'").toString())
         }, (15 * 1000));
     }
 
     /* Kea CA REST API call - config-get and statistics-get */
-    stats_req_data = JSON.stringify({ "command": "statistic-get-all", "service": [anterius_config.current_server] });
-    config_get_req_data = JSON.stringify({ "command": "config-get", "service": [anterius_config.current_server] });
+    stats_req_data = JSON.stringify({ "command": "statistic-get-all", "service": [global.anterius_config.current_server] });
+    config_get_req_data = JSON.stringify({ "command": "config-get", "service": [global.anterius_config.current_server] });
 
     /* Fetch and set server config*/
-    var response_data = api_agent.fire_kea_api(config_get_req_data, anterius_config.server_addr, anterius_config.server_port).then(function (api_data) {
+    var response_data = api_agent.fire_kea_api(config_get_req_data, global.anterius_config.server_addr, global.anterius_config.server_port).then(function (api_data) {
         return api_data;
     });
     response_data.then(function (data) {
         if (data.result == 0 && data.arguments != undefined) {
-            kea_config = data.arguments;
-            subnet_list = [];
-            server.server_config = kea_config;
+            global.kea_config = data.arguments;
+            global.kea_server.subnet_list = [];
+            global.kea_server.server_config = global.kea_config;
 
             /* Set identifiers based on current server */
-            if (anterius_config.current_server == 'dhcp4') {
-                server.svr_tag = 'Dhcp4';
-                server.sn_tag = 'subnet4';
-                server.addr_tag = 'addresses';
+            if (global.anterius_config.current_server == 'dhcp4') {
+                global.kea_server.svr_tag = 'Dhcp4';
+                global.kea_server.sn_tag = 'subnet4';
+                global.kea_server.addr_tag = 'addresses';
             }
             else {
-                server.svr_tag = 'Dhcp6';
-                server.sn_tag = 'subnet6';
-                server.addr_tag = 'pds';
+                global.kea_server.svr_tag = 'Dhcp6';
+                global.kea_server.sn_tag = 'subnet6';
+                global.kea_server.addr_tag = 'pds';
             }
 
-            // console.log(server,server.server_config[server.svr_tag], server.sn_tag, server.addr_tag);
+            // console.log(server,global.kea_server.server_config[global.kea_server.svr_tag], global.kea_server.sn_tag, global.kea_server.addr_tag);
 
             /* Retrieve and store subnets defined within shared nw */
-            server.server_config[server.svr_tag]['shared-networks'].forEach(shnw => {
-                shnw[server.sn_tag].forEach(x => {
+            global.kea_server.server_config[global.kea_server.svr_tag]['shared-networks'].forEach(shnw => {
+                shnw[global.kea_server.sn_tag].forEach(x => {
                     x['shared_nw_name'] = shnw.name;
-                    subnet_list.push(x);
+                    global.kea_server.subnet_list.push(x);
                 });
             });
 
             /* Retrieve and store subnets defined*/
-            server.server_config[server.svr_tag][server.sn_tag].forEach(x => {
-                subnet_list.push(x);
+            global.kea_server.server_config[global.kea_server.svr_tag][global.kea_server.sn_tag].forEach(x => {
+                global.kea_server.subnet_list.push(x);
             });
 
             /* Subnet sorting by ID */
-            subnet_list.sort(function (a, b) {
+            global.kea_server.subnet_list.sort(function (a, b) {
                 return parseInt(a.id) - parseInt(b.id);
             });
 
-            total_leases = 0;
-            subnet_count = subnet_list.length;
-            shared_nw_count = server.server_config[server.svr_tag]['shared-networks'].length;
+            global.kea_server.total_leases = 0;
+            var subnet_count = global.kea_server.subnet_list.length;
+            var shared_nw_count = global.kea_server.server_config[global.kea_server.svr_tag]['shared-networks'].length;
 
             /* Fetch and set server stats*/
-            var response_data = api_agent.fire_kea_api(stats_req_data, anterius_config.server_addr, anterius_config.server_port).then(function (sapi_data) {
+            var response_data = api_agent.fire_kea_api(stats_req_data, global.anterius_config.server_addr, global.anterius_config.server_port).then(function (sapi_data) {
                 return sapi_data;
             });
             response_data.then(function (sdata) {
                 if (sdata.result == 0) {
-                    kea_stats = sdata.arguments;
+                    global.kea_stats = sdata.arguments;
                     for (var i = 1; i <= subnet_count; i++) {
-                        total_leases += kea_stats['subnet[' + i + '].assigned-' + server.addr_tag][0][0];
+                        global.kea_server.total_leases += global.kea_stats['subnet[' + i + '].assigned-' + global.kea_server.addr_tag][0][0];
                     }
 
                     /* Update metric - leases / sec  */
                     if (lpm_counter > 0)
-                        leases_per_sec = total_leases - tl0;
+                        global.kea_server.leases_per_sec = global.kea_server.total_leases - tl0;
 
-                    lps_list[lpm_counter] = leases_per_sec;
+                    lps_list[lpm_counter] = global.kea_server.leases_per_sec;
                     lpm_counter++;
 
-                    leases_per_minute = 0;
+                    global.kea_server.leases_per_minute = 0;
                     for (i = 0; i < 59; i++) {
                         if (lps_list[i] > 0) {
-                            leases_per_minute += lps_list[i];
-                            // console.log("iteration " + i + " val: " + lps_list[i] + " lpm: " + leases_per_minute);
+                            global.kea_server.leases_per_minute += lps_list[i];
+                            // console.log("iteration " + i + " val: " + lps_list[i] + " lpm: " + global.kea_server.leases_per_minute);
                         }
                         else {
                             // console.log("no data " + i);
@@ -285,34 +270,35 @@ var lease_stats_monitor = function () {
                     if (lpm_counter == 60)
                         lpm_counter = 0;
 
-                    tl0 = total_leases
-
+                    var tl0 = global.kea_server.total_leases
                 }
                 else {
                     console.log("CA Error: " + sdata.text);
-                    server_active = 0;
+                    global.kea_server.server_active = 0;
                 }
-            }).catch(function () {
-                server_active = 0;
+            }).catch(function (e) {
+                console.log('Error 1: ', e)
+                global.kea_server.server_active = 0;
             });
-            // console.log(kea_stats, kea_config);
+            // console.log(global.kea_stats, global.kea_config);
         }
         else {
             console.log("CA Error: " + data.text);
-            server_active = 0;
+            global.kea_server.server_active = 0;
         }
-    }).catch(function () {
-        server_active = 0;
+    }).catch(function (e) {
+        console.log('Error 2: ', e)
+        global.kea_server.server_active = 0;
     });;
 
-    // console.log(leases_per_minute, leases_per_sec, total_leases);
+    // console.log(global.kea_server.leases_per_minute, global.kea_server.leases_per_sec, global.kea_server.total_leases);
 
     /* Websockets statistics subscription broadcast */
     // if (ws_event_subscribers('dhcp_statistics')) {
     //     return_data = {
-    //         "cpu_utilization": cpu_utilization,
-    //         "lps": leases_per_sec,
-    //         "leases_per_minute": leases_per_minute
+    //         "global.kea_server.cpu_utilization": global.kea_server.cpu_utilization,
+    //         "lps": global.kea_server.leases_per_sec,
+    //         "global.kea_server.leases_per_minute": global.kea_server.leases_per_minute
     //     };
     //     wss.broadcast_event(JSON.stringify(return_data), 'dhcp_statistics');
     // }
@@ -321,7 +307,7 @@ var lease_stats_monitor = function () {
 
 /* Call and export stats function */
 lease_stats_monitor();
-setInterval(lease_stats_monitor, anterius_config.stat_refresh_interval * 1000);
+setInterval(lease_stats_monitor, global.anterius_config.stat_refresh_interval * 1000);
 // clearInterval(lease_stats_monitor);
 exports.reload = lease_stats_monitor;
 
@@ -345,8 +331,8 @@ exports.reload = lease_stats_monitor;
 fs.watch('config/anterius_config.json', function (event, filename) {
     if (filename) {
         setTimeout(function () {
-            anterius_config = json_file.readFileSync('config/anterius_config.json');
-            server_active = 1;
+            global.anterius_config = json_file.readFileSync('config/anterius_config.json');
+            global.kea_server.server_active = 1;
             console.log("Anterius Server> Config Loaded");
         }, 1000);
     } else {
@@ -361,12 +347,12 @@ const wss = new WebSocket.Server({ port: 8080 });
 
 options.interval = 300;
 var tail_dhcp_log = new tail_module(
-    anterius_config.log_file,
+    global.anterius_config.log_file,
     "\n",
     options
 );
 
-dhcp_requests = {};
+var dhcp_requests = {};
 
 /* Watch DHCP Log File */
 tail_dhcp_log.on("line", function (data) {
@@ -412,7 +398,7 @@ tail_dhcp_log.on("line", function (data) {
                 var mac_oui = request_from.split(":").join("").toUpperCase().slice(0, 6);
 
                 if (typeof dhcp_requests[request_from].request_vendor === "undefined")
-                    dhcp_requests[request_from].request_vendor = oui_data[mac_oui];
+                    dhcp_requests[request_from].request_vendor = global.oui_data[mac_oui];
             }
         }
 
@@ -559,7 +545,7 @@ var socket_clients = 0;
 
 // var Slack = require('slack-node');
 
-// webhookUri = anterius_config.slack_webhook_url;
+// webhookUri = global.anterius_config.slack_webhook_url;
 
 // slack = new Slack();
 // slack.setWebhook(webhookUri);
@@ -568,7 +554,7 @@ var socket_clients = 0;
 //     console.log("[Slack] %s", message);
 
 //     slack.webhook({
-//         channel: anterius_config.slack_alert_channel,
+//         channel: global.anterius_config.slack_alert_channel,
 //         username: "Glass",
 //         icon_emoji: "https://imgur.com/wD3CcBi",
 //         text: "(" + host_name + ") " + message
@@ -582,39 +568,39 @@ var socket_clients = 0;
  */
 
 // alert_status = [];
-// alert_status['leases_per_minute'] = 0;
+// alert_status['global.kea_server.leases_per_minute'] = 0;
 // setTimeout(function () {
 //     console.log("Anterius Server> Alert loop started");
 
 //     // Server LPM Alert timer - 5s loop
 //     alert_check_timer = setInterval(function () {
 //         // console.log("[Timer] Alert Timer check");
-//         if (anterius_config.leases_per_minute_threshold > 0) {
-//             // console.log("[Timer] lpm: %s lpm_th: %s", leases_per_minute, anterius_config.leases_per_minute_threshold);
-//             if (leases_per_minute <= anterius_config.leases_per_minute_threshold && alert_status['leases_per_minute'] == 0) {
-//                 alert_status['leases_per_minute'] = 1;
+//         if (global.anterius_config.leases_per_minute_threshold > 0) {
+//             // console.log("[Timer] lpm: %s lpm_th: %s", global.kea_server.leases_per_minute, global.anterius_config.leases_per_minute_threshold);
+//             if (global.kea_server.leases_per_minute <= global.anterius_config.leases_per_minute_threshold && alert_status['global.kea_server.leases_per_minute'] == 0) {
+//                 alert_status['global.kea_server.leases_per_minute'] = 1;
 
 //                 // TODO: enable slack warning hook if required
 //                 // slack_message(":warning: CRITICAL: DHCP leases per minute have dropped below threshold " +
-//                 //     "(" + parseInt(anterius_config.leases_per_minute_threshold).toLocaleString('en') + ") " +
-//                 //     "Current (" + parseInt(leases_per_minute).toLocaleString('en') + ")");
+//                 //     "(" + parseInt(global.anterius_config.leases_per_minute_threshold).toLocaleString('en') + ") " +
+//                 //     "Current (" + parseInt(global.kea_server.leases_per_minute).toLocaleString('en') + ")");
 
 //                 email_alert("CRITICAL: Leases Per Minute Threshold", "DHCP leases per minute dropped below critical threshold <br><br>" +
-//                     "Threshold: (" + parseInt(anterius_config.leases_per_minute_threshold).toLocaleString('en') + ") <br>" +
-//                     "Current: (" + parseInt(leases_per_minute).toLocaleString('en') + ") <br><br>" +
+//                     "Threshold: (" + parseInt(global.anterius_config.leases_per_minute_threshold).toLocaleString('en') + ") <br>" +
+//                     "Current: (" + parseInt(global.kea_server.leases_per_minute).toLocaleString('en') + ") <br><br>" +
 //                     "This is usually indicative of a process or hardware problem and needs to be addressed immediately");
 //             }
-//             else if (leases_per_minute >= anterius_config.leases_per_minute_threshold && alert_status['leases_per_minute'] == 1) {
-//                 alert_status['leases_per_minute'] = 0;
+//             else if (global.kea_server.leases_per_minute >= global.anterius_config.leases_per_minute_threshold && alert_status['global.kea_server.leases_per_minute'] == 1) {
+//                 alert_status['global.kea_server.leases_per_minute'] = 0;
 
 //                 // TODO: enable slack warning hook if required
 //                 // slack_message(":white_check_mark: CLEAR: DHCP leases per minute have returned to above threshold " +
-//                 //     "(" + parseInt(anterius_config.leases_per_minute_threshold).toLocaleString('en') + ") " +
-//                 //     "Current (" + parseInt(leases_per_minute).toLocaleString('en') + ")");
+//                 //     "(" + parseInt(global.anterius_config.leases_per_minute_threshold).toLocaleString('en') + ") " +
+//                 //     "Current (" + parseInt(global.kea_server.leases_per_minute).toLocaleString('en') + ")");
 
 //                 email_alert("CLEAR: Leases Per Minute Threshold", "DHCP leases per minute have returned to normal <br><br>" +
-//                     "Threshold: (" + parseInt(anterius_config.leases_per_minute_threshold).toLocaleString('en') + ") <br>" +
-//                     "Current: (" + parseInt(leases_per_minute).toLocaleString('en') + ")"
+//                     "Threshold: (" + parseInt(global.anterius_config.leases_per_minute_threshold).toLocaleString('en') + ") <br>" +
+//                     "Current: (" + parseInt(global.kea_server.leases_per_minute).toLocaleString('en') + ")"
 //                 );
 
 //             }
@@ -625,39 +611,39 @@ var socket_clients = 0;
 //     alert_status_networks_critical = [];
 
 //     /*
-//      ** TODO: Replace shared nw location attribute as per kea_stats results
+//      ** TODO: Replace shared nw location attribute as per global.kea_stats results
 //     */
 //     // Shared nw utilzn Alert timer - 5s loop   
 //     alert_subnet_check_timer = setInterval(function () {
 //         // console.log("[Timer] Alert Timer check - subnets");
 
-//         if (anterius_config.shared_network_warning_threshold > 0 || anterius_config.shared_network_critical_threshold > 0) {
+//         if (global.anterius_config.shared_network_warning_threshold > 0 || global.anterius_config.shared_network_critical_threshold > 0) {
 
 //             // TODO: remove local dhcpd-pools parser tools if deemed not required 
 //             // const execSync = require('child_process').execSync;
-//             // output = execSync('./bin/dhcpd-pools -c ' + anterius_config.config_file + ' -l ' + anterius_config.leases_file + ' -f j -A -s e');
+//             // output = execSync('./bin/dhcpd-pools -c ' + global.anterius_config.config_file + ' -l ' + global.anterius_config.leases_file + ' -f j -A -s e');
 //             // var dhcp_data = JSON.parse(output);
 
 //             // Calculate Shared network utilization
-//             shared_nw_count = kea_config['Dhcp4']['shared-networks'].length;
+//             shared_nw_count = global.kea_config['Dhcp4']['shared-networks'].length;
 //             shared_nw_util = [];
 //             for (var i = 0; i < shared_nw_count; i++) {
 //                 // TODO: verify shared nw stats are received as below usage
-//                 utilization = round(parseFloat(kea_stats['shared-network[' + i + '].assigned-addresses'][0][0] / kea_stats['shared-network[' + i + '].total-addresses'][0][0]) * 100, 2);
+//                 utilization = round(parseFloat(global.kea_stats['shared-network[' + i + '].assigned-addresses'][0][0] / global.kea_stats['shared-network[' + i + '].total-addresses'][0][0]) * 100, 2);
 
 //                 if (isNaN(utilization))
 //                     utilization = 0;
 
 
 //                 /* Initialize these array buckets */
-//                 if (typeof alert_status_networks_warning[kea_stats['shared-networks'][i].location] === "undefined")
-//                     alert_status_networks_warning[kea_stats['shared-networks'][i].location] = 0;
+//                 if (typeof alert_status_networks_warning[global.kea_stats['shared-networks'][i].location] === "undefined")
+//                     alert_status_networks_warning[global.kea_stats['shared-networks'][i].location] = 0;
 
-//                 if (typeof alert_status_networks_critical[kea_stats['shared-networks'][i].location] === "undefined")
-//                     alert_status_networks_critical[kea_stats['shared-networks'][i].location] = 0;
+//                 if (typeof alert_status_networks_critical[global.kea_stats['shared-networks'][i].location] === "undefined")
+//                     alert_status_networks_critical[global.kea_stats['shared-networks'][i].location] = 0;
 
 //                 /*
-//                  console.log("Location: %s", kea_stats['shared-networks'][i].location);
+//                  console.log("Location: %s", global.kea_stats['shared-networks'][i].location);
 //                  console.log("Used: %s", dhcp_data['shared-networks'][i].used.toLocaleString('en'));
 //                  console.log("Defined: %s", dhcp_data['shared-networks'][i].defined.toLocaleString('en'));
 //                  console.log("Free: %s", dhcp_data['shared-networks'][i].free.toLocaleString('en'));
@@ -666,42 +652,42 @@ var socket_clients = 0;
 //                  */
 
 //                 /* Check Warnings */
-//                 if (anterius_config.shared_network_warning_threshold > 0) {
+//                 if (global.anterius_config.shared_network_warning_threshold > 0) {
 //                     if (
-//                         utilization >= anterius_config.shared_network_warning_threshold &&
-//                         utilization <= anterius_config.shared_network_critical_threshold &&
-//                         alert_status_networks_warning[kea_stats['shared-networks'][i].location] == 0
+//                         utilization >= global.anterius_config.shared_network_warning_threshold &&
+//                         utilization <= global.anterius_config.shared_network_critical_threshold &&
+//                         alert_status_networks_warning[global.kea_stats['shared-networks'][i].location] == 0
 //                     ) {
-//                         alert_status_networks_warning[kea_stats['shared-networks'][i].location] = 1;
+//                         alert_status_networks_warning[global.kea_stats['shared-networks'][i].location] = 1;
 
 //                         // TODO: enable slack warning hook if required
-//                         // slack_message(":warning: WARNING: DHCP shared network utilization (" + kea_stats['shared-networks'][i].location + ") " +
+//                         // slack_message(":warning: WARNING: DHCP shared network utilization (" + global.kea_stats['shared-networks'][i].location + ") " +
 //                         //     "Current: (" + utilization + "%) " +
-//                         //     "Threshold: (" + anterius_config.shared_network_warning_threshold + "%)"
+//                         //     "Threshold: (" + global.anterius_config.shared_network_warning_threshold + "%)"
 //                         // );
 
 //                         email_alert("WARNING: DHCP shared network utilization",
-//                             "WARNING: DHCP shared network utilization (" + kea_stats['shared-networks'][i].location + ") <br><br>" +
-//                             "Threshold: (" + anterius_config.shared_network_warning_threshold + "%) <br>" +
+//                             "WARNING: DHCP shared network utilization (" + global.kea_stats['shared-networks'][i].location + ") <br><br>" +
+//                             "Threshold: (" + global.anterius_config.shared_network_warning_threshold + "%) <br>" +
 //                             "Current: (" + utilization + "%)"
 //                         );
 
 //                     }
 //                     else if (
-//                         utilization <= anterius_config.shared_network_warning_threshold &&
-//                         alert_status_networks_warning[kea_stats['shared-networks'][i].location] == 1
+//                         utilization <= global.anterius_config.shared_network_warning_threshold &&
+//                         alert_status_networks_warning[global.kea_stats['shared-networks'][i].location] == 1
 //                     ) {
-//                         alert_status_networks_warning[kea_stats['shared-networks'][i].location] = 0;
+//                         alert_status_networks_warning[global.kea_stats['shared-networks'][i].location] = 0;
 
 //                         // TODO: enable slack warning hook if required
-//                         // slack_message(":white_check_mark: CLEAR: Warning DHCP shared network utilization (" + kea_stats['shared-networks'][i].location + ") " +
+//                         // slack_message(":white_check_mark: CLEAR: Warning DHCP shared network utilization (" + global.kea_stats['shared-networks'][i].location + ") " +
 //                         //     "Current: (" + utilization + "%) " +
-//                         //     "Threshold: (" + anterius_config.shared_network_warning_threshold + "%)"
+//                         //     "Threshold: (" + global.anterius_config.shared_network_warning_threshold + "%)"
 //                         // );
 
 //                         email_alert("CLEAR: DHCP shared network utilization warning",
-//                             "CLEAR: DHCP shared network utilization (" + kea_stats['shared-networks'][i].location + ") <br><br>" +
-//                             "Threshold: (" + anterius_config.shared_network_warning_threshold + "%) <br>" +
+//                             "CLEAR: DHCP shared network utilization (" + global.kea_stats['shared-networks'][i].location + ") <br><br>" +
+//                             "Threshold: (" + global.anterius_config.shared_network_warning_threshold + "%) <br>" +
 //                             "Current: (" + utilization + "%)"
 //                         );
 
@@ -709,41 +695,41 @@ var socket_clients = 0;
 //                 }
 
 //                 /* Check Critical */
-//                 if (anterius_config.shared_network_critical_threshold > 0) {
+//                 if (global.anterius_config.shared_network_critical_threshold > 0) {
 //                     if (
-//                         utilization >= anterius_config.shared_network_critical_threshold &&
-//                         alert_status_networks_critical[kea_stats['shared-networks'][i].location] == 0
+//                         utilization >= global.anterius_config.shared_network_critical_threshold &&
+//                         alert_status_networks_critical[global.kea_stats['shared-networks'][i].location] == 0
 //                     ) {
-//                         alert_status_networks_critical[kea_stats['shared-networks'][i].location] = 1;
+//                         alert_status_networks_critical[global.kea_stats['shared-networks'][i].location] = 1;
 
 //                         // TODO: enable slack warning hook if required
-//                         // slack_message(":fire: CRITICAL: DHCP shared network utilization (" + kea_stats['shared-networks'][i].location + ") " +
+//                         // slack_message(":fire: CRITICAL: DHCP shared network utilization (" + global.kea_stats['shared-networks'][i].location + ") " +
 //                         //     "Current: (" + utilization + "%) " +
-//                         //     "Threshold: (" + anterius_config.shared_network_critical_threshold + "%)"
+//                         //     "Threshold: (" + global.anterius_config.shared_network_critical_threshold + "%)"
 //                         // );
 
 //                         email_alert("CRITICAL: DHCP shared network utilization",
-//                             "CRITICAL: DHCP shared network utilization (" + kea_stats['shared-networks'][i].location + ") <br><br>" +
-//                             "Threshold: (" + anterius_config.shared_network_critical_threshold + "%) <br>" +
+//                             "CRITICAL: DHCP shared network utilization (" + global.kea_stats['shared-networks'][i].location + ") <br><br>" +
+//                             "Threshold: (" + global.anterius_config.shared_network_critical_threshold + "%) <br>" +
 //                             "Current: (" + utilization + "%)"
 //                         );
 
 //                     }
 //                     else if (
-//                         utilization <= anterius_config.shared_network_critical_threshold &&
-//                         alert_status_networks_critical[kea_stats['shared-networks'][i].location] == 1
+//                         utilization <= global.anterius_config.shared_network_critical_threshold &&
+//                         alert_status_networks_critical[global.kea_stats['shared-networks'][i].location] == 1
 //                     ) {
-//                         alert_status_networks_critical[kea_stats['shared-networks'][i].location] = 0;
+//                         alert_status_networks_critical[global.kea_stats['shared-networks'][i].location] = 0;
 
 //                         // TODO: enable slack warning hook if required
-//                         // slack_message(":white_check_mark: CLEAR: Critical DHCP shared network utilization (" + kea_stats['shared-networks'][i].location + ") " +
+//                         // slack_message(":white_check_mark: CLEAR: Critical DHCP shared network utilization (" + global.kea_stats['shared-networks'][i].location + ") " +
 //                         //     "Current: (" + utilization + "%) " +
-//                         //     "Threshold: (" + anterius_config.shared_network_critical_threshold + "%)"
+//                         //     "Threshold: (" + global.anterius_config.shared_network_critical_threshold + "%)"
 //                         // );
 
 //                         email_alert("CLEAR: DHCP shared network utilization",
-//                             "CLEAR: DHCP shared network utilization (" + kea_stats['shared-networks'][i].location + ") <br><br>" +
-//                             "Threshold: (" + anterius_config.shared_network_critical_threshold + "%) <br>" +
+//                             "CLEAR: DHCP shared network utilization (" + global.kea_stats['shared-networks'][i].location + ") <br><br>" +
+//                             "Threshold: (" + global.anterius_config.shared_network_critical_threshold + "%) <br>" +
 //                             "Current: (" + utilization + "%)"
 //                         );
 //                     }
@@ -778,10 +764,10 @@ var socket_clients = 0;
 //     /* E-Mail Template Load */
 //     console.log("Anterius Server> Sending E-Mail Alert...\n");
 
-//     if (typeof anterius_config.email_alert_to === "undefined" && typeof anterius_config.sms_alert_to === "undefined")
+//     if (typeof global.anterius_config.email_alert_to === "undefined" && typeof global.anterius_config.sms_alert_to === "undefined")
 //         return false;
 
-//     if (anterius_config.email_alert_to == "" && anterius_config.sms_alert_to != "") {
+//     if (global.anterius_config.email_alert_to == "" && global.anterius_config.sms_alert_to != "") {
 //         console.log("Anterius Server> No email_to specified - returning...");
 //         return false;
 //     }
@@ -792,13 +778,13 @@ var socket_clients = 0;
 //     email_body = email_body.replace("[local_time]", new Date().toString());
 
 //     /* Clean extra commas etc. */
-//     anterius_config.email_alert_to = anterius_config.email_alert_to.replace(/^[,\s]+|[,\s]+$/g, '').replace(/,[,\s]*,/g, ',');
+//     global.anterius_config.email_alert_to = global.anterius_config.email_alert_to.replace(/^[,\s]+|[,\s]+$/g, '').replace(/,[,\s]*,/g, ',');
 
 //     /* Publish HTML E-Mail Alert (regular mail) */
-//     if (anterius_config.email_alert_to.trim() != "") {
+//     if (global.anterius_config.email_alert_to.trim() != "") {
 //         var mailOptions = {
 //             from: "Kea-Anterius Monitor Alerts kea-anterius@noreply.com",
-//             to: anterius_config.email_alert_to,
+//             to: global.anterius_config.email_alert_to,
 //             subject: "Kea-Anterius " + "(" + host_name + ") " + alert_title,
 //             html: email_body,
 //         };
@@ -813,10 +799,10 @@ var socket_clients = 0;
 //     }
 
 //     /* Publish SMS Alert */
-//     if (anterius_config.sms_alert_to.trim() != "") {
+//     if (global.anterius_config.sms_alert_to.trim() != "") {
 //         var mailOptions = {
 //             from: "Kea-Anterius Monitor Alerts kea-anterius@noreply.com",
-//             to: anterius_config.sms_alert_to,
+//             to: global.anterius_config.sms_alert_to,
 //             subject: "Kea-Anterius " + "(" + host_name + ") " + alert_title,
 //             html: (alert_message.substring(0, 130) + "..."),
 //         };
