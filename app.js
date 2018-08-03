@@ -29,7 +29,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', require('./routes/index'));
 app.use('/users', require('./routes/users'));
 app.use('/nw_detail_info', require('./routes/nw_detail_info'));
-app.use('/dhcp_statistics', require('./routes/dhcp_statistics_page'));
+app.use('/dhcp_statistics', require('./routes/dhcp_device_statistics_page'));
 app.use('/get_mac_device_stats', require('./routes/get_mac_device_stats'));
 app.use('/dhcp_leases', require('./routes/dhcp_leases'));
 app.use('/dhcp_lease_search', require('./routes/dhcp_lease_search'));
