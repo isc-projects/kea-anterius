@@ -10,6 +10,11 @@ from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 
+import json
+import requests
+
+config_request_url = "" 
+
 def browser_open(browser, link):
 	browser.get(link)
 
@@ -37,8 +42,59 @@ def (browser, username, passwd):
 
 	except TimeoutException:
 		print( "Loading timeout expired" )
-	  
+
+
+def verify_table_entries(server):
+
+	with open('../config/anterius_config.json') as f:
+		ant_config = json.load(f)
+
+	config_request_url = 'http://'+ant_config.server_addr+':'+ant_config.server_port 
+
+	data = { "command": "config-get", "service": [ server ] }
+ 
+	resp = requests.post(url = config_request_url, data = data)
+	# print(resp.arguments)
+	server_config = resp.arguments
+
+	data =  {"command": "statistic-get-all", "service": [ server ] }
+	resp = requests.post(url = config_request_url, data = data)
+	# print(resp.arguments)
+	server_stats = resp.arguments
+
+	// Generate subnet and shared nw lists from API for cross validationn
+	subnet_list = [], sharednw_list = []
+	for shnw in server_config[server]['shared-networks']:
+		sharednw_list.append(shnw)
+		for x in shnw[server.sn_tag]:
+			x['shared_nw_name'] = shnw.name
+			subnet_list.appendn(x)
+
+	for x in server_config[server]['subnet'+server.replace('dhcp')]:
+		subnet_list.append(x)
 	
+	
+	browser.get("http://localhost:3000/")
+
+	table = driver.find_element_by_xpath("//table[@id='shared-networks']")
+	rows = table.find_element_by_xpath(".//tr")
+	for i in len(rows):
+		cols = rows[i].find_elements_by_xpath(".//td"):
+		assert cols[0].text() == sharednw_list[i].name, "Shared NW name mismatch" 
+		assert cols[1].text() == sharednw_list[i]., "Shared NW name mismatch" 
+		assert cols[2].text() == sharednw_list[i].name, "Shared NW name mismatch" 
+		assert cols[0].text() == sharednw_list[i].name, "Shared NW name mismatch" 
+			
+
+
+def nw_config_edit(nw_type, nw_id):
+
+	config_request_url = "" 
+	browser.get("http://localhost:3000/")
+	table = driver.find_element_by_xpath("//table[@id='"+nw_type+"']")
+	row = table.find_elements_by_xpath(".//tr")[nw_id]:
+	for td in row.find_elements_by_xpath(".//td")
+
 def google_search_results(browser, search_phrase, n_results):
 
 	browser.get("http://www.google.com")
@@ -115,6 +171,12 @@ if __name__ == '__main__':
 	# browser = webdriver.Chrome()
 	browser = webdriver.Firefox()
 
+	nw_config_edit('shared-networks', 1)
+	nw_config_edit('shared-networks', 2)
+
+	nw_config_edit('subnets', 1)
+	nw_config_edit('subnets', 2)
+
 
 	# browser_open('www.google.com')
 	# fb_login_check(browser, 'jerinjohn101@gmail.com', '...')
@@ -124,3 +186,4 @@ if __name__ == '__main__':
 	# custom_website_test(browser, 'http://www.phptravels.net/register', 'signup')
 	# custom_website_test(browser, 'http://www.phptravels.net/login', 'login')
 	custom_website_test(browser, 'http://www.phptravels.net', 'nav')
+	

@@ -34,8 +34,13 @@ describe('Local Server Counter Information', () => {
   });
 })
 
+
+describe('Test Log Streaming from ')
+
+
 describe('API mechanism - fire_kea_api()', function () {
   
+  it('should connect succesfully with CA')
   function fire_api(request){
     api_agent.fire_kea_api(request, anterius_config.server_addr, anterius_config.server_port).then(function (api_data) {
       if (api_data.result == 0){
@@ -57,10 +62,12 @@ describe('API mechanism - fire_kea_api()', function () {
 
   it('should fetch config data from API ', function () {
     config_get_req_data = JSON.stringify({ "command": "config-get", "service": ["dhcp4"] });
+    expect()
   });
 
   it('should fetch stats data from API ', function () {
     lease_get_req_data = JSON.stringify({ "command": "lease4-get-all", "service": ["dhcp4"], "arguments": { "subnets": id } });
+
   });
 
   it('should fetch stats data from API ', function () {
