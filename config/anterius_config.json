@@ -4,20 +4,23 @@
   "stat_refresh_interval": "5",
   "admin_user": "keaadmin",
   "admin_password": "keaadmin",
+  "current_server": "dhcp4",
+  "current_host_index": 0,
+  "server_host_list": [
+    {
+      "hostname": "Local Machine",
+      "svr_addr": "localhost",
+      "svr_port": "8000"
+    }
+  ],
   "leases_file": "/usr/local/var/kea/kea-leases4.csv",
   "log_file": "/usr/local/var/log/kea-dhcp4.log",
   "config_file": "/usr/local/etc/kea/kea-dhcp4.conf",
   "shared_network_critical_threshold": "95",
   "shared_network_warning_threshold": "0",
-  "slack_webhook_url": "",
-  "slack_alert_channel": "",
   "leases_per_minute_threshold": "50",
-  "ip_ranges_to_allow": [
-    ""
-  ],
   "email_alert_to": "",
   "sms_alert_to": "",
-  "_leases_file": "/var/lib/dhcp/dhcpd.leases",
-  "_log_file": "/var/log/dhcp.log",
-  "_config_file": "/etc/dhcp/dhcpd.conf"
+  "slack_webhook_url": "",
+  "slack_alert_channel": ""
 }
