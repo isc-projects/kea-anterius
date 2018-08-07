@@ -105,52 +105,77 @@
 ## Installation
 (Instructions for Debian/Ubuntu based systems)
 
-#### Install NodeJS (primary dependency)
+### Prerequisites
 
+#### Kea Server installation and startup
+
+- Installation and operational instructions for Kea can be found in the [Kea Admin Reference Guide](https://kea.isc.org/docs/kea-guide.html)
+- To run the Kea Server with its default configuration or specified config file, use the kea control command as shown below.
+(\*server\* = dhcp4 *or* dhcp6) :
 <pre>
-curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
-sudo apt-get install -y nodejs
+~$ keactrl start -s *server*  
 </pre>
 
-### Install Anterius
-- Clone source code from Github
 <pre>
-git clone https://github.com/isc-projects/kea-anterius.git
-cd kea-anterius
+~$ keactrl start -s *server* -c */path/to/kea-*server*.conf* 
 </pre>
 
-- Install node modules and run
-<pre>
-sudo npm install
-sudo npm start
-</pre>
 
-- 'npm start' command launches the nodejs server, browse to http://localhost:3000 to use the interface.
-
-### Configuration with Kea Server
-- Anterius interface can be configured to work with a Kea server instance running either on a remote system or the local machine. 
-
-- This characteristic is dependant on the address parameter set for the Kea Control Agent that provides API access to the server.
-
-- To run the Kea Server with its default configuration or specified config file, use the kea control command as shown:
-<pre>
-~$ keactrl start -s dhcp4  
-</pre>
-<pre>
-~$ keactrl start -s dhcp4 -c /path/to/kea-dhcp4.conf 
-</pre>
+#### Configure Kea Control Agent (CA)
 
 - Activate the Kea Control Agent using the following command (change -c conf file path if required):
 <pre>
 ~$ kea-ctrl-agent -c /usr/local/etc/kea/kea-ctrl-agent.conf
 </pre>
 
-- Check status of Kea DHCPv4 and Kea Control Agent (both must be active) using the command:
+- The CA runs on port 8000 by default, defined in the CA config file. Please refer to the [Kea Control Agent Documentation](https://kea.isc.org/docs/kea-guide.html#kea-ctrl-agent) for setting CA parameters and addtional info.
+
+- Check status of Kea DHCPv4/v6 servers and Kea Control Agent (must be active) using the command:
 <pre>
 ~$ keactrl status
 </pre>
 
-- Kea Control Agent(CA) runs on port 8000 by default, defined in the CA config file. Please refer to the [Kea Control Agent Documentation](https://kea.isc.org/docs/kea-guide.html#kea-ctrl-agent) for setting CA parameters and addtional info.
+#### Setup Hooks Library for Leases Commands
+
+- Anterius employs a set of commands from the Leases hooks library to fetch current lease information from the server via the CA API. This information would be absent from the dashboard in case this hook is not configured.
+
+- Add the following lines to the server(v4/v6) config file to enable lease hook library:
+
+<pre>
+"hooks-libraries": [{
+        "library": "/usr/local/lib/hooks/libdhcp_lease_cmds.so"
+}]
+</pre>
+
+#### Install NodeJS (primary dependency)
+<pre>
+curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+sudo apt-get install -y nodejs
+</pre>
+
+
+### Anterius Installation
+- Clone source code from Github
+<pre>
+git clone https://github.com/isc-projects/kea-anterius.git
+cd kea-anterius
+</pre>
+
+- Install node modules (application dependencies) 
+<pre>
+sudo npm install
+</pre>
+
+- Launch the nodejs server, browse to http://localhost:3000 to use the interface.
+<pre>
+sudo npm start
+</pre>
+
+
+### Configuration with Kea Server
+- Anterius interface can be configured to work with one or more Kea server instances running either on a remote system or the local machine. 
+
+- This characteristic is defined by the address parameter set for the Kea Control Agent that provides API access to the server.
 
 ![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_settings.png)
 
