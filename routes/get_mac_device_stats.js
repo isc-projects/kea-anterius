@@ -13,7 +13,7 @@ router.get('/', function (req, res, next) {
 
     /* Fetch lease data for network*/
     var response_data = api_agent.fire_kea_api(lease_get_req_data, global.anterius_config.server_addr, global.anterius_config.server_port).then(function (api_data) {
-        // console.log(api_data);
+        console.log(api_data);
         return api_data;
     });
 
@@ -25,9 +25,10 @@ router.get('/', function (req, res, next) {
         }
         else {
             leases_data = data.arguments.leases;
-            // console.log(leases_data);
+            console.log(leases_data);
             var vendor_stats = {}, device_stats = {};
             var count = 0;
+            // console.log(global.oui_data);
 
             /* Leases Data parser - retrieve mac oui data */
             for (var i = 0; i < leases_data.length; i++) {
@@ -35,12 +36,13 @@ router.get('/', function (req, res, next) {
                 /* Mac OUI Lookup */
                 var mac_oui = leases_data[i]['hw-address'].split(":").join("").toUpperCase().slice(0, 6);
 
+                // console.log(mac_oui, global.oui_data[mac_oui]);
+                
                 /* Vendor List and Device Count block*/
                 leases_data[i].mac_oui_vendor = '';
                 if (typeof global.oui_data[mac_oui] !== "undefined") {
                     leases_data[i].mac_oui_vendor = global.oui_data[mac_oui];
                 }
-
                 if ((typeof leases_data[i].mac_oui_vendor !== "undefined" ? leases_data[i].mac_oui_vendor : 'Misc') == "")
                     continue;
 
@@ -73,6 +75,7 @@ router.get('/', function (req, res, next) {
                 }
             }
 
+            // console.log(vendor_stats, device_stats);
             res.setHeader('Content-Type', 'application/json');
             res.send(JSON.stringify({ 'vendor_stats': vendor_stats, 'device_stats': device_stats }));
         }
