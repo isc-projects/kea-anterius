@@ -56,9 +56,7 @@
 
 - Anterius also provides a feature to apply configuration changes for specific networks entities (subnet/shared-network) accessible thru the edit config button available in the network detailed info pages.
 
-![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_config_shnw.png)
-
-![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_config_sn.png)
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_config_entity.png)
 
 - Config modifications can be reviewed from the File Editor tab where changes are highlighted.
 
@@ -71,14 +69,18 @@
 
 - The Snapshot centre provides admins features like viewing previously created config checkpoints and also validate and restore the config files with user confirmation.
 
-![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_config_snapshots.png)
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_config_snapshots1.png)
+
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_config_snapshots2.png)
 
 
 ### DHCP Server Boot Operations <local-server-feature>
 
 - Anterius provides a server operation management page to execute start / stop / restart commands for DHCP v4/v6 servers. (Please note this feature is only supported for a local machine server until these commands are added to the Control Agent API) 
 
-![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_boot_ops.png)
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_boot_ops1.png)
+
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_boot_ops2.png)
 
 
 ### Kea Log Streaming <local-server-feature>
@@ -91,15 +93,17 @@
 
 - The alerting function allows admins to set custom thresholds for subnet and shared network utilization
 
-![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_alerts.png)
-
 - Alert Levels:
   - Default 80 (Warning)
   - Default 95 (Critical)
 
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_alerts1.png)
+
 - Alert Delivery Methods
   - E-Mail
   - SMS
+
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_alerts2.png)
 
 
 ## Installation
@@ -177,11 +181,13 @@ sudo npm start
 
 - This characteristic is defined by the address parameter set for the Kea Control Agent that provides API access to the server.
 
-![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_settings.png)
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_settings1.png)
 
 - To select server host machine, browse to the Anterius Settings option from the menu and select from the list of available hostnames. 
 - Navigate to the Kea Hostname List in the settings page to add/edit/delete server host machine details. 
 
   - For local server (default mode), set address = localhost:8000
   - For remote server, set address = <public_ip:port>
+
+![anterius_screenshots](https://raw.githubusercontent.com/isc-projects/kea-anterius/master/public/images/screenshots/anterius_settings2.png)
 
