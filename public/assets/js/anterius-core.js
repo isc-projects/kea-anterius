@@ -18,7 +18,7 @@ var loader_html = '<div class="preloader"> \
  */
 
 $(document).ready(function () {
-    'use strict';
+    
     remove_init_form();
 
     /* Remove 'active' class from 'li' items */
@@ -50,7 +50,7 @@ $(document).ready(function () {
  */
 
 $(document).on('on_pjax_click', function (e, href) {
-    'use strict';
+    
     $('li.active').removeClass("active");
     href.parent('li').addClass("active");
 
@@ -63,7 +63,7 @@ $(document).on('on_pjax_click', function (e, href) {
  * When a sidebar item is clicked in mobile - let's make sure we push the sidebar back in
  */
 $(document).on('on_pjax_complete', function (e) {
-    'use strict';
+    
     if ($('.ls-closed').length > 0) {
         $('body').removeClass('overlay-open');
         $('.overlay').css("display", "none");
@@ -107,7 +107,7 @@ $(document).on('on_pjax_complete', function (e) {
 });
 
 function handle_websocket_subscription_navigation() {
-    'use strict';
+    
     console.log(window.location.pathname);
 
     /* Stream dashboard stats */
@@ -120,14 +120,14 @@ function handle_websocket_subscription_navigation() {
 }
 
 function remove_init_form() {
-    'use strict';
+    
     setTimeout(function () {
         $('.form-line').removeClass("focused");
     }, 10);
 }
 
 function modal(title, content, buttons) {
-    'use strict';
+    
     
     // console.log(title, buttons);
     $('#modal-buttons').html('');
@@ -143,7 +143,7 @@ function modal(title, content, buttons) {
 
 /* Method to generate  query string from html form fields */
 function get_form_query_string(form_id) {
-    'use strict';
+    
 
     query_string = "";
     $('#' + form_id).find('input, select, textarea').each(function (key) {
@@ -166,7 +166,7 @@ function get_form_query_string(form_id) {
 
 /* Toggle show/hide feature for side nav menu */
 function navtoggle() {
-    'use strict';
+    
 
     side_nav = document.getElementById("leftsidebar");
     logo = document.getElementById("logo");
@@ -212,7 +212,7 @@ function navtoggle() {
 
 /* Reload page on refresh_stats user request  */
 function refresh_info(delay = 0, message = 'Reloading..', source = window.location.href) {
-    'use strict';
+    
 
     setTimeout(function () {
         console.log(source);
@@ -230,7 +230,7 @@ function refresh_info(delay = 0, message = 'Reloading..', source = window.locati
 
 /* Identify and forward add / edit requests for dhcp nw entities */
 function edit_params(mode) {
-    'use strict';
+    
 
     source = window.location.href;
     console.log(mode);
@@ -246,7 +246,7 @@ function edit_params(mode) {
 
 /* Forward and notify settings update request */
 function save_config() {
-    'use strict';
+    
 
     anterius_settings = get_form_query_string("anterius-settings-form");
     $.post("/anterius_settings_save", anterius_settings, function (data) {
@@ -259,7 +259,7 @@ var $hostname, $addr, $port;
 
 /* Method to Replace server host values with input fields */
 function edit_server_host(index) {
-    'use strict';
+    
 
     $hostname = $('<input type="input" name="hostname" id="hostname" class="form-control"/>').val($('#h' + index).text());
     $addr = $('<input type="input" name="svr_addr" id="svr_addr" class="form-control"/>').val($('#a' + index).text());
@@ -276,7 +276,7 @@ function edit_server_host(index) {
 
 /* Method to save server host input field values */
 function save_server_host(index) {
-    'use strict';
+    
 
     $hostname = $('#hostname');
     $addr = $('#svr_addr');
@@ -302,7 +302,7 @@ function save_server_host(index) {
 }
 /* Method to delete server host entry */
 function delete_server_host(index) {
-    'use strict';
+    
     svr_host = "index=" + index + "&delete=true";
 
     $.post("/anterius_settings_save", svr_host, function (data) {
@@ -312,7 +312,7 @@ function delete_server_host(index) {
 
 /* Forward and notify current server host and server type change requests */
 function select_server(mode, index = 0) {
-    'use strict';
+    
 
     if (mode == 'host') {
         svrselect = 'mode=current_host_index&svrselect=' + index;
@@ -331,7 +331,7 @@ function select_server(mode, index = 0) {
 
 /* Custom notification generator */
 function notification(text, colorName = 'bg-black', delay = 2000, url = '#') {
-    'use strict';
+    
 
     animateEnter = 'animated fadeInDown';
     animateExit = 'animated fadeOutUp';
@@ -367,7 +367,7 @@ function notification(text, colorName = 'bg-black', delay = 2000, url = '#') {
 }
 
 $(document).on("click", ".option_data", function () {
-    'use strict';
+    
     var lease = $(this).attr("lease");
     if ($("#" + lease).is(":visible")) {
         $("#" + lease).hide();
@@ -379,7 +379,7 @@ $(document).on("click", ".option_data", function () {
 });
 
 $(document).on("keypress", "#lease_search_criteria", function (e) {
-    'use strict';
+    
     if (e.which == 13) {
         $('#search_result').html(loader_html);
         $.post("/dhcp_lease_search", { search: $("#lease_search_criteria").val() }, function (result) {
