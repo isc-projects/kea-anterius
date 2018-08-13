@@ -29,8 +29,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', require('./routes/index'));
 app.use('/users', require('./routes/users'));
 app.use('/nw_detail_info', require('./routes/nw_detail_info'));
-app.use('/dhcp_statistics', require('./routes/dhcp_device_statistics_page'));
+app.use('/dhcp_device_statistics_page', require('./routes/dhcp_device_statistics_page'));
 app.use('/get_mac_device_stats', require('./routes/get_mac_device_stats'));
+app.use('/get_dhcp_requests', require('./routes/get_dhcp_requests'));
 app.use('/dhcp_leases', require('./routes/dhcp_leases'));
 app.use('/dhcp_lease_search', require('./routes/dhcp_lease_search'));
 app.use('/dhcp_log', require('./routes/dhcp_log'));
@@ -48,7 +49,6 @@ app.use('/anterius_settings_save', require('./routes/anterius_settings_save'));
 // app.use('/api/get_subnet_details/', require('./api/get_subnet_details'));
 // app.use('/api/get_vendor_count/', require('./api/get_vendor_count'));
 // app.use('/api/get_mac_oui_count_by_vendor/', require('./api/get_mac_oui_count_by_vendor'));
-// app.use('/api/get_dhcp_requests/', require('./api/get_dhcp_requests'));
 // app.use('/api/get_server_info/', require('./api/get_server_info'));
 // app.use('/api/get_mac_oui_list/', require('./api/get_mac_oui_list'));
 
@@ -83,11 +83,12 @@ global.anterius_config = json_file.readFileSync('config/anterius_config.json');
 /* Global Identifier structure for current server */
 global.kea_server = {
     'server_config': {}, 'svr_tag': '', 'sn_tag': '', 'addr_tag': '',
-    'cpu_utilization': -1,
-    'total_leases': -1,
+    'cpu_utilization': 0,
+    'total_leases': 0,
     'leases_per_sec': 0,
     'leases_per_minute': 0,
     'server_active': 1,
+    'local_server': 0,
     'run_status': '',
     'subnet_list': [],
 };
@@ -106,8 +107,10 @@ if (global.anterius_config.ip_ranges_to_allow != "") {
     app.use(ip_filter(ips, { mode: 'allow' }));
 }
 
-// TODO: Mechanism to retrieve following attibutes from remote machine
-if (global.anterius_config.server_addr == 'localhost') {
+// TODO: Add Mechanism to retrieve following attibutes from remote machine - future release
+if (global.anterius_config.server_addr == 'localhost' || global.anterius_config.server_addr == '127.0.0.1') {
+
+    global.kea_server.local_server = 1;
     host_name = execSync("cat /etc/hostname").toString().replace("\n", "");
     global.kea_server.run_status = execSync("keactrl status").toString();
 
@@ -164,6 +167,7 @@ if (fs.existsSync(oui_database_file)) {
                 if (typeof oui_line_data[1] !== "undefined")
                     global.oui_data[oui_line_data[0].trim()] = oui_line_data[1].trim();
             }
+            // console.log(global.oui_data);
             console.log("Anterius Server> OUI Database Loaded");
         }
     });
@@ -172,13 +176,23 @@ if (fs.existsSync(oui_database_file)) {
 /* Leases per minute calculator */
 var lps_list = [0];
 var lpm_counter = 0;
+var tl0 = 0;
+
+/* LPM Reset */
+setInterval(function () {
+    global.kea_server.leases_per_minute = 0;
+    // console.log(global.kea_server.leases_per_minute)
+}, 60000);
 
 /* * Recurrent Loop for lease stats * */
 var lease_stats_monitor = function () {
 
     /* Fetch running status at set refresh interval*/
     // TODO: Mechanism to retrieve following attibutes from remote machine
+    // console.log(global.kea_server.server_active)
+
     if (global.anterius_config.server_addr == 'localhost' || global.anterius_config.server_addr == '127.0.0.1') {
+        global.kea_server.local_server = 1;
         host_name = execSync("cat /etc/hostname").toString().replace("\n", "");
         global.kea_server.run_status = execSync("keactrl status").toString();
 
@@ -186,17 +200,15 @@ var lease_stats_monitor = function () {
         cpu_utilization_poll = setInterval(function () {
             global.kea_server.cpu_utilization = parseFloat(execSync("top -bn 1 | awk 'NR>7{s+=$9} END {print s/4}'").toString())
         }, (15 * 1000));
-    }
+    } else
+        global.kea_server.local_server = 0;
 
     /* Kea CA REST API call - config-get and statistics-get */
     stats_req_data = JSON.stringify({ "command": "statistic-get-all", "service": [global.anterius_config.current_server] });
     config_get_req_data = JSON.stringify({ "command": "config-get", "service": [global.anterius_config.current_server] });
 
     /* Fetch and set server config*/
-    var response_data = api_agent.fire_kea_api(config_get_req_data, global.anterius_config.server_addr, global.anterius_config.server_port).then(function (api_data) {
-        return api_data;
-    });
-    response_data.then(function (data) {
+    var response_data = api_agent.fire_kea_api(config_get_req_data, global.anterius_config.server_addr, global.anterius_config.server_port).then(function (data) {
         if (data.result == 0 && data.arguments != undefined) {
             global.kea_config = data.arguments;
             global.kea_server.subnet_list = [];
@@ -239,10 +251,7 @@ var lease_stats_monitor = function () {
             var shared_nw_count = global.kea_server.server_config[global.kea_server.svr_tag]['shared-networks'].length;
 
             /* Fetch and set server stats*/
-            var response_data = api_agent.fire_kea_api(stats_req_data, global.anterius_config.server_addr, global.anterius_config.server_port).then(function (sapi_data) {
-                return sapi_data;
-            });
-            response_data.then(function (sdata) {
+            var response_data = api_agent.fire_kea_api(stats_req_data, global.anterius_config.server_addr, global.anterius_config.server_port).then(function (sdata) {
                 if (sdata.result == 0) {
                     global.kea_stats = sdata.arguments;
                     for (var i = 1; i <= subnet_count; i++) {
@@ -270,14 +279,14 @@ var lease_stats_monitor = function () {
                     if (lpm_counter == 60)
                         lpm_counter = 0;
 
-                    var tl0 = global.kea_server.total_leases
+                    tl0 = global.kea_server.total_leases
                 }
                 else {
                     console.log("CA Error: " + sdata.text);
                     global.kea_server.server_active = 0;
                 }
             }).catch(function (e) {
-                console.log('Error 1: ', e)
+                console.log('Error 1: ', e);
                 global.kea_server.server_active = 0;
             });
             // console.log(global.kea_stats, global.kea_config);
@@ -287,9 +296,9 @@ var lease_stats_monitor = function () {
             global.kea_server.server_active = 0;
         }
     }).catch(function (e) {
-        console.log('Error 2: ', e)
+        console.log('Error 2: ', e);
         global.kea_server.server_active = 0;
-    });;
+    });
 
     // console.log(global.kea_server.leases_per_minute, global.kea_server.leases_per_sec, global.kea_server.total_leases);
 
@@ -331,10 +340,13 @@ exports.reload = lease_stats_monitor;
 fs.watch('config/anterius_config.json', function (event, filename) {
     if (filename) {
         setTimeout(function () {
-            global.anterius_config = json_file.readFileSync('config/anterius_config.json');
+            json_file.readFile('config/anterius_config.json', function (err, data) {
+                if (err) throw err;
+                global.anterius_config = data;
+            });
             global.kea_server.server_active = 1;
             console.log("Anterius Server> Config Loaded");
-        }, 1000);
+        }, 2000);
     } else {
         console.log('filename not provided');
     }
@@ -352,7 +364,7 @@ var tail_dhcp_log = new tail_module(
     options
 );
 
-var dhcp_requests = {};
+global.dhcp_requests = {};
 
 /* Watch DHCP Log File */
 tail_dhcp_log.on("line", function (data) {
