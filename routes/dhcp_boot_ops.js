@@ -57,8 +57,9 @@ router.post('/', authorize.auth, function (req, res, next) {
 
 	var options = {
 		name: 'Anterius',
-		icns: '../public/assets/images/favicon.ico'
+		icns: '../public/assets/images/favicon.ico',
 	};
+
 
 	svr_name = request.server.replace('server', '').replace('v', '').toLowerCase();
 
@@ -69,8 +70,12 @@ router.post('/', authorize.auth, function (req, res, next) {
 					if (error) throw error;
 					console.log('stdout: ' + stdout);
 				}
-			)
-			res.send("<script type='text/javascript'>get_stats(); refresh_info(delay = 750, message = '" + request.server + " Stopped');ignore_cache = 1;$('#mdModal').modal('hide');</script>");
+			);
+			// var child = sudo(['keactrl stop -s ' + svr_name], options);
+			// child.stdout.on('data', function (data) {
+			// 	console.log(data.toString());
+			// });
+			res.send("<script type='text/javascript'>refresh_info(delay = 4000, message = 'Stopping " + request.server + " after authentication. Please reload page manually to reflect changes.');ignore_cache = 1;$('#mdModal').modal('hide');</script>");
 			break;
 
 		case "start":
@@ -79,8 +84,12 @@ router.post('/', authorize.auth, function (req, res, next) {
 					if (error) throw error;
 					console.log('stdout: ' + stdout);
 				}
-			)
-			res.send("<script type='text/javascript'> get_stats(); refresh_info(delay = 750, message = '" + request.server + " Started');ignore_cache = 1;</script>");
+			);
+			// var child = sudo(['keactrl start -s ' + svr_name], options);
+			// child.stdout.on('data', function (data) {
+			// 	console.log(data.toString());
+			res.send("<script type='text/javascript'>refresh_info(delay = 4000, message = 'Starting " + request.server + " after authentication. Please reload page manually to reflect changes.');ignore_cache = 1;</script>");
+			// }); 	 
 			break;
 
 		case "restart":
@@ -89,8 +98,12 @@ router.post('/', authorize.auth, function (req, res, next) {
 					if (error) throw error;
 					console.log('stdout: ' + stdout);
 				}
-			)
-			res.send("<script type='text/javascript'> get_stats(); refresh_info(delay = 750, message = '" + request.server + " Restarted '); $('#mdModal').modal('hide');</script > ");
+			);
+			// var child = sudo(['keactrl reload -s ' + svr_name], options);
+			// child.stdout.on('data', function (data) {
+			// 	console.log(data.toString());
+			res.send("<script type='text/javascript'>refresh_info(delay = 4000, message = 'Restarting " + request.server + " after authentication. Please reload page manually to reflect changes.'); $('#mdModal').modal('hide');</script > ");
+			// });
 			break;
 
 		default:
