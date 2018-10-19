@@ -49,7 +49,7 @@ router.get('/', authorize.auth, function (req, res, next) {
 
 	/* Admin User */
 	input = input + template_render.form_input('Admin User', '<input type="input" class="form-control" name="admin_user" id="admin_user" placeholder="Username" value="' + global.anterius_config.admin_user + '">');
-	input = input + template_render.form_input('Admin Password', '<input type="input" class="form-control" name="admin_password" id="admin_password" placeholder="Password" value="' + global.anterius_config.admin_password + '">');
+	input = input + template_render.form_input('Admin Password', '<input type="password" class="form-control" name="admin_password" id="admin_password" placeholder="Password" value="' + global.anterius_config.admin_password + '">');
 
 	/* Log File */
 	// input = input + template_render.form_input('Log File', '<input type="input" class="form-control" name="log_file" id="log_file" placeholder="/var/log/dhcp.log" value="' + global.anterius_config.log_file + '">');
