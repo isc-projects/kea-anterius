@@ -26,7 +26,7 @@ router.post('/', function (req, res, next) {
 	}
 
 	/* Check if delete server host entry request */
-	if (request.delete) {
+	else if (request.delete) {
 
 		global.anterius_config.server_host_list.splice(request.index, 1);
 
