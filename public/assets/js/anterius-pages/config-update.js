@@ -156,6 +156,13 @@ function test_dhcp_config() {
 function upload_dhcp_config(svr_tag) {
 	// Push updated config file data as query string to  
 	var affirm = confirm("Confirm: Apply changed config to " + svr_tag + " server?");
+
+	params = "mode=save&dhcp_config_file=" + encodeURIComponent(dhcp_config.getValue());
+
+	$.post("/dhcp_config_snapshots", params, function (data) {
+		notification(data.message, 'bg-black', 3000);
+	});
+
 	params = "mode=update&affirm=" + affirm + "&dhcp_config_file=" + encodeURIComponent(dhcp_config.getValue());
 
 	$.post("/dhcp_config_update", params, function (data) {
