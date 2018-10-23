@@ -2,6 +2,8 @@
 © Anthrino > Anterius Settings Manager
 */
 
+'use strict';
+
 var express = require('express');
 var router = express.Router();
 var fs = require('fs');
@@ -10,9 +12,11 @@ var authorize = require('../lib/authorize.js');
 
 router.get('/', authorize.auth, function (req, res, next) {
 
-	anterius_settings_template = template_render.get_template("anterius_settings");
+	var anterius_settings_template = template_render.get_template("anterius_settings");
 
 	var json_file = require('jsonfile');
+
+	var server_host_list = global.anterius_config.server_host_list;
 
 	// /* Leases File */
 	// input = template_render.form_input('Leases File', '<input type="input" class="form-control" name="leases_file" id="leases_file" placeholder="/var/lib/dhcp/dhcpd.leases" value="' + global.anterius_config.leases_file + '">');
@@ -21,10 +25,10 @@ router.get('/', authorize.auth, function (req, res, next) {
 	// input = input + template_render.form_input('Config File', '<input type="input" class="form-control" name="config_file" id="config_file" placeholder="/etc/dhcp/dhcpd.conf" value="' + global.anterius_config.config_file + '">');
 
 	/* Kea Control Agent Hostname Select */
-	host_select = '<select class="bootstrap-select" id="svr-host-select" name="svr-host-select">';
-	if (global.anterius_config.server_host_list) {
-		svr_host_list = '<option value="" disabled>Choose Kea machine</option>';
-		global.anterius_config.server_host_list.forEach(function (host, index) {
+	var host_select = '<select class="bootstrap-select" id="svr-host-select" name="svr-host-select">';
+	if (server_host_list) {
+		var svr_host_list = '<option value="" disabled>Choose Kea machine</option>';
+		server_host_list.forEach(function (host, index) {
 			svr_host_list += '<option value="' + index + '" id="server-host' + index + '" >' + host.hostname + ' [' + host.svr_addr + ':' + host.svr_port + ']</option>';
 		});
 
@@ -36,7 +40,7 @@ router.get('/', authorize.auth, function (req, res, next) {
 	} else
 		svr_host_list = '<option value="" disabled selected>No server hosts configured</option>';
 
-	input = '<label>Kea Control Agent Host [host:port]</label><div class="form-group">' + host_select + svr_host_list + '</select></div>';
+	var input = '<label>Kea Control Agent Host [host:port]</label><div class="form-group">' + host_select + svr_host_list + '</select></div>';
 
 	/* Stats Refresh interval */
 	input = input + template_render.form_input('Statistics Refresh Interval (s)', '<input type="input" class="form-control" name="stat_refr_int" id="stat_refr_int" placeholder="Enter refresh interval in secs" value="' + global.anterius_config.stat_refresh_interval + '">');
@@ -56,17 +60,16 @@ router.get('/', authorize.auth, function (req, res, next) {
 
 	input = input + '<br><div id="anterius_settings_result"></div>';
 
-	form_data = template_render.form_body("anterius-settings-form", input);
+	var form_data = template_render.form_body("anterius-settings-form", input);
 
 	anterius_settings_template = template_render.set_template_variable(anterius_settings_template, "body_content", form_data);
 
-	server_host_list = global.anterius_config.server_host_list;
-	hostname_data_table = '';
+	var hostname_data_table = '';
 
 	for (var i = 0; i < server_host_list.length; i++) {
 
 		/* Define hostname row for remote servers table */
-		table_row = '';
+		var table_row = '';
 		// table_row = table_row + '<td><input type="radio" name="svrhost" id="r' + i + '" value="' + i + '" class="with-gap"/></td>';
 		table_row = table_row + '<td><p id="h' + i + '">' + server_host_list[i].hostname + '</p></td>';
 		table_row = table_row + '<td><p id="a' + i + '">' + server_host_list[i].svr_addr + '</p></td>';
@@ -82,7 +85,7 @@ router.get('/', authorize.auth, function (req, res, next) {
 
 	// hostname_data_table = hostname_data_table.replace('value="' + global.anterius_config.current_host_index + '"', 'value="' + global.anterius_config.current_host_index + '" checked');
 
-	anterius_settings_template = template_render.set_template_variable(anterius_settings_template, "svr_hosts_len", global.anterius_config.server_host_list.length);
+	anterius_settings_template = template_render.set_template_variable(anterius_settings_template, "svr_hosts_len", server_host_list.length);
 	anterius_settings_template = template_render.set_template_variable(anterius_settings_template, "server_host_list", hostname_data_table);
 
 
