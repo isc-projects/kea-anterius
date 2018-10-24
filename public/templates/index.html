@@ -279,13 +279,13 @@
 
         /* Stats update rendering fn */
         function get_stats() {
-            do_pjax_request('/');
+            do_pjax_request(window.location.pathname);
 
             $('#shared-networks').fadeOut(100).fadeIn(100);
             $('#subnets').fadeOut(100).fadeIn(100);
 
             $('#body-content').css("opacity", "1");
-            $("select").selectpicker('refresh');
+            // $("select").selectpicker('refresh');
         }
 
         /* OnReady - Scroll to top, initialize server host selector */
@@ -301,6 +301,7 @@
                 css({ 'width': '90%', 'display': 'inline-block' });
 
             $("select").selectpicker('refresh');
+            get_stats();
         });
 
 
@@ -348,7 +349,7 @@
             refresh_flag = false;
             select_server('host', this.value);
             refresh_flag = true;
-            get_stats();
+            // get_stats();
             refresh_info(750, 'Switched to ' + $("select[id=svr-host-select] :selected").text(), '/');
         });
 
@@ -357,7 +358,7 @@
             refresh_flag = false;
             select_server('type');
             refresh_flag = true;
-            get_stats();
+            // get_stats();
             refresh_info(500, 'Switched to ' + $("input[name=svrselect]:checked").val());
         });
 
