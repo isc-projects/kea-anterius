@@ -15,7 +15,12 @@
 </div>
 
 <script type="text/javascript">
+    'use strict';
     
+    setTimeout(() => {
+        do_pjax_request(window.location.pathname);   
+    }, 3000);
+
     function server_boot_ops(action, svr_name) {
 
         switch (action) {

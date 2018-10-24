@@ -1,3 +1,9 @@
+/*
+© Anthrino > Kea Boot-Operations manager
+*/
+
+'use strict';
+
 var express = require('express');
 var router = express.Router();
 var template_render = require('../lib/render_template.js');
@@ -23,8 +29,8 @@ router.get('/', authorize.auth, function (req, res, next) {
 
 	svrun.forEach(function (svr, index, svr_list) {
 
-		state = '';
-		svr_name = svr.split(':')[0];
+		var state = '', ss_btn_template = '';
+		var svr_name = svr.split(':')[0];
 
 		if (svr.includes('Inactive')) {
 			ss_btn_template = '<div class="row" align="center">' +
@@ -44,9 +50,11 @@ router.get('/', authorize.auth, function (req, res, next) {
 			'<button id="restart_btn" type="button" class="btn btn-info waves-effect ant-btn" ' + state + ' style="margin-bottom: 2%; width: 20%;" onclick="server_boot_ops(\'restart\',\'' + svr_name + '\')">' +
 			'<i class="material-icons">restore</i>' +
 			'<span>Restart</span></button></div><hr>'
+
 	});
 
-	content = template_render.set_template_variable(content, "c_content", return_content);
+	return_content = return_content + '<h6><center> Page auto-refreshed every 3s, please reload manually if changes are not reflected. </center></h6>';
+	var content = template_render.set_template_variable(content, "c_content", return_content);
 	res.send(template_render.get_index_template(content, req.url));
 });
 
@@ -60,8 +68,7 @@ router.post('/', authorize.auth, function (req, res, next) {
 		icns: '../public/assets/images/favicon.ico',
 	};
 
-
-	svr_name = request.server.replace('server', '').replace('v', '').toLowerCase();
+	var svr_name = request.server.replace('server', '').replace('v', '').toLowerCase();
 
 	switch (request.action) {
 		case "stop":
@@ -75,7 +82,7 @@ router.post('/', authorize.auth, function (req, res, next) {
 			// child.stdout.on('data', function (data) {
 			// 	console.log(data.toString());
 			// });
-			res.send("<script type='text/javascript'>refresh_info(delay = 4000, message = 'Stopping " + request.server + " after authentication. Please reload page manually to reflect changes.');ignore_cache = 1;$('#mdModal').modal('hide');</script>");
+			res.send("<script type='text/javascript'>refresh_info(delay = 4000, message = 'Stopping " + request.server + " after authentication. ');ignore_cache = 1;$('#mdModal').modal('hide');</script>");
 			break;
 
 		case "start":
@@ -88,7 +95,7 @@ router.post('/', authorize.auth, function (req, res, next) {
 			// var child = sudo(['keactrl start -s ' + svr_name], options);
 			// child.stdout.on('data', function (data) {
 			// 	console.log(data.toString());
-			res.send("<script type='text/javascript'>refresh_info(delay = 4000, message = 'Starting " + request.server + " after authentication. Please reload page manually to reflect changes.');ignore_cache = 1;</script>");
+			res.send("<script type='text/javascript'>refresh_info(delay = 4000, message = 'Starting " + request.server + " after authentication. ');ignore_cache = 1;</script>");
 			// }); 	 
 			break;
 
@@ -102,7 +109,7 @@ router.post('/', authorize.auth, function (req, res, next) {
 			// var child = sudo(['keactrl reload -s ' + svr_name], options);
 			// child.stdout.on('data', function (data) {
 			// 	console.log(data.toString());
-			res.send("<script type='text/javascript'>refresh_info(delay = 4000, message = 'Restarting " + request.server + " after authentication. Please reload page manually to reflect changes.'); $('#mdModal').modal('hide');</script > ");
+			res.send("<script type='text/javascript'>refresh_info(delay = 4000, message = 'Restarting " + request.server + " after authentication. '); $('#mdModal').modal('hide');</script > ");
 			// });
 			break;
 
