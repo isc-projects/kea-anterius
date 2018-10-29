@@ -32,7 +32,7 @@
                         <button type="button" id="save_snap_btn" class="btn btn-info waves-effect ant-btn" style="margin-bottom: 2%; width: 25%;"
                             onclick="save_config_snapshot()">
                             <i class="material-icons">save</i>
-                            <span>Save Config</span>
+                            <span>Save Config Snapshot</span>
                         </button>
                     </div>
 
@@ -54,7 +54,7 @@
                 <span>Test Config</span>
             </button>
             <span style="margin-left:5%; margin-right:5%"></span>
-            <button id="update_btn" type="button" class="btn btn-info waves-effect ant-btn" style="margin-bottom: 2%;  width: 20%;" onclick="upload_dhcp_config()">
+            <button id="update_btn" type="button" class="btn btn-info waves-effect ant-btn" style="margin-bottom: 2%;  width: 20%;" onclick="upload_dhcp_config('[svr_tag]')">
                 <i class="material-icons">system_update_alt</i>
                 <span>Update Config</span>
             </button>
@@ -62,8 +62,15 @@
     </div>
 
 </div>
+
+<script src="assets/js/ace_editor/ace.js" type="text/javascript" charset="utf-8"></script>
+<script src="assets/js/ace_editor/theme-terminal.js" type="text/javascript" charset="utf-8"></script>
+<script src="assets/js/anterius-pages/config-update.js" type="text/javascript" charset="utf-8"></script>
+<script src="assets/js/anterius-pages/config-snapshots.js" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript">
     
+    'use strict';
+
     /* OnReady - Scroll to top, initialize buttons */
     $(window).load(function () {
         $(this).scrollTop(0);
@@ -92,7 +99,3 @@
     });
 
 </script>
-<script src="assets/js/ace_editor/ace.js" type="text/javascript" charset="utf-8"></script>
-<script src="assets/js/ace_editor/theme-terminal.js" type="text/javascript" charset="utf-8"></script>
-<script src="assets/js/anterius-pages/config-update.js" type="text/javascript" charset="utf-8"></script>
-<script src="assets/js/anterius-pages/config-snapshots.js" type="text/javascript" charset="utf-8"></script>

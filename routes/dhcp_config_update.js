@@ -2,6 +2,8 @@
 © Anthrino > DHCP config update publisher [API config-set]
 */
 
+'use strict';
+
 var express = require('express');
 var router = express.Router();
 
@@ -10,29 +12,35 @@ var api_agent = require('../lib/api_service.js');
 
 router.post('/', authorize.auth, function (req, res, next) {
 
-	var request = req.body;
-	// console.log(JSON.parse(request.dhcp_config_file)[global.kea_server.sn_tag]);
-	// ISC DHCP Local config verification - replaced by CA API
-	// fs.writeFileSync("./syntax_verify_config", request.dhcp_config_file, 'utf8');
-	// var exec = require('child_process').exec;
+	try {
 
-	if (request.mode == 'test') {
-		config_update_req_data = JSON.stringify({ "command": "config-test", "service": [global.anterius_config.current_server], "arguments": JSON.parse(request.dhcp_config_file) });
+		var request = req.body, config_update_req_data = '';
+		console.log(JSON.parse(request.dhcp_config_file)[global.kea_server.sn_tag]);
+		// ISC DHCP Local config verification - replaced by CA API
+		// fs.writeFileSync("./syntax_verify_config", request.dhcp_config_file, 'utf8');
+		// var exec = require('child_process').exec;
+
+		if (request.mode == 'test') {
+			config_update_req_data = JSON.stringify({ "command": "config-test", "service": [global.anterius_config.current_server], "arguments": JSON.parse(request.dhcp_config_file) });
+		}
+		else {
+			config_update_req_data = JSON.stringify({ "command": "config-set", "service": [global.anterius_config.current_server], "arguments": JSON.parse(request.dhcp_config_file) });
+		}
+		if (request.affirm) {
+			/* Fetch and set server config*/
+			var response_data = api_agent.fire_kea_api(config_update_req_data, global.anterius_config.server_addr, global.anterius_config.server_port).then(function (api_data) {
+				console.log(api_data);
+				return api_data;
+			});
+			response_data.then(function (data) {
+				if (data.result != 0)
+					console.log("CA Error: " + data.text);
+				res.send({ "message": data.text, "status": data.result });
+			});
+		}
 	}
-	else {
-		config_update_req_data = JSON.stringify({ "command": "config-set", "service": [global.anterius_config.current_server], "arguments": JSON.parse(request.dhcp_config_file) });
-	}
-	if (request.affirm) {
-		/* Fetch and set server config*/
-		var response_data = api_agent.fire_kea_api(config_update_req_data, global.anterius_config.server_addr, global.anterius_config.server_port).then(function (api_data) {
-			console.log(api_data);
-			return api_data;
-		});
-		response_data.then(function (data) {
-			if (data.result != 0)
-				console.log("CA Error: " + data.text);
-			res.send({ "message": data.text, "status": data.result });
-		});
+	catch (e) {
+		res.send({ "message": e.message, "status": 1 });
 	}
 
 
