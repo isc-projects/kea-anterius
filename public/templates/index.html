@@ -302,7 +302,8 @@
                 css({ 'width': '90%', 'display': 'inline-block' });
 
             $("select").selectpicker('refresh');
-            get_stats();
+            if (window.location.pathname == '/' && refresh_flag)
+                get_stats();
         });
 
 
