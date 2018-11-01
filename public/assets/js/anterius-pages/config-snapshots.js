@@ -1,3 +1,9 @@
+/*
+© Anthrino > DHCP Config Snapshot request handler
+*/
+
+'use strict';
+
 /* Method to receive view snapshot requests from snapshots page */
 function view_snapshot(snapshot) {
 	$.post("/dhcp_config_snapshot_view", "snapshot=" + encodeURIComponent(snapshot), function (data) {
@@ -15,7 +21,7 @@ function view_snapshot(snapshot) {
 		}, 500);
 
 		/* Load selected snapshot onto Ace editor */
-		config_snapshot = ace.edit("dhcp-config");
+		var config_snapshot = ace.edit("dhcp-config");
 		config_snapshot.setTheme("ace/theme/terminal");
 		config_snapshot.session.setValue(JSON.stringify(data, null, '\t'));
 		config_snapshot.$blockScrolling = Infinity;
@@ -26,10 +32,14 @@ function view_snapshot(snapshot) {
 function save_config_snapshot(snapshot) {
 
 	var dhcp_config = ace.edit("dhcp-config");
-	params = "mode=save&dhcp_config_file=" + encodeURIComponent(dhcp_config.getValue());
+	var params = "mode=save&dhcp_config_file=" + encodeURIComponent(dhcp_config.getValue());
 
 	$.post("/dhcp_config_snapshots", params, function (data) {
-		notification(data.message, 'bg-black', 3000);
+		if (data.message)
+			notification(data.message, 'bg-black', 3000);
+		else
+			notification("Error creating snapshot : " + data.error, 'bg-red', 3000);
+
 	});
 }
 
@@ -37,10 +47,13 @@ function save_config_snapshot(snapshot) {
 function delete_config_snapshot(snapshot) {
 
 	var affirm = confirm("Confirm: Delete Config Snapshot: " + snapshot + "?");
-	params = "mode=delete&affirm=" + affirm + "&snapshot=" + encodeURIComponent(snapshot);
+	var params = "mode=delete&affirm=" + affirm + "&snapshot=" + encodeURIComponent(snapshot);
 
 	$.post("/dhcp_config_snapshots", params, function (data) {
-		notification(data.message, 'bg-black', 3000);
-		refresh_info(delay = 750);
+		if (data.message)
+			notification(data.message, 'bg-black', 3000);
+		else
+			notification("Error deleting snapshot : " + data.error, 'bg-red', 3000);
+		refresh_info(750);
 	});
 }
