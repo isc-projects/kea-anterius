@@ -285,7 +285,7 @@ function save_server_host(index) {
     svr_host = "index=" + index + "&hostname=" + $hostname.val() + "&addr=" + $addr.val() + "&port=" + $port.val();
 
     $.post("/anterius_settings_save", svr_host, function (data) {
-        refresh_info(delay = 750, message = data);
+        refresh_info(750, data);
     });
 
     var $h = $('<p data-editable id="h' + index + '"/>').text($hostname.val());
@@ -306,7 +306,7 @@ function delete_server_host(index) {
     svr_host = "index=" + index + "&delete=true";
 
     $.post("/anterius_settings_save", svr_host, function (data) {
-        refresh_info(delay = 750, message = data);
+        refresh_info(750, data);
     });
 }
 

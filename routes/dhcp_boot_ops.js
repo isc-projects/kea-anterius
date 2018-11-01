@@ -82,7 +82,7 @@ router.post('/', authorize.auth, function (req, res, next) {
 			// child.stdout.on('data', function (data) {
 			// 	console.log(data.toString());
 			// });
-			res.send("<script type='text/javascript'>refresh_info(delay = 4000, message = 'Stopping " + request.server + " after authentication. ');ignore_cache = 1;$('#mdModal').modal('hide');</script>");
+			res.send("<script type='text/javascript'>refresh_info(4000, 'Stopping " + request.server + " after authentication. ');ignore_cache = 1;$('#mdModal').modal('hide');</script>");
 			break;
 
 		case "start":
@@ -95,7 +95,7 @@ router.post('/', authorize.auth, function (req, res, next) {
 			// var child = sudo(['keactrl start -s ' + svr_name], options);
 			// child.stdout.on('data', function (data) {
 			// 	console.log(data.toString());
-			res.send("<script type='text/javascript'>refresh_info(delay = 4000, message = 'Starting " + request.server + " after authentication. ');ignore_cache = 1;</script>");
+			res.send("<script type='text/javascript'>refresh_info(4000, 'Starting " + request.server + " after authentication. ');ignore_cache = 1;</script>");
 			// }); 	 
 			break;
 
@@ -109,7 +109,7 @@ router.post('/', authorize.auth, function (req, res, next) {
 			// var child = sudo(['keactrl reload -s ' + svr_name], options);
 			// child.stdout.on('data', function (data) {
 			// 	console.log(data.toString());
-			res.send("<script type='text/javascript'>refresh_info(delay = 4000, message = 'Restarting " + request.server + " after authentication. '); $('#mdModal').modal('hide');</script > ");
+			res.send("<script type='text/javascript'>refresh_info(4000, 'Restarting " + request.server + " after authentication. '); $('#mdModal').modal('hide');</script > ");
 			// });
 			break;
 
