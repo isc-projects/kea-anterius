@@ -10,9 +10,7 @@ var dhcp_config = ace.edit("dhcp-config");
 dhcp_config.setTheme("ace/theme/terminal");
 dhcp_config.$blockScrolling = Infinity;
 
-var Range = ace.require('ace/range').Range;
 var config_copy = dhcp_config.session.doc.getAllLines();
-var markedList = [];
 
 function gen_dhcp_config(mode, svr_tag, sn_tag, nw_id, nw_type, nw_template, subnet_list) {
 
@@ -182,32 +180,7 @@ function upload_dhcp_config(svr_tag) {
 function file_highlight() {
 
 	/* Instantiate a temp test file and Copy to identify file changes*/
-	// console.log(dhcp_config === config_copy)
+	// console.log(dhcp_config)
+	// config_copy.forEach(line => { console.log(line) });
 	highlightEditedLineNumbers(dhcp_config, config_copy);
-}
-
-/* Method to highlight lines with changes in config params */
-function highlightEditedLineNumbers(editor, config_og) {
-	var lines = editor.session.doc.getAllLines();
-
-	/* Remove existing markers */
-	markedList.forEach(mid => {
-		dhcp_config.session.removeMarker(mid);
-	})
-
-	markedList = [];
-
-	for (var i = 0, l = lines.length; i < l; i++) {
-		var target_line = lines[i];
-
-		// TODO: Figure out way to highlight actual changes
-		/*Compare line and highlight */
-		if (!config_og.includes(target_line)) {
-			// editor.session.insert({ row: i }, target_line.replace('>>>', ''));
-			markedList.push(dhcp_config.session.addMarker(new Range(i, 0, i, 1), "editMarker", "fullLine"));
-		}
-
-	}
-	// console.log(markedList);
-
 }

@@ -17,7 +17,7 @@ router.get('/', authorize.auth, function (req, res, next) {
 	var content = template_render.get_template("dhcp_config");
 
 	// Display current config file from API config-get
-	content = template_render.set_template_variable(content, "dhcp_config_content", JSON.stringify(global.kea_config, null, 4));
+	content = template_render.set_template_variable(content, "dhcp_config_content", JSON.stringify(global.kea_config, null, '\t'));
 	content = template_render.set_template_variable(content, "title", global.anterius_config.current_server.toUpperCase().replace('P', 'Pv'));
 	content = template_render.set_template_variable(content, "svr_tag", global.anterius_config.current_server.toUpperCase().replace('P', 'Pv'));
 

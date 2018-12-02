@@ -57,4 +57,11 @@
         "aaSorting": [],
         "order": [[1, "desc"]]
     });
+
+    $('#dhcp-config').on('keypress keydown keyup', function () {
+        // console.log('**');
+        document.getElementById('update_btn').disabled = true;
+        document.getElementById('test_btn').disabled = false;
+        snap_highlight();
+    });
 </script>
