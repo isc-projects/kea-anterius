@@ -9,6 +9,7 @@ from selenium.webdriver.common.keys import Keys
 
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 import os
 import json
@@ -19,9 +20,20 @@ config_request_url = ""
 script_dir = os.path.dirname(__file__)
 
 
+def authenticate(browser):
+    wait = WebDriverWait(browser, 10)
+    wait.until(EC.alert_is_present())
+    alert = browser.switch_to_alert()
+    print(alert.text)
+    alert.send_keys('keaadmin')
+    alert.send_keys(Keys.TAB)
+    alert.send_keys('keaadmin')
+    alert.accept()
+
+
 def alert_settings(browser):
 
-    browser.get("http://localhost:3000/anterius_alerts")
+    browser.get("http://keaadmin:keaadmin@localhost:3000/anterius_alerts")
 
     # authenticate(browser)
 
@@ -46,15 +58,17 @@ def alert_settings(browser):
 
     # print(ant_config)
 
-    assert ant_config['shared_network_critical_threshold'] == "101" and ant_config[
-        'shared_network_warning_threshold'] == "101" and ant_config[
-            'leases_per_minute_threshold'] == "101", "Alert Settings update failed"
+    assert ant_config[
+        'shared_network_critical_threshold'] == "101" and ant_config[
+            'shared_network_warning_threshold'] == "101" and ant_config[
+                'leases_per_minute_threshold'] == "101", "Alert Settings update failed"
 
     browser.execute_script("arguments[0].value = '" + snc + "';", sn_critical)
     browser.execute_script("arguments[0].value = '" + snw + "';", sn_warn)
     browser.execute_script("arguments[0].value = '" + lpmth + "';", lpm_thresh)
 
     browser.execute_script("arguments[0].click();", save_btn)
+
 
 if __name__ == '__main__':
 
