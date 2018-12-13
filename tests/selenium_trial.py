@@ -30,6 +30,7 @@ def authenticate(browser):
     alert.send_keys('keaadmin')
     alert.accept()
 
+
 def get_ant_config():
 
     with open(os.path.join(script_dir, '../config/anterius_config.json')) as f:
@@ -47,6 +48,8 @@ def anterius_settings(browser):
     # authenticate(browser)
 
     # Switch server host check
+    print('\n>> Server Host Machine selection check')
+
     svr_host_select = browser.find_element_by_xpath(
         "//select[@name='svr-host-select']")
 
@@ -75,6 +78,31 @@ def anterius_settings(browser):
             svr_host_select = browser.find_element_by_xpath("//select[@name='svr-host-select']")
             svr_hosts = svr_host_select.find_elements_by_tag_name("option")
 
+    # Switch default server (v4/v6) check
+    print('\n>> Default server (v4/v6) switch check')
+
+    print("`` Attempting Option: DHCPv4", end="")
+    # svrselect = browser.find_element_by_id("dhcp4")
+    # svrselect.click()
+
+    browser.execute_script("document.getElementById('dhcp4').click()")
+    ant_config = get_ant_config()
+
+    assert ant_config['current_server'] == "dhcp4", "FAIL: v4 Server select"
+
+    print(" > SUCCESS")
+
+    time.sleep(1)
+
+    print("`` Attempting Option: DHCPv6", end='')
+    # svrselect = browser.find_element_by_id("dhcp6")
+    # svrselect.click()
+    browser.execute_script("document.getElementById('dhcp6').click()")
+    ant_config = get_ant_config()
+
+    assert ant_config['current_server'] == "dhcp6", "FAIL: v6 Server select"
+
+    print(" > SUCCESS")
 
 def alert_settings(browser):
 
