@@ -104,6 +104,56 @@ def anterius_settings(browser):
 
     print(" > SUCCESS")
 
+    time.sleep(2)
+
+    print('\n>> ADD/DEL Kea server host machine check')
+
+    # Add server host
+    # svr_add_btn = browser.find_element_by_id("svr-add-btn")
+    # svr_add_btn.click()
+    browser.execute_script("document.getElementById('svr-add-btn').click()")
+
+    ant_config = get_ant_config()
+    add_svr_host_form = browser.find_element_by_xpath(
+        "//form[@id='anterius-settings-form']")
+    sh_count = len(ant_config['server_host_list'])
+
+    ip = browser.find_element_by_id('hostname')
+    ip.send_keys("Trial Server")
+
+    ip = browser.find_element_by_id('svr_addr')
+    ip.send_keys("localhost")
+
+    ip = browser.find_element_by_id('svr_port')
+    ip.send_keys("8010")
+
+    print("`` Attempting addition: Trial Server [localhost:8010]", end="")
+
+    browser.execute_script("document.getElementById('sb"+str(sh_count)+"').click()")
+
+    # Verify trial server entry is added to config file
+    time.sleep(1)
+    ant_config = get_ant_config()
+
+    new_svr_host = ant_config['server_host_list'][sh_count]
+
+    assert new_svr_host['hostname'] == "Trial Server" and new_svr_host['svr_addr'] == "localhost" and new_svr_host['svr_port'] == "8010", "FAIL: Server host addition"
+
+    print(" > SUCCESS")
+
+    # Delete server host entry
+    browser.execute_script("document.getElementById('db"+str(sh_count-1)+"').click()")
+
+    # Verify trial server entry is deleted from config file
+    time.sleep(1)
+    ant_config = get_ant_config()
+    print("`` Attempting deletion: Trial Server [localhost:8010]", end='')
+
+    assert len(ant_config['server_host_list']) == sh_count, "FAIL: Server Host entry deletion"
+
+    print(" > SUCCESS")
+
+
 def alert_settings(browser):
 
     browser.get("http://keaadmin:keaadmin@localhost:3000/anterius_alerts")
