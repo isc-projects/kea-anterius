@@ -46,6 +46,7 @@ def anterius_settings(browser):
     browser.get("http://keaadmin:keaadmin@localhost:3000/anterius_settings")
 
     # authenticate(browser)
+    print('\n === Anterius Settings Test === ')
 
     # Switch server host check
     print('\n>> Server Host Machine selection check')
@@ -77,6 +78,8 @@ def anterius_settings(browser):
 
             svr_host_select = browser.find_element_by_xpath("//select[@name='svr-host-select']")
             svr_hosts = svr_host_select.find_elements_by_tag_name("option")
+
+    time.sleep(1)
 
     # Switch default server (v4/v6) check
     print('\n>> Default server (v4/v6) switch check')
@@ -153,12 +156,54 @@ def anterius_settings(browser):
 
     print(" > SUCCESS")
 
+    print('\n>> Anterius Credentials/interval checks', end='')
+
+    stat_refr_int = browser.find_element_by_id("stat_refr_int")
+    admin_username = browser.find_element_by_id("admin_user")
+    admin_password = browser.find_element_by_id("admin_password")
+    save_btn = browser.find_element_by_id("ant-set-btn")
+
+    sfr = stat_refr_int.get_attribute("value")
+    au = admin_username.get_attribute("value")
+    ap = admin_password.get_attribute("value")
+
+    stat_refr_int.clear()
+    admin_username.clear()
+    admin_password.clear()
+
+    stat_refr_int.send_keys("101")
+    admin_username.send_keys("101")
+    admin_password.send_keys("101")
+
+    browser.execute_script("arguments[0].click();", save_btn)
+    # save_btn.click()
+
+    ant_config = get_ant_config()
+
+    assert ant_config['stat_refresh_interval'] == "101" and ant_config[
+        'admin_user'] == "101" and ant_config[
+            'admin_password'] == "101", "FAIL: Anterius Settings Update"
+
+    browser.execute_script("arguments[0].value = '" + sfr + "';",
+                           stat_refr_int)
+    browser.execute_script("arguments[0].value = '" + au + "';",
+                           admin_username)
+    browser.execute_script("arguments[0].value = '" + ap + "';",
+                           admin_password)
+
+    browser.execute_script("arguments[0].click();", save_btn)
+
+    print('> SUCCESS')
+
 
 def alert_settings(browser):
+
+    print('\n === Anterius Alert Settings Test === ')
 
     browser.get("http://keaadmin:keaadmin@localhost:3000/anterius_alerts")
 
     # authenticate(browser)
+    print('\n>> Alert Settings updation checks', end='')
 
     sn_critical = browser.find_element_by_id(
         "shared_network_critical_threshold")
@@ -194,7 +239,7 @@ def alert_settings(browser):
 
     browser.execute_script("arguments[0].click();", save_btn)
 
-    print('\n PASS: Anterius Alert Settings')
+    print(" > SUCCESS")
 
 
 if __name__ == '__main__':
@@ -202,5 +247,5 @@ if __name__ == '__main__':
     browser = webdriver.Chrome(
         'D:\Software\chromedriver_win32\chromedriver.exe')
 
-    # alert_settings(browser)
     anterius_settings(browser)
+    alert_settings(browser)
