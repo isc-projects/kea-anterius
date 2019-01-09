@@ -59,6 +59,7 @@ router.post('/', authorize.auth, function (req, res, next) {
 
     } catch (err) {
         console.error(err);
+        res.send({ "message": err });
     }
 
 

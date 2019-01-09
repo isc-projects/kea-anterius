@@ -1,26 +1,32 @@
 {
   "server_addr": "localhost",
-  "server_port": "8000",
+  "server_port": "8010",
   "stat_refresh_interval": "5",
   "admin_user": "keaadmin",
   "admin_password": "keaadmin",
-  "current_server": "dhcp4",
-  "current_host_index": 0,
+  "current_server": "dhcp6",
+  "current_host_index": "2",
   "server_host_list": [
     {
       "hostname": "Local Machine",
       "svr_addr": "localhost",
       "svr_port": "8000"
+    },
+    {
+      "hostname": "Trial",
+      "svr_addr": "localhost",
+      "svr_port": "8001"
+    },
+    {
+      "hostname": "Trial Server",
+      "svr_addr": "localhost",
+      "svr_port": "8010"
     }
   ],
   "leases_file": "/usr/local/var/kea/kea-leases4.csv",
   "log_file": "/usr/local/var/log/kea-dhcp4.log",
   "config_file": "/usr/local/etc/kea/kea-dhcp4.conf",
-  "shared_network_critical_threshold": "95",
-  "shared_network_warning_threshold": "0",
-  "leases_per_minute_threshold": "50",
-  "email_alert_to": "",
-  "sms_alert_to": "",
-  "slack_webhook_url": "",
-  "slack_alert_channel": ""
+  "shared_network_critical_threshold": "101",
+  "shared_network_warning_threshold": "101",
+  "leases_per_minute_threshold": "101"
 }

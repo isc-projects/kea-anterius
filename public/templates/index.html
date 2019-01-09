@@ -260,7 +260,6 @@
     <script src="assets/js/pjax.js"></script>
 
     <script type="text/javascript">
-        'use strict';
 
         var prevScrollpos = window.pageYOffset;
         var shared_nw_dtable, subnet_dtable;
@@ -311,13 +310,13 @@
         }, 3000);
 
         /* Refresh stats on window focus */
-        var window_focus = true;
+        /*var window_focus = true;
         $(window).focus(function () {
             window_focus = true;
             get_stats();
         }).blur(function () {
             window_focus = false;
-        });
+        }); */
 
         if (typeof $.fn.slimScroll != 'undefined') {
             var configs = $.AdminBSB.options.leftSideBar;

@@ -1,6 +1,7 @@
 /*
 © Anthrino > Express APP
 */
+
 'use strict';
 
 var express = require('express');
@@ -41,7 +42,7 @@ app.use('/dhcp_config_snapshot_view', require('./routes/dhcp_config_snapshot_vie
 app.use('/dhcp_config_update', require('./routes/dhcp_config_update'));
 app.use('/dhcp_boot_ops', require('./routes/dhcp_boot_ops'));
 app.use('/anterius_settings', require('./routes/anterius_settings'));
-app.use('/anterius_alerts', require('./routes/alerts_config'));
+app.use('/anterius_alerts', require('./routes/anterius_alert_settings'));
 app.use('/anterius_alert_settings_save', require('./routes/anterius_alert_settings_save'));
 app.use('/anterius_settings_save', require('./routes/anterius_settings_save'));
 
@@ -88,6 +89,7 @@ global.kea_server = {
     'leases_per_sec': 0,
     'leases_per_minute': 0,
     'server_active': 1,
+    'data_fetch': 0,
     'local_server': 0,
     'run_status': '',
     'subnet_list': [],
@@ -131,6 +133,7 @@ api_agent.fire_kea_api(stats_req_data, global.anterius_config.server_addr, globa
         global.kea_stats = api_data.arguments;
     else
         console.log("CA Error: " + api_data.text);
+
 }).catch(function () {
     global.kea_server.server_active = 0;
 });
@@ -142,6 +145,7 @@ api_agent.fire_kea_api(config_get_req_data, global.anterius_config.server_addr, 
         global.kea_config = api_data.arguments;
     else
         console.log("CA Error: " + api_data.text);
+
 }).catch(function () {
     global.kea_server.server_active = 0;
 });;
@@ -207,118 +211,121 @@ var lease_stats_monitor = function () {
     stats_req_data = JSON.stringify({ "command": "statistic-get-all", "service": [global.anterius_config.current_server] });
     config_get_req_data = JSON.stringify({ "command": "config-get", "service": [global.anterius_config.current_server] });
 
-    /* Fetch and set server config*/
-    var response_data = api_agent.fire_kea_api(config_get_req_data, global.anterius_config.server_addr, global.anterius_config.server_port).then(function (data) {
-        if (data.result == 0 && data.arguments != undefined) {
-            global.kea_config = data.arguments;
-            global.kea_server.subnet_list = [];
-            global.kea_server.server_config = global.kea_config;
+    return new Promise(function (resolve, reject) {
 
-            /* Set identifiers based on current server */
-            if (global.anterius_config.current_server == 'dhcp4') {
-                global.kea_server.svr_tag = 'Dhcp4';
-                global.kea_server.sn_tag = 'subnet4';
-                global.kea_server.addr_tag = 'addresses';
-            }
-            else {
-                global.kea_server.svr_tag = 'Dhcp6';
-                global.kea_server.sn_tag = 'subnet6';
-                global.kea_server.addr_tag = 'pds';
-            }
+        /* Fetch and set server config*/
+        var response_data = api_agent.fire_kea_api(config_get_req_data, global.anterius_config.server_addr, global.anterius_config.server_port).then(function (data) {
+            if (data.result == 0 && data.arguments != undefined) {
+                global.kea_config = data.arguments;
+                global.kea_server.subnet_list = [];
+                global.kea_server.server_config = global.kea_config;
 
-            // console.log(server,global.kea_server.server_config[global.kea_server.svr_tag], global.kea_server.sn_tag, global.kea_server.addr_tag);
-
-            /* Retrieve and store subnets defined within shared nw */
-            global.kea_server.server_config[global.kea_server.svr_tag]['shared-networks'].forEach(shnw => {
-                shnw[global.kea_server.sn_tag].forEach(x => {
-                    x['shared_nw_name'] = shnw.name;
-                    global.kea_server.subnet_list.push(x);
-                });
-            });
-
-            /* Retrieve and store subnets defined*/
-            global.kea_server.server_config[global.kea_server.svr_tag][global.kea_server.sn_tag].forEach(x => {
-                global.kea_server.subnet_list.push(x);
-            });
-
-            /* Subnet sorting by ID */
-            global.kea_server.subnet_list.sort(function (a, b) {
-                return parseInt(a.id) - parseInt(b.id);
-            });
-
-            global.kea_server.total_leases = 0;
-            var subnet_count = global.kea_server.subnet_list.length;
-            var shared_nw_count = global.kea_server.server_config[global.kea_server.svr_tag]['shared-networks'].length;
-
-            /* Fetch and set server stats*/
-            var response_data = api_agent.fire_kea_api(stats_req_data, global.anterius_config.server_addr, global.anterius_config.server_port).then(function (sdata) {
-                if (sdata.result == 0) {
-                    global.kea_stats = sdata.arguments;
-                    for (var i = 1; i <= subnet_count; i++) {
-                        global.kea_server.total_leases += global.kea_stats['subnet[' + i + '].assigned-' + global.kea_server.addr_tag][0][0];
-                    }
-
-                    /* Update metric - leases / sec  */
-                    if (lpm_counter > 0)
-                        global.kea_server.leases_per_sec = global.kea_server.total_leases - tl0;
-
-                    lps_list[lpm_counter] = global.kea_server.leases_per_sec;
-                    lpm_counter++;
-
-                    global.kea_server.leases_per_minute = 0;
-                    for (i = 0; i < 59; i++) {
-                        if (lps_list[i] > 0) {
-                            global.kea_server.leases_per_minute += lps_list[i];
-                            // console.log("iteration " + i + " val: " + lps_list[i] + " lpm: " + global.kea_server.leases_per_minute);
-                        }
-                        else {
-                            // console.log("no data " + i);
-                        }
-                    }
-
-                    if (lpm_counter == 60)
-                        lpm_counter = 0;
-
-                    tl0 = global.kea_server.total_leases
+                /* Set identifiers based on current server */
+                if (global.anterius_config.current_server == 'dhcp4') {
+                    global.kea_server.svr_tag = 'Dhcp4';
+                    global.kea_server.sn_tag = 'subnet4';
+                    global.kea_server.addr_tag = 'addresses';
                 }
                 else {
-                    console.log("CA Error: " + sdata.text);
-                    global.kea_server.server_active = 0;
+                    global.kea_server.svr_tag = 'Dhcp6';
+                    global.kea_server.sn_tag = 'subnet6';
+                    global.kea_server.addr_tag = 'pds';
                 }
-            }).catch(function (e) {
-                console.log('Error 1: ', e);
+
+                // console.log(server,global.kea_server.server_config[global.kea_server.svr_tag], global.kea_server.sn_tag, global.kea_server.addr_tag);
+
+                /* Retrieve and store subnets defined within shared nw */
+                global.kea_server.server_config[global.kea_server.svr_tag]['shared-networks'].forEach(shnw => {
+                    shnw[global.kea_server.sn_tag].forEach(x => {
+                        x['shared_nw_name'] = shnw.name;
+                        global.kea_server.subnet_list.push(x);
+                    });
+                });
+
+                /* Retrieve and store subnets defined*/
+                global.kea_server.server_config[global.kea_server.svr_tag][global.kea_server.sn_tag].forEach(x => {
+                    global.kea_server.subnet_list.push(x);
+                });
+
+                /* Subnet sorting by ID */
+                global.kea_server.subnet_list.sort(function (a, b) {
+                    return parseInt(a.id) - parseInt(b.id);
+                });
+
+                global.kea_server.total_leases = 0;
+                var subnet_count = global.kea_server.subnet_list.length;
+                var shared_nw_count = global.kea_server.server_config[global.kea_server.svr_tag]['shared-networks'].length;
+
+                /* Fetch and set server stats*/
+                var response_data = api_agent.fire_kea_api(stats_req_data, global.anterius_config.server_addr, global.anterius_config.server_port).then(function (sdata) {
+                    if (sdata.result == 0) {
+                        global.kea_stats = sdata.arguments;
+                        for (var i = 1; i <= subnet_count; i++) {
+                            global.kea_server.total_leases += global.kea_stats['subnet[' + i + '].assigned-' + global.kea_server.addr_tag][0][0];
+                        }
+
+                        /* Update metric - leases / sec  */
+                        if (lpm_counter > 0)
+                            global.kea_server.leases_per_sec = global.kea_server.total_leases - tl0;
+
+                        lps_list[lpm_counter] = global.kea_server.leases_per_sec;
+                        lpm_counter++;
+
+                        global.kea_server.leases_per_minute = 0;
+                        for (i = 0; i < 59; i++) {
+                            if (lps_list[i] > 0) {
+                                global.kea_server.leases_per_minute += lps_list[i];
+                                // console.log("iteration " + i + " val: " + lps_list[i] + " lpm: " + global.kea_server.leases_per_minute);
+                            }
+                            else {
+                                // console.log("no data " + i);
+                            }
+                        }
+
+                        if (lpm_counter == 60)
+                            lpm_counter = 0;
+
+                        tl0 = global.kea_server.total_leases
+                    }
+                    else {
+                        console.log("CA Error: " + sdata.text);
+                        global.kea_server.server_active = 0;
+                    }
+                }).catch(function (e) {
+                    console.log('Error 1: ', e);
+                    global.kea_server.server_active = 0;
+                });
+                // console.log(global.kea_stats, global.kea_config);
+            }
+            else {
+                console.log("CA Error: " + data.text);
                 global.kea_server.server_active = 0;
-            });
-            // console.log(global.kea_stats, global.kea_config);
-        }
-        else {
-            console.log("CA Error: " + data.text);
+            }
+        }).catch(function (e) {
+            console.log('Error 2: ', e);
             global.kea_server.server_active = 0;
-        }
-    }).catch(function (e) {
-        console.log('Error 2: ', e);
-        global.kea_server.server_active = 0;
+        });
+        resolve();
+        // console.log(global.kea_server.leases_per_minute, global.kea_server.leases_per_sec, global.kea_server.total_leases);
+
+        /* Websockets statistics subscription broadcast */
+        // if (ws_event_subscribers('dhcp_statistics')) {
+        //     return_data = {
+        //         "global.kea_server.cpu_utilization": global.kea_server.cpu_utilization,
+        //         "lps": global.kea_server.leases_per_sec,
+        //         "global.kea_server.leases_per_minute": global.kea_server.leases_per_minute
+        //     };
+        //     wss.broadcast_event(JSON.stringify(return_data), 'dhcp_statistics');
+        // }
     });
-
-    // console.log(global.kea_server.leases_per_minute, global.kea_server.leases_per_sec, global.kea_server.total_leases);
-
-    /* Websockets statistics subscription broadcast */
-    // if (ws_event_subscribers('dhcp_statistics')) {
-    //     return_data = {
-    //         "global.kea_server.cpu_utilization": global.kea_server.cpu_utilization,
-    //         "lps": global.kea_server.leases_per_sec,
-    //         "global.kea_server.leases_per_minute": global.kea_server.leases_per_minute
-    //     };
-    //     wss.broadcast_event(JSON.stringify(return_data), 'dhcp_statistics');
-    // }
-
 };
 
 /* Call and export stats function */
 lease_stats_monitor();
+exports.reload = lease_stats_monitor;
+
 setInterval(lease_stats_monitor, global.anterius_config.stat_refresh_interval * 1000);
 // clearInterval(lease_stats_monitor);
-exports.reload = lease_stats_monitor;
 
 /**
  * Clean Expired Leases

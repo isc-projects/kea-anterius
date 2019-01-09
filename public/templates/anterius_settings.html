@@ -14,7 +14,7 @@
                             <div class="header">
                                 <h2>
                                     Kea Server Host Machine Configurations
-                                    <button style="float: right; margin-top:-1%; margin-right:1%;" type="button" class="btn btn-info waves-effect ant-btn" onclick="add_server_host([svr_hosts_len])">
+                                    <button style="float: right; margin-top:-1%; margin-right:1%;" id="svr-add-btn" type="button" class="btn btn-info waves-effect ant-btn" onclick="add_server_host([svr_hosts_len])">
                                         <i class="material-icons">add</i>
                                     </button>
                                 </h2>
@@ -41,7 +41,7 @@
                     </div>
                 </div>
                 <div class="row" align="center">
-                    <button type="button" class="btn btn-info waves-effect ant-btn" onclick="save_config()">
+                    <button type="button" class="btn btn-info waves-effect ant-btn" id="ant-set-btn" onclick="save_config()">
                         <i class="material-icons">settings</i>
                         <span>Save Anteris Settings</span>
                     </button>
@@ -78,9 +78,9 @@
             '<td><input type="input" name="hostname" id="hostname" placeholder="Enter server hostname" class="form-control"/></td>' +
             '<td><input type="input" name="svr_addr" id="svr_addr" placeholder="Enter Host IP address" class="form-control"/></td>' +
             '<td><input type="input" name="svr_port" id="svr_port" placeholder="Enter Host machine port" class="form-control"/></td>' +
-            '<td><button type="button" class="btn waves-effect" id="b' + index + '" onclick="save_server_host(\'' + index + '\')">' +
+            '<td><button type="button" class="btn waves-effect" id="sb' + index + '" onclick="save_server_host(\'' + index + '\')">' +
             '<i class="material-icons">save</i></button>' +
-            '<button type="button" style="margin-left: 1%" class="btn waves-effect" id="b' + index + '" onclick="delete_server_host(\'' + index + '\')">' +
+            '<button type="button" style="margin-left: 1%" class="btn waves-effect" id="db' + index + '" onclick="delete_server_host(\'' + index + '\')">' +
             '<i class="material-icons">delete</i></button></td></tr>';
 
         server_hosts_table.rows.add($(table_row)).draw(); // Add new datax
