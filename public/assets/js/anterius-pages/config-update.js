@@ -2,15 +2,15 @@
 © Anthrino > DHCP config update handler
 */
 
+'use strict';
+
 $('#dhcp-config').height($(window).height() * 0.6);
 
 var dhcp_config = ace.edit("dhcp-config");
 dhcp_config.setTheme("ace/theme/terminal");
 dhcp_config.$blockScrolling = Infinity;
 
-var Range = ace.require('ace/range').Range;
 var config_copy = dhcp_config.session.doc.getAllLines();
-var markedList = [];
 
 function gen_dhcp_config(mode, svr_tag, sn_tag, nw_id, nw_type, nw_template, subnet_list) {
 
@@ -18,13 +18,13 @@ function gen_dhcp_config(mode, svr_tag, sn_tag, nw_id, nw_type, nw_template, sub
 	// dhcp_config_form_data = get_form_query_string("dhcp_config_form");
 	// dhcp_config_form_data += "&nw_entity=" + nw_entity + "&nw_type=" + nw_type;
 
-	configformData = $("#config-form").serializeArray();
+	var configformData = $("#config-form").serializeArray();
 	// console.log(configformData)
 
 	/* Instantiate a temp test file and Copy to identify file changes*/
 	config_copy = dhcp_config.session.doc.getAllLines();
 	// console.log(dhcp_config.getValue())
-	test_config_file = JSON.parse(dhcp_config.getValue());
+	var test_config_file = JSON.parse(dhcp_config.getValue());
 
 	// console.log(test_config_file[svr_tag][sn_tag][0]);
 	// console.log(subnet_list);
@@ -44,10 +44,10 @@ function gen_dhcp_config(mode, svr_tag, sn_tag, nw_id, nw_type, nw_template, sub
 	else {
 		if (nw_type == 'reservations') {
 
-			hr_addr = nw_id.split(':')[0];
-			subnet_id = nw_id.split(':')[1];
+			var hr_addr = nw_id.split(':')[0];
+			var subnet_id = nw_id.split(':')[1];
 
-			target_sn_list = [];
+			var target_sn_list = [];
 
 			/* Check if subnet lies under shared nw */
 			if (subnet_list[subnet_id - 1].shared_nw_name)
@@ -86,17 +86,17 @@ function gen_dhcp_config(mode, svr_tag, sn_tag, nw_id, nw_type, nw_template, sub
 			});
 		} else {
 
-			target_sn_list = test_config_file[svr_tag][nw_type];
+			var target_sn_list = test_config_file[svr_tag][nw_type];
 
 			if (nw_type == 'shared-networks')
-				x = 'name';
+				var x = 'name';
 			else {
 				if (subnet_list[nw_id - 1].shared_nw_name)
 					test_config_file[svr_tag]['shared-networks'].forEach(shnw => {
 						if (shnw.name == subnet_list[nw_id - 1].shared_nw_name)
 							target_sn_list = shnw[sn_tag];
 					});
-				x = 'id';
+				var x = 'id';
 			}
 			// console.log(target_sn_list);
 
@@ -141,7 +141,7 @@ function gen_dhcp_config(mode, svr_tag, sn_tag, nw_id, nw_type, nw_template, sub
 
 function test_dhcp_config() {
 	// Fetch changed config file data as query string for verification
-	params = "mode=test&affirm=true&dhcp_config_file=" + encodeURIComponent(dhcp_config.getValue());
+	var params = "mode=test&affirm=true&dhcp_config_file=" + encodeURIComponent(dhcp_config.getValue());
 
 	$.post("/dhcp_config_update", params, function (data) {
 		// console.log(data.message);
@@ -149,13 +149,20 @@ function test_dhcp_config() {
 			notification(data.message, 'bg-green', 3000);
 			document.getElementById('update_btn').disabled = false;
 		} else
-			notification(data.message, 'bg-red', 3000);
+			notification("Config error : " + data.message, 'bg-red', 3000);
 	});
 }
 
 function upload_dhcp_config(svr_tag) {
 	// Push updated config file data as query string to  
 	var affirm = confirm("Confirm: Apply changed config to " + svr_tag + " server?");
+
+	var params = "mode=save&dhcp_config_file=" + encodeURIComponent(dhcp_config.getValue());
+
+	$.post("/dhcp_config_snapshots", params, function (data) {
+		notification(data.message, 'bg-black', 3000);
+	});
+
 	params = "mode=update&affirm=" + affirm + "&dhcp_config_file=" + encodeURIComponent(dhcp_config.getValue());
 
 	$.post("/dhcp_config_update", params, function (data) {
@@ -165,7 +172,7 @@ function upload_dhcp_config(svr_tag) {
 			document.getElementById('update_btn').disabled = true;
 			document.getElementById('test_btn').disabled = true;
 		} else
-			notification(data.message, 'bg-red', 3000);
+			notification("Error applying config : " + data.message, 'bg-red', 3000);
 	});
 }
 
@@ -173,27 +180,7 @@ function upload_dhcp_config(svr_tag) {
 function file_highlight() {
 
 	/* Instantiate a temp test file and Copy to identify file changes*/
+	// console.log(dhcp_config)
+	// config_copy.forEach(line => { console.log(line) });
 	highlightEditedLineNumbers(dhcp_config, config_copy);
-}
-
-/* Method to highlight lines with changes in config params */
-function highlightEditedLineNumbers(editor, config_og) {
-	var lines = editor.session.doc.getAllLines();
-	markedList.forEach(mid => {
-		dhcp_config.session.removeMarker(mid);
-	})
-
-	markedList = [];
-	// console.log(markedList);
-
-	for (var i = 0, l = lines.length; i < l; i++) {
-		target_line = lines[i];
-
-		// TODO: Figure out way to highlight actual changes
-		if (!config_copy.includes(target_line)) {
-			// editor.session.insert({ row: i }, target_line.replace('>>>', ''));
-			markedList.push(dhcp_config.session.addMarker(new Range(i, 0, i, 1), "editMarker", "fullLine"));
-		}
-
-	}
 }

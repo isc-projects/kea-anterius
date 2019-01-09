@@ -1,3 +1,9 @@
+/*
+© Anthrino > DHCP Config View and stats renderer
+*/
+
+'use strict';
+
 var express = require('express');
 var router = express.Router();
 var fs = require('fs');
@@ -8,26 +14,30 @@ var json_file = require('jsonfile');
 router.get('/', authorize.auth, function (req, res, next) {
 
 	// var json_file = require('jsonfile');
-	content = template_render.get_template("dhcp_config");
+	var content = template_render.get_template("dhcp_config");
 
 	// Display current config file from API config-get
-	content = template_render.set_template_variable(content, "dhcp_config_content", JSON.stringify(global.kea_config, null, 4));
+	content = template_render.set_template_variable(content, "dhcp_config_content", JSON.stringify(global.kea_config, null, '\t'));
 	content = template_render.set_template_variable(content, "title", global.anterius_config.current_server.toUpperCase().replace('P', 'Pv'));
+	content = template_render.set_template_variable(content, "svr_tag", global.anterius_config.current_server.toUpperCase().replace('P', 'Pv'));
 
-	var nw_id, nw_template = '', nw_type = req.query.network;
+	var nw_id, nw_template = '', nw_type = req.query.network, input = '';
 	if (req.query.id)
 		nw_id = req.query.id;
 	else
 		nw_id = -1;
 
+	/* Config form option to add/edit */
 	if (nw_type) {
 
 		if (req.query.mode == 'edit') {
+
+			/* Edit Host reservations */
 			if (nw_type == 'reservations') {
 
 				var nw_entity;
-				hr_addr = req.query.id.split(':')[0];
-				subnet_id = req.query.id.split(':')[1];
+				var hr_addr = req.query.id.split(':')[0];
+				var subnet_id = req.query.id.split(':')[1];
 				global.kea_server.subnet_list.forEach(s => {
 					if (s.id == subnet_id) {
 						// pools = s.pools;
@@ -50,7 +60,7 @@ router.get('/', authorize.auth, function (req, res, next) {
 				input = input + template_render.form_input('Next Server', '<input type="text" class="form-control" name="next-server" id="next-server" placeholder="Enter next server address" value="' + nw_entity['next-server'] + '">');
 			}
 			else {
-
+				/* Edit Subnet */
 				var nw_entity;
 				if (nw_type == global.kea_server.sn_tag) {
 
@@ -66,6 +76,7 @@ router.get('/', authorize.auth, function (req, res, next) {
 					content = template_render.set_template_variable(content, "edit_title", "Subnet ID : " + nw_entity.id + " [ <a href='/nw_detail_info?type=" + global.kea_server.sn_tag + "&id=" + nw_entity.id + "'>" + nw_entity.subnet + "</a> ] Configuration options");
 					input = template_render.form_input('Subnet', '<input type="text" class="form-control" name="subnet" id="subnet" placeholder="Enter address/netmask" value="' + nw_entity.subnet + '">');
 				}
+				/* Edit Shared NW */
 				else {
 
 					global.kea_server.server_config[global.kea_server.svr_tag]['shared-networks'].forEach(s => {
@@ -90,17 +101,17 @@ router.get('/', authorize.auth, function (req, res, next) {
 				input += template_render.form_input('Relay IP Address', '<input type="text" class="form-control" name="relay_ip-addresses" id="relay_ipaddr" placeholder="Enter relay address" value="' + nw_entity.relay['ip-address'] + '">');
 			}
 		} else {
-
+			/* Subnet/Shared NW creation option */
 			if (nw_type == 'subnet')
 				nw_template = json_file.readFileSync('public/config_templates/subnet' + global.kea_server.svr_tag.replace('Dhcp', '') + '.json');
 			else
 				nw_template = json_file.readFileSync('public/config_templates/sharednw' + global.kea_server.svr_tag.replace('Dhcp', '') + '.json');
 
-			// console.log(nw_template);
+			console.log(nw_template);
 			content = template_render.set_template_variable(content, "edit_title", nw_type.toUpperCase() + " Creation options: " + global.kea_server.svr_tag + " Server");
-			input = '', buffer = '';
+			var buffer = '';
 
-			for (param in nw_template) {
+			for (var param in nw_template) {
 				// console.log(nw_template[param]);
 				if (typeof (nw_template[param]) === 'boolean')
 					buffer += '<div class="form-group"><input type="checkbox" class="form-check-input checkbox pull-right" name="' + param + '" id="' + param + '"><label for="' + param + '">' + param + '</label></div>';
@@ -118,7 +129,8 @@ router.get('/', authorize.auth, function (req, res, next) {
 		input += '<div class="row" align="center"><button id="gen_btn" type="button" class="btn btn-info waves-effect ant-btn" style="margin-bottom: 2%; width: 25%;" onclick=\'gen_dhcp_config("'
 			+ req.query.mode + '","' + global.kea_server.svr_tag + '","' + global.kea_server.sn_tag + '","' + nw_id + '","' + nw_type + '",' + JSON.stringify(nw_template) + ',' + JSON.stringify(global.kea_server.subnet_list) + ')\'><i class="material-icons">settings</i> <span>Write ' + req.query.mode + ' changes to Test file</span></button></div>';
 
-		form_data = template_render.form_body("config-form", input);
+		// console.log(input);
+		var form_data = template_render.form_body("config-form", input);
 
 		content = template_render.set_template_variable(content, "config_form", form_data);
 		content = template_render.set_template_variable(content, "form_focus", "active", 1);
@@ -126,9 +138,10 @@ router.get('/', authorize.auth, function (req, res, next) {
 		content = template_render.set_template_variable(content, "form_selected", "true", 1);
 		content = template_render.set_template_variable(content, "file_selected", "false", 1);
 	}
+
+	/* Config File editor option */
 	else {
 		// console.log(req.query);
-
 		content = template_render.set_template_variable(content, "file_focus", "active", 1);
 		content = template_render.set_template_variable(content, "form_focus", "disabled disabledTab", 1);
 		content = template_render.set_template_variable(content, "file_selected", "true", 1);

@@ -1,3 +1,9 @@
+/*
+© Anthrino > Anterius Alerts Settings Manager
+*/
+
+'use strict';
+
 var express = require('express');
 var router = express.Router();
 var fs = require('fs');
@@ -6,12 +12,12 @@ var authorize = require('../lib/authorize.js');
 
 router.get('/', authorize.auth, function (req, res, next) {
 
-	anterius_settings_template = template_render.get_template("alerts_editor");
+	var anterius_settings_template = template_render.get_template("anterius_alerts_settings");
 
 	var json_file = require('jsonfile');
 
 	/* Shared Network Alert Threshold (Critical) */
-	input = template_render.form_input('Shared Network Alert Threshold % (Critical)', '<input type="input" class="form-control" name="shared_network_critical_threshold" id="shared_network_critical_threshold" placeholder="95%" value="' + global.anterius_config.shared_network_critical_threshold + '">');
+	var input = template_render.form_input('Shared Network Alert Threshold % (Critical)', '<input type="input" class="form-control" name="shared_network_critical_threshold" id="shared_network_critical_threshold" placeholder="95%" value="' + global.anterius_config.shared_network_critical_threshold + '">');
 
 	/* Shared Network Alert Threshold (Warning) */
 	input = input + template_render.form_input('Shared Network Alert Threshold % (Warning)', '<input type="input" class="form-control" name="shared_network_warning_threshold" id="shared_network_warning_threshold" placeholder="80" value="' + global.anterius_config.shared_network_warning_threshold + '">');
@@ -21,7 +27,7 @@ router.get('/', authorize.auth, function (req, res, next) {
 
 	// <div name="" id="anterius_settings_result"></div>
 
-	form_data = template_render.form_body("anterius-alerts-form", input);
+	var form_data = template_render.form_body("anterius-alerts-form", input);
 
 	anterius_settings_template = template_render.set_template_variable(anterius_settings_template, "c_content", form_data);
 

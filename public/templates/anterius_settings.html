@@ -52,7 +52,8 @@
     </div>
 </div>
 <script type="text/javascript">
-    
+    'use strict';
+
     $(document).ready(function () {
         $(this).scrollTop(0);
     });
@@ -73,7 +74,7 @@
     /* Method to add a server host */
     function add_server_host(index) {
 
-        table_row = '<tr>' +
+        var table_row = '<tr>' +
             // '<td><input type="radio" name="svrhost" id="r' + index + '" value="' + index + '" class="with-gap"/></td>'+
             '<td><input type="input" name="hostname" id="hostname" placeholder="Enter server hostname" class="form-control"/></td>' +
             '<td><input type="input" name="svr_addr" id="svr_addr" placeholder="Enter Host IP address" class="form-control"/></td>' +
@@ -85,7 +86,4 @@
 
         server_hosts_table.rows.add($(table_row)).draw(); // Add new datax
     }
-
-
-
 </script>

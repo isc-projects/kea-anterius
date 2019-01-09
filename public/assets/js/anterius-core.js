@@ -13,12 +13,15 @@ var loader_html = '<div class="preloader"> \
     </div> \
     </div>';
 
+var Range = ace.require('ace/range').Range;
+var markedList = [];
+
 /*
  * On initial document load events
  */
 
 $(document).ready(function () {
-    
+
     remove_init_form();
 
     /* Remove 'active' class from 'li' items */
@@ -50,7 +53,7 @@ $(document).ready(function () {
  */
 
 $(document).on('on_pjax_click', function (e, href) {
-    
+
     $('li.active').removeClass("active");
     href.parent('li').addClass("active");
 
@@ -63,7 +66,7 @@ $(document).on('on_pjax_click', function (e, href) {
  * When a sidebar item is clicked in mobile - let's make sure we push the sidebar back in
  */
 $(document).on('on_pjax_complete', function (e) {
-    
+
     if ($('.ls-closed').length > 0) {
         $('body').removeClass('overlay-open');
         $('.overlay').css("display", "none");
@@ -107,7 +110,7 @@ $(document).on('on_pjax_complete', function (e) {
 });
 
 function handle_websocket_subscription_navigation() {
-    
+
     console.log(window.location.pathname);
 
     /* Stream dashboard stats */
@@ -120,15 +123,15 @@ function handle_websocket_subscription_navigation() {
 }
 
 function remove_init_form() {
-    
+
     setTimeout(function () {
         $('.form-line').removeClass("focused");
     }, 10);
 }
 
 function modal(title, content, buttons) {
-    
-    
+
+
     // console.log(title, buttons);
     $('#modal-buttons').html('');
     $('#modal-title').html(title);
@@ -143,7 +146,7 @@ function modal(title, content, buttons) {
 
 /* Method to generate  query string from html form fields */
 function get_form_query_string(form_id) {
-    
+
 
     query_string = "";
     $('#' + form_id).find('input, select, textarea').each(function (key) {
@@ -166,7 +169,7 @@ function get_form_query_string(form_id) {
 
 /* Toggle show/hide feature for side nav menu */
 function navtoggle() {
-    
+
 
     side_nav = document.getElementById("leftsidebar");
     logo = document.getElementById("logo");
@@ -212,7 +215,7 @@ function navtoggle() {
 
 /* Reload page on refresh_stats user request  */
 function refresh_info(delay = 0, message = 'Reloading..', source = window.location.href) {
-    
+
 
     setTimeout(function () {
         console.log(source);
@@ -230,7 +233,7 @@ function refresh_info(delay = 0, message = 'Reloading..', source = window.locati
 
 /* Identify and forward add / edit requests for dhcp nw entities */
 function edit_params(mode) {
-    
+
 
     source = window.location.href;
     console.log(mode);
@@ -246,7 +249,7 @@ function edit_params(mode) {
 
 /* Forward and notify settings update request */
 function save_config() {
-    
+
 
     anterius_settings = get_form_query_string("anterius-settings-form");
     $.post("/anterius_settings_save", anterius_settings, function (data) {
@@ -259,7 +262,7 @@ var $hostname, $addr, $port;
 
 /* Method to Replace server host values with input fields */
 function edit_server_host(index) {
-    
+
 
     $hostname = $('<input type="input" name="hostname" id="hostname" class="form-control"/>').val($('#h' + index).text());
     $addr = $('<input type="input" name="svr_addr" id="svr_addr" class="form-control"/>').val($('#a' + index).text());
@@ -276,7 +279,7 @@ function edit_server_host(index) {
 
 /* Method to save server host input field values */
 function save_server_host(index) {
-    
+
 
     $hostname = $('#hostname');
     $addr = $('#svr_addr');
@@ -285,7 +288,7 @@ function save_server_host(index) {
     svr_host = "index=" + index + "&hostname=" + $hostname.val() + "&addr=" + $addr.val() + "&port=" + $port.val();
 
     $.post("/anterius_settings_save", svr_host, function (data) {
-        refresh_info(delay = 750, message = data);
+        refresh_info(750, data);
     });
 
     var $h = $('<p data-editable id="h' + index + '"/>').text($hostname.val());
@@ -302,17 +305,17 @@ function save_server_host(index) {
 }
 /* Method to delete server host entry */
 function delete_server_host(index) {
-    
+
     svr_host = "index=" + index + "&delete=true";
 
     $.post("/anterius_settings_save", svr_host, function (data) {
-        refresh_info(delay = 750, message = data);
+        refresh_info(750, data);
     });
 }
 
 /* Forward and notify current server host and server type change requests */
 function select_server(mode, index = 0) {
-    
+
 
     if (mode == 'host') {
         svrselect = 'mode=current_host_index&svrselect=' + index;
@@ -331,7 +334,7 @@ function select_server(mode, index = 0) {
 
 /* Custom notification generator */
 function notification(text, colorName = 'bg-black', delay = 2000, url = '#') {
-    
+
 
     animateEnter = 'animated fadeInDown';
     animateExit = 'animated fadeOutUp';
@@ -366,8 +369,35 @@ function notification(text, colorName = 'bg-black', delay = 2000, url = '#') {
         });
 }
 
+/* Method to highlight lines with changes in config params */
+function highlightEditedLineNumbers(editor, config_og) {
+    var lines = editor.session.doc.getAllLines();
+
+    /* Remove existing markers */
+    markedList.forEach(mid => {
+        editor.session.removeMarker(mid);
+    })
+
+    markedList = [];
+
+    for (var i = 0, l = lines.length; i < l; i++) {
+        var target_line = lines[i];
+
+        // TODO: Figure out way to highlight actual changes
+        /*Compare line and highlight */
+        if (!config_og.includes(target_line)) {
+            // editor.session.insert({ row: i }, target_line.replace('>>>', ''));
+            // console.log(i);
+            var new_mark = editor.session.addMarker(new Range(i, 0, i, 1), "editMarker", "fullLine")
+            markedList.push(new_mark);
+        }
+
+    }
+    // console.log(markedList);
+}
+
 $(document).on("click", ".option_data", function () {
-    
+
     var lease = $(this).attr("lease");
     if ($("#" + lease).is(":visible")) {
         $("#" + lease).hide();
@@ -379,7 +409,7 @@ $(document).on("click", ".option_data", function () {
 });
 
 $(document).on("keypress", "#lease_search_criteria", function (e) {
-    
+
     if (e.which == 13) {
         $('#search_result').html(loader_html);
         $.post("/dhcp_lease_search", { search: $("#lease_search_criteria").val() }, function (result) {

@@ -35,9 +35,10 @@
     [save_button]
 </div>
 <script type="text/javascript">
+    'use strict';
     function save_alarm_settings() {
-        
-        anterius_alert_settings = get_form_query_string("alerts_config");
+    
+        var anterius_alert_settings = get_form_query_string("alerts_config");
 
         $.post("/anterius_alert_settings_save", anterius_alert_settings, function (data) {
             $("#anterius_alerts_result").html(data);

@@ -7,10 +7,12 @@
     <div class="body">
         <ul class="nav nav-tabs nav-justified" role="tablist" id="config-tab">
             <li class="nav-item [form_focus]">
-                <a class="nav-link" data-toggle="tab" role="tab" aria-controls="fields" aria-selected="[form_selected]" href="#fields">Config Parameters Form Editor</a>
+                <a class="nav-link" data-toggle="tab" role="tab" aria-controls="fields" aria-selected="[form_selected]"
+                    href="#fields">Config Parameters Form Editor</a>
             </li>
             <li class="nav-item [file_focus]">
-                <a class="nav-link" data-toggle="tab" role="tab" aria-controls="file" aria-selected="[file_selected]" href="#file">Config File Editor</a>
+                <a class="nav-link" data-toggle="tab" role="tab" aria-controls="file" aria-selected="[file_selected]"
+                    href="#file">Config File Editor</a>
             </li>
         </ul>
         <div class="tab-content" style="margin-bottom: -5%;">
@@ -32,7 +34,7 @@
                         <button type="button" id="save_snap_btn" class="btn btn-info waves-effect ant-btn" style="margin-bottom: 2%; width: 25%;"
                             onclick="save_config_snapshot()">
                             <i class="material-icons">save</i>
-                            <span>Save Config</span>
+                            <span>Save Config Snapshot</span>
                         </button>
                     </div>
 
@@ -49,12 +51,14 @@
         </div>
         <hr>
         <div class="row" align="center">
-            <button id="test_btn" type="button" class="btn btn-info waves-effect ant-btn" style="margin-bottom: 2%; width: 20%;" onclick="test_dhcp_config()">
+            <button id="test_btn" type="button" class="btn btn-info waves-effect ant-btn" style="margin-bottom: 2%; width: 20%;"
+                onclick="test_dhcp_config()">
                 <i class="material-icons">system_update_alt</i>
                 <span>Test Config</span>
             </button>
             <span style="margin-left:5%; margin-right:5%"></span>
-            <button id="update_btn" type="button" class="btn btn-info waves-effect ant-btn" style="margin-bottom: 2%;  width: 20%;" onclick="upload_dhcp_config()">
+            <button id="update_btn" type="button" class="btn btn-info waves-effect ant-btn" style="margin-bottom: 2%;  width: 20%;"
+                onclick="upload_dhcp_config('[svr_tag]')">
                 <i class="material-icons">system_update_alt</i>
                 <span>Update Config</span>
             </button>
@@ -62,14 +66,27 @@
     </div>
 
 </div>
+
+<script src="assets/js/ace_editor/ace.js" type="text/javascript" charset="utf-8"></script>
+<script src="assets/js/ace_editor/theme-terminal.js" type="text/javascript" charset="utf-8"></script>
+<script src="assets/js/anterius-pages/config-update.js" type="text/javascript" charset="utf-8"></script>
+<script src="assets/js/anterius-pages/config-snapshots.js" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript">
-    
+
+    'use strict';
+
     /* OnReady - Scroll to top, initialize buttons */
     $(window).load(function () {
         $(this).scrollTop(0);
         $("#gen_btn").attr("disabled", "disabled");
         $("#update_btn").attr("disabled", "disabled");
         $("#test_btn").attr("disabled", "disabled");
+
+        $('#dhcp-config').on('keypress keydown keyup', function () {
+            document.getElementById('test_btn').disabled = false;
+            document.getElementById('update_btn').disabled = true;
+            file_highlight();
+        });
     });
 
     $('#config-tab a').on('click', function (e) {
@@ -85,14 +102,4 @@
         $("#test_btn").attr("disabled", "disabled");
     });
 
-    $('#dhcp-config').on('keypress keydown keyup', function () {
-        document.getElementById('test_btn').disabled = false;
-        document.getElementById('update_btn').disabled = true;
-        file_highlight();
-    });
-
 </script>
-<script src="assets/js/ace_editor/ace.js" type="text/javascript" charset="utf-8"></script>
-<script src="assets/js/ace_editor/theme-terminal.js" type="text/javascript" charset="utf-8"></script>
-<script src="assets/js/anterius-pages/config-update.js" type="text/javascript" charset="utf-8"></script>
-<script src="assets/js/anterius-pages/config-snapshots.js" type="text/javascript" charset="utf-8"></script>
