@@ -323,6 +323,13 @@
             if (window.location.pathname == '/' && refresh_flag)
                 get_stats();
         });
+        /*var window_focus = true;
+        $(window).focus(function () {
+            window_focus = true;
+            get_stats();
+        }).blur(function () {
+            window_focus = false;
+        }); */
 
         if (typeof $.fn.slimScroll != 'undefined') {
             var configs = $.AdminBSB.options.leftSideBar;

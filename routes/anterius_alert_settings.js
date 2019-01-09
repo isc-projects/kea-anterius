@@ -58,7 +58,7 @@ router.get('/', authorize.auth, function (req, res, next) {
 	anterius_settings_template = template_render.set_template_variable(
 		anterius_settings_template,
 		"save_button",
-		'<button type="button" class="btn btn-info waves-effect ant-btn" onclick="save_alarm_settings()"><i class="material-icons">add_alert</i> <span>Save Alert Settings</span></button>'
+		'<button type="button" id="alert-set-btn" class="btn btn-info waves-effect ant-btn" onclick="save_alarm_settings()"><i class="material-icons">add_alert</i> <span>Save Alert Settings</span></button>'
 	);
 
 	res.send(template_render.get_index_template(anterius_settings_template, req.url));

@@ -72,3 +72,17 @@ body {
 [type="radio"]:checked+label::after, [type="radio"].with-gap:checked+label::before, [type="radio"].with-gap:checked+label::after {
   border: 2px solid rgb(2, 79, 8) !important;
 }
+
+.info-box .content .text {
+  margin-top: 5px !important;
+}
+
+@media all and (max-width: 1600px) and (min-width: 1000px){
+  .hide_col {
+      display: none;
+      width: 0;
+      height: 0;
+      opacity: 0;
+      visibility: collapse;
+  }
+}
