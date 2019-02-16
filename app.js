@@ -86,7 +86,11 @@ global.kea_server = {
     'server_config': {}, 'svr_tag': '', 'sn_tag': '', 'addr_tag': '',
     'cpu_utilization': 0,
     'total_leases': 0,
+    'leases_per_sec_date': null,
+    'leases_per_sec_total': 0,
     'leases_per_sec': 0,
+    'leases_per_minute_date': null,
+    'leases_per_minute_total': 0,
     'leases_per_minute': 0,
     'server_active': 1,
     'data_fetch': 0,
@@ -177,44 +181,36 @@ if (fs.existsSync(oui_database_file)) {
     });
 }
 
-/* Leases per minute calculator */
-var lps_list = [0];
-var lpm_counter = 0;
-var tl0 = 0;
+var hostMonitorInterval = null;
+var leaseStatsMonitorInterval = null;
 
-/* LPM Reset */
-setInterval(function () {
-    global.kea_server.leases_per_minute = 0;
-    // console.log(global.kea_server.leases_per_minute)
-}, 60000);
+var host_monitor = function () {
+
+    return new Promise(function (resolve, reject) {
+    
+        if (global.anterius_config.server_addr == 'localhost' || global.anterius_config.server_addr == '127.0.0.1') {
+            global.kea_server.local_server = 1;
+            
+            host_name = execSync("cat /etc/hostname").toString().replace("\n", "");
+            
+            global.kea_server.run_status = execSync("keactrl status").toString();
+            global.kea_server.cpu_utilization = parseFloat(execSync("top -bn 1 | awk 'NR>7{s+=$9} END {print s/4}'").toString())
+        }
+        
+        resolve();
+    });
+}
 
 /* * Recurrent Loop for lease stats * */
 var lease_stats_monitor = function () {
 
-    /* Fetch running status at set refresh interval*/
-    // TODO: Mechanism to retrieve following attibutes from remote machine
-    // console.log(global.kea_server.server_active)
-
-    if (global.anterius_config.server_addr == 'localhost' || global.anterius_config.server_addr == '127.0.0.1') {
-        global.kea_server.local_server = 1;
-        host_name = execSync("cat /etc/hostname").toString().replace("\n", "");
-        global.kea_server.run_status = execSync("keactrl status").toString();
-
-        /* Poll: CPU Utilization */
-        cpu_utilization_poll = setInterval(function () {
-            global.kea_server.cpu_utilization = parseFloat(execSync("top -bn 1 | awk 'NR>7{s+=$9} END {print s/4}'").toString())
-        }, (15 * 1000));
-    } else
-        global.kea_server.local_server = 0;
-
-    /* Kea CA REST API call - config-get and statistics-get */
     stats_req_data = JSON.stringify({ "command": "statistic-get-all", "service": [global.anterius_config.current_server] });
     config_get_req_data = JSON.stringify({ "command": "config-get", "service": [global.anterius_config.current_server] });
 
     return new Promise(function (resolve, reject) {
-
-        /* Fetch and set server config*/
+    
         var response_data = api_agent.fire_kea_api(config_get_req_data, global.anterius_config.server_addr, global.anterius_config.server_port).then(function (data) {
+        
             if (data.result == 0 && data.arguments != undefined) {
                 global.kea_config = data.arguments;
                 global.kea_server.subnet_list = [];
@@ -251,53 +247,7 @@ var lease_stats_monitor = function () {
                 global.kea_server.subnet_list.sort(function (a, b) {
                     return parseInt(a.id) - parseInt(b.id);
                 });
-
-                global.kea_server.total_leases = 0;
-                var subnet_count = global.kea_server.subnet_list.length;
-                var shared_nw_count = global.kea_server.server_config[global.kea_server.svr_tag]['shared-networks'].length;
-
-                /* Fetch and set server stats*/
-                var response_data = api_agent.fire_kea_api(stats_req_data, global.anterius_config.server_addr, global.anterius_config.server_port).then(function (sdata) {
-                    if (sdata.result == 0) {
-                        global.kea_stats = sdata.arguments;
-                        for (var i = 1; i <= subnet_count; i++) {
-                            global.kea_server.total_leases += global.kea_stats['subnet[' + i + '].assigned-' + global.kea_server.addr_tag][0][0];
-                        }
-
-                        /* Update metric - leases / sec  */
-                        if (lpm_counter > 0)
-                            global.kea_server.leases_per_sec = global.kea_server.total_leases - tl0;
-
-                        lps_list[lpm_counter] = global.kea_server.leases_per_sec;
-                        lpm_counter++;
-
-                        global.kea_server.leases_per_minute = 0;
-                        for (i = 0; i < 59; i++) {
-                            if (lps_list[i] > 0) {
-                                global.kea_server.leases_per_minute += lps_list[i];
-                                // console.log("iteration " + i + " val: " + lps_list[i] + " lpm: " + global.kea_server.leases_per_minute);
-                            }
-                            else {
-                                // console.log("no data " + i);
-                            }
-                        }
-
-                        if (lpm_counter == 60)
-                            lpm_counter = 0;
-
-                        tl0 = global.kea_server.total_leases
-                    }
-                    else {
-                        console.log("CA Error: " + sdata.text);
-                        global.kea_server.server_active = 0;
-                    }
-                }).catch(function (e) {
-                    console.log('Error 1: ', e);
-                    global.kea_server.server_active = 0;
-                });
-                // console.log(global.kea_stats, global.kea_config);
-            }
-            else {
+            } else {
                 console.log("CA Error: " + data.text);
                 global.kea_server.server_active = 0;
             }
@@ -305,27 +255,96 @@ var lease_stats_monitor = function () {
             console.log('Error 2: ', e);
             global.kea_server.server_active = 0;
         });
-        resolve();
-        // console.log(global.kea_server.leases_per_minute, global.kea_server.leases_per_sec, global.kea_server.total_leases);
+        
+        /* Fetch and set server stats*/
+        var response_data = api_agent.fire_kea_api(stats_req_data, global.anterius_config.server_addr, global.anterius_config.server_port).then(function (sdata) {
+        
+            if (sdata.result == 0) {
+            
+                global.kea_server.total_leases = 0;
+                
+                var subnet_count = global.kea_server.subnet_list.length;
+                var shared_nw_count = global.kea_server.server_config[global.kea_server.svr_tag]['shared-networks'].length;
+                
+                global.kea_stats = sdata.arguments;
+                for (var i = 1; i <= subnet_count; i++) {
+                    global.kea_server.total_leases += global.kea_stats['subnet[' + i + '].assigned-' + global.kea_server.addr_tag][0][0];
+                }
+                        
+                var now = new Date();
+                        
+                if (global.kea_server.leases_per_sec_date !== null) {
+                
+                    var leaseDifference = global.kea_server.total_leases - global.kea_server.leases_per_sec_total;
+                    
+                    global.kea_server.leases_per_sec_total = global.kea_server.total_leases;
+                            
+                    if (leaseDifference > 0) {
+                    
+                        var timeDifference = (now.getTime() - global.kea_server.leases_per_sec_date.getTime()) / 1000;
+                            
+                        global.kea_server.leases_per_sec = Math.round(leaseDifference / timeDifference);
+                        
+                        if (global.kea_server.leases_per_sec > global.kea_server.total_leases) {
+                            global.kea_server.leases_per_sec = global.kea_server.total_leases;
+                        }
+                    } else {
+                        global.kea_server.leases_per_sec = 0;
+                    }
+                }
+                        
+                global.kea_server.leases_per_sec_date = new Date();
+                        
+                if (global.kea_server.leases_per_minute_date !== null) {
+                
+                    var timeDifference = (now.getTime() - global.kea_server.leases_per_minute_date.getTime()) / 1000;
+                    
+                    if (timeDifference >= 60) {
+                        var leaseDifference = global.kea_server.total_leases - global.kea_server.leases_per_minute_total;
+                    
+                        global.kea_server.leases_per_minute = Math.round(leaseDifference * 60 / timeDifference);
+                        
+                        if (global.kea_server.leases_per_minute < 0) {
+                            global.kea_server.leases_per_minute = 0;
+                        } else if (global.kea_server.leases_per_minute > global.kea_server.total_leases) {
+                            global.kea_server.leases_per_minute = global.kea_server.total_leases;
+                        }                        
+                    
+                        global.kea_server.leases_per_minute_total = global.kea_server.total_leases;
 
-        /* Websockets statistics subscription broadcast */
-        // if (ws_event_subscribers('dhcp_statistics')) {
-        //     return_data = {
-        //         "global.kea_server.cpu_utilization": global.kea_server.cpu_utilization,
-        //         "lps": global.kea_server.leases_per_sec,
-        //         "global.kea_server.leases_per_minute": global.kea_server.leases_per_minute
-        //     };
-        //     wss.broadcast_event(JSON.stringify(return_data), 'dhcp_statistics');
-        // }
+                        global.kea_server.leases_per_minute_date = new Date();
+                    }
+                } else {
+                    global.kea_server.leases_per_minute_date = new Date();
+                }
+                
+            } else {
+                console.log("CA Error: " + sdata.text);
+                global.kea_server.server_active = 0;
+            }
+                
+            }).catch(function (e) {
+                console.log('Error 1: ', e);
+                global.kea_server.server_active = 0;
+            });       
+        
+        resolve();
     });
 };
 
 /* Call and export stats function */
 lease_stats_monitor();
-exports.reload = lease_stats_monitor;
 
-setInterval(lease_stats_monitor, global.anterius_config.stat_refresh_interval * 1000);
-// clearInterval(lease_stats_monitor);
+// dummy
+function reload() {
+    return new Promise(function (resolve, reject) {
+        resolve();
+    });
+    
+    return;
+}
+
+exports.reload = reload;
 
 /**
  * Clean Expired Leases
@@ -345,6 +364,9 @@ setInterval(lease_stats_monitor, global.anterius_config.stat_refresh_interval * 
 
 /* Watch Anterius settings file changes and reload */
 fs.watch('config/anterius_config.json', function (event, filename) {
+
+    lease_stats_monitor();
+    
     if (filename) {
         setTimeout(function () {
             json_file.readFile('config/anterius_config.json', function (err, data) {
@@ -438,9 +460,83 @@ tail_dhcp_log.on("line", function (data) {
 // }, 3600 * 1000);
 /* 60 Minutes */
 
-wss.on('connection', function connection(ws) {
-    socket_clients++;
-    console.log("[WS] CLIENT_CONNECT: Socket clients (" + socket_clients + ")");
+function closeClientConnection(ws) {
+
+        if (ws.keepAliveInterval != undefined) {
+            clearInterval(ws.keepAliveInterval);
+        }
+    
+        try {
+            ws.terminate();
+        } catch (e) {console.log(e)}
+        
+        var count = 0;
+        wss.clients.forEach(function each(client) {
+            if (client.readyState === WebSocket.OPEN) {
+                count++;
+            }
+        });
+        
+        if (count === 0) {
+            if (leaseStatsMonitorInterval !== null) {
+                clearInterval(leaseStatsMonitorInterval);
+                leaseStatsMonitorInterval = null;
+            }
+            if (hostMonitorInterval !== null) {
+                clearInterval(hostMonitorInterval);
+                hostMonitorInterval = null;
+            }
+        }
+
+        console.log("[WS] close connection (" + ws.id + ")");
+}
+
+wss.on('connection', function connection(ws, req) {
+
+    if (leaseStatsMonitorInterval === null) {
+
+        lease_stats_monitor();
+
+        leaseStatsMonitorInterval = setInterval(lease_stats_monitor, global.anterius_config.stat_refresh_interval * 1000);
+    }
+    
+    if (hostMonitorInterval === null) {
+    
+        host_monitor();
+
+        hostMonitorInterval = setInterval(host_monitor, global.anterius_config.stat_refresh_interval * 1000);
+    }
+
+    ws.id = req.headers['sec-websocket-key'];
+    
+    console.log("[WS] open connection (" + ws.id + ")");
+    
+    ws.keepAliveInterval = setInterval(function(ws) {
+    
+        if (ws.readyState === WebSocket.OPEN) {
+            
+            ws.ping('noop');
+            
+            ws.keepAliveTimeout = setTimeout(function(ws) {
+                closeClientConnection(ws);
+            }, 2 * 1000, ws);
+            
+            console.log("[WS] ping from (" + ws.id + ")");
+        } else {
+            closeClientConnection(ws);
+        }
+        
+    }, 10 * 1000, ws);
+    
+    ws.on('close', function() {
+        closeClientConnection(this);
+    });
+    
+    
+    ws.on('pong',function() {
+        console.log("[WS] received pong from (" + this.id + ")"); 
+        clearTimeout(ws.keepAliveTimeout);
+    });
 
     if (!listening_to_log_file) {
         /* Watch log file for new information */
@@ -448,17 +544,27 @@ wss.on('connection', function connection(ws) {
 
         listening_to_log_file = 1;
     }
-
+    
+    ws.event_subscription = [];
+    ws.on('message', function incoming(data) {
+    
+        if (data != "" && isJson(data)) {
+            var json = JSON.parse(data);
+            if (typeof json["event_subscription"] !== "undefined") {
+                console.log("[WS] Incoming Subscription '%s'", json['event_subscription']);
+                ws.event_subscription[json["event_subscription"]] = 1;
+            }
+            if (typeof json["event_unsubscribe"] !== "undefined") {
+                console.log("[WS] event_unsubscribe '%s'", json['event_unsubscribe']);
+                delete ws.event_subscription[json["event_unsubscribe"]];
+            }
+            if (typeof json["all_events"] !== "undefined") {
+                console.log("[WS] event_unsubscribe '%s'", json['event_unsubscribe']);
+                ws.event_subscription = [];
+            }
+        }
+    });    
 });
-
-wss.on('close', function close() {
-    socket_clients--;
-    console.log("[WS] CLIENT_DISCONNECT: Socket clients (" + socket_clients + ")");
-});
-
-function heartbeat() {
-    this.isAlive = true;
-}
 
 function isJson(str) {
     try {
@@ -494,31 +600,6 @@ function ws_event_subscribers(event) {
     return false;
 }
 
-wss.on('connection', function connection(ws) {
-    ws.isAlive = true;
-    ws.on('pong', heartbeat);
-    ws.event_subscription = [];
-    ws.on('message', function incoming(data) {
-        if (data != "" && isJson(data)) {
-            var json = JSON.parse(data);
-            if (typeof json["event_subscription"] !== "undefined") {
-                console.log("[WS] Incoming Subscription '%s'", json['event_subscription']);
-                ws.event_subscription[json["event_subscription"]] = 1;
-            }
-            if (typeof json["event_unsubscribe"] !== "undefined") {
-                console.log("[WS] event_unsubscribe '%s'", json['event_unsubscribe']);
-                delete ws.event_subscription[json["event_unsubscribe"]];
-            }
-            if (typeof json["all_events"] !== "undefined") {
-                console.log("[WS] event_unsubscribe '%s'", json['event_unsubscribe']);
-                ws.event_subscription = [];
-            }
-        }
-    });
-
-    stale_connections_audit();
-});
-
 wss.broadcast = function broadcast(data) {
     wss.clients.forEach(function each(client) {
         if (client.readyState === WebSocket.OPEN) {
@@ -535,28 +616,6 @@ wss.broadcast_event = function broadcast(data, event) {
         }
     });
 };
-
-function stale_connections_audit() {
-    socket_clients = 0;
-    wss.clients.forEach(function each(ws) {
-        if (ws.isAlive === false) return ws.terminate();
-
-        ws.isAlive = false;
-        ws.ping('', false, true);
-
-        socket_clients++;
-    });
-
-    console.log("[WS] STATUS: Socket clients (" + socket_clients + ")");
-}
-
-/* Keepalive - kill stale connections (30s poll) */
-const interval = setInterval(function ping() {
-    stale_connections_audit();
-}, 30000);
-
-var socket_clients = 0;
-
 
 /**
  * Slack Hooks
