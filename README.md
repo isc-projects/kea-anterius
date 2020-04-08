@@ -1,6 +1,10 @@
 [![npm](https://img.shields.io/npm/v/npm.svg)]()
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
 
+## NOTE
+This is an archive of a project that is no longer updated. There are known security vulnerabilities in Anterius. 
+You may want to take a look at [Stork](https://gitlab.isc.org/isc-projects/stork), which is under heavy development by ISC.
+
 # kea-anterius
 - The Anterius project is developed as part of the [Google Summer of Code '18](https://summerofcode.withgoogle.com) program, with the objective to create a GUI dashboard for the Kea DHCP server that provides monitoring and configuration capabilities to users. 
 
