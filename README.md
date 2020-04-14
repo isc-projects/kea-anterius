@@ -3,7 +3,7 @@
 
 ## NOTE
 This is an archive of a project that is no longer updated. There are known security vulnerabilities in Anterius. 
-You may want to take a look at [Stork](https://gitlab.isc.org/isc-projects/stork), which is under heavy development by ISC.
+You may want to take a look at [Stork](https://github.com/isc-projects/stork), which is under heavy development by ISC.
 
 # kea-anterius
 - The Anterius project is developed as part of the [Google Summer of Code '18](https://summerofcode.withgoogle.com) program, with the objective to create a GUI dashboard for the Kea DHCP server that provides monitoring and configuration capabilities to users. 
